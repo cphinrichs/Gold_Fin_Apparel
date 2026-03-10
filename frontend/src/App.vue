@@ -1,14 +1,9 @@
 <template>
-  <div class="container">
-    <h1>Hello from Vue + TypeScript</h1>
-    <p>This is a basic website setup.</p>
-  </div>
+  <Home />
 </template>
 
-<script lang="ts">
-export default {
-  name: "App",
-};
+<script lang="ts" setup>
+import Home from "./Views/HomeView.vue";
 </script>
 
 <style>
