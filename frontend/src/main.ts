@@ -1,2 +1,4 @@
-// This file will serve as the entry point for our Vue application,
-// initializing the app and mounting it to the DOM.
+import { createApp } from "vue";
+import App from "./App.vue";
+
+createApp(App).mount("#app");

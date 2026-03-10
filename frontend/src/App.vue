@@ -1,5 +1,19 @@
-<!-- 
-This file will act as the main entry point for our Vue application. 
-It will contain the main layout and structure of our app, 
-and we will use it to include our components and manage the overall state of the application. 
--->
+<template>
+  <div class="container">
+    <h1>Hello from Vue + TypeScript</h1>
+    <p>This is a basic website setup.</p>
+  </div>
+</template>
+
+<script lang="ts">
+export default {
+  name: "App",
+};
+</script>
+
+<style>
+.container {
+  font-family: Arial, sans-serif;
+  padding: 2rem;
+}
+</style>
