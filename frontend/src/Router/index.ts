@@ -35,6 +35,26 @@ const router = createRouter({
       path: '/inspect',
       name: 'Inspect',
       component: () => import('../Views/InspectView.vue')
+    },
+    {
+      path: '/tops',
+      name: 'Tops',
+      component: () => import('../ProductViewPages/TopsView.vue')
+    },
+    {
+      path: '/hats',
+      name: 'Hats',
+      component: () => import('../ProductViewPages/HatsView.vue')
+    },
+    {
+      path: '/socks',
+      name: 'Socks',
+      component: () => import('../ProductViewPages/SocksView.vue')
+    },
+    {
+      path: '/accessories',
+      name: 'Accessories',
+      component: () => import('../ProductViewPages/AccessoriesView.vue')
     }
 
   ],
