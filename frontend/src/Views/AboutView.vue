@@ -5,7 +5,6 @@ import About from '../Components/About.vue';
 </script>
 
 <template>
-    <TaskBar />
     <div class="about"> 
         <About />
     </div>
