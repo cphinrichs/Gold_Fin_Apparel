@@ -4,7 +4,7 @@ providing navigation links and quick access to key features.
 -->
 <template>
   <nav class="taskbar">
-    <h1 class="logo">GOLDFIN</h1>
+    <a href="/"><h1 class="logo">GOLDFIN</h1></a>
     <ul>
       <li><a href="/">Home</a></li>
       <li><a href="/products">Products</a></li>
@@ -24,6 +24,10 @@ providing navigation links and quick access to key features.
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
 }
 
 .logo {

@@ -4,13 +4,13 @@
   <section class="product-list">
     <ul>
       <li class="product-item">
-        <img src="../Assets/Designer(5).png" alt="Product Image">
+        <a href="/inspect"><img src="../Assets/Designer(5).png" alt="Product Image"></a>
       </li>
       <li class="product-item">
-        <img src="../Assets/Designer(5).png" alt="Product Image">
+        <a href="/inspect"><img src="../Assets/Designer(5).png" alt="Product Image"></a>
       </li>
       <li class="product-item">
-        <img src="../Assets/Designer(5).png" alt="Product Image">
+        <a href="/inspect"><img src="../Assets/Designer(5).png" alt="Product Image"></a>
       </li>
     </ul>
   </section>
