@@ -1,5 +1,4 @@
 <template>
-  <TaskBar />
   <section class="home">
     <h1>GoldFin Apparel</h1>
     <p>Welcome to our store!</p>
