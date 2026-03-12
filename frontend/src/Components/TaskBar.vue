@@ -10,7 +10,6 @@ providing navigation links and quick access to key features.
       <li>
         <a href="/browse">Browse</a>
         <ul class="dropdown">
-          <li><a href="/all">All Products</a></li>
           <li><a href="/tops">Tops</a></li>
           <li><a href="/hats">Hats</a></li>
           <li><a href="/socks">Socks</a></li>
@@ -79,14 +78,12 @@ providing navigation links and quick access to key features.
     radial-gradient(circle at 20% 50%, #FFD700 0%, #FFD700 20%, transparent 50%),
     radial-gradient(circle at 60% 30%, #FFD700 0%, #FFD700 20%, transparent 50%),
     radial-gradient(circle at 80% 70%, #FFD700 0%, #FFD700 20%, transparent 50%),
-    radial-gradient(circle at 40% 80%, #FFD700 0%, #FFD700 20%, transparent 50%),
-    linear-gradient(135deg, #1a1a1a, #000);
+    radial-gradient(circle at 40% 80%, #FFD700 0%, #FFD700 20%, transparent 50%);
   background-size: 100% 100%;
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 
-    3px 3px 5px rgba(0, 0, 0, 0.9),
     1px 1px 0px rgba(0, 0, 0, 0.5);
 }
 
