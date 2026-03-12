@@ -4,7 +4,7 @@ import json
 
 from enum import Enum
 from inspect import getframeinfo, stack
-from src.config.settings import Settings
+from config.settings import Settings
 
 
 class Level(Enum):
@@ -63,8 +63,8 @@ class _Logger(object):
         # FRAME INFO USED TO DISPLAY WHERE IN CODE LOG COMES FROM
         caller = getframeinfo(stack()[1][0]) # The path in the project where the call came from
         path = pathlib.PurePath(caller.filename)
-        parts = path.parts # Split filepath into list of directories
-        packageName = "/".join(parts[-2:-1].reverse())
+        parts = list(path.parts) # Split filepath into list of directories
+        packageName = "/".join(parts[-2:])
         output = "{}/{}/{}:{} - {}".format(packageName, path.stem, caller.function, caller.lineno, msg)
         
 
