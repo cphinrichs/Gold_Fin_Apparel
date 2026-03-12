@@ -6,6 +6,7 @@ enter shipping and payment information, delete and complete their purchase.
 import CheckOutButton from './Buttons/CheckOutButton.vue';
 import DeleteFromCartButton from './Buttons/DeleteFromCartButton.vue';
 import QuantityModifierButton from './Buttons/QuantityModifierButton.vue';
+import BrowseButton from './Buttons/BrowseButton.vue';
 </script>
 
 <template>
@@ -16,7 +17,10 @@ import QuantityModifierButton from './Buttons/QuantityModifierButton.vue';
                 <QuantityModifierButton />
             </div>  -->
         </div>
-        <div class="checkout-footer">
+        <div class="browse-footer">
+            <BrowseButton />
+        </div>
+        <div class="checkout-browse-footer">
             <CheckOutButton />
         </div>
     </section>
@@ -42,7 +46,7 @@ import QuantityModifierButton from './Buttons/QuantityModifierButton.vue';
   margin: 30px 0;
 }
 
-.checkout-footer {
+.checkout-browse-footer {
   position: fixed;
   bottom: 20px;
   left: 20px;

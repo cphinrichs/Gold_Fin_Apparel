@@ -1,24 +1,25 @@
-<!--
-Users will press this button to complete their order and be taken to the order confirmation page.
+<!-- 
+Browse button will be in the Cart Page and be used to navigate back to browse products page. It will be a simple button with a link to the browse page.
 -->
 
 <template>
-  <button class="complete-order-btn" @click="handleCompleteOrder">
-    <span class="btn-icon">✓</span>
-    <span class="btn-text">Complete Order</span>
+  <button class="browse-btn" @click="navigateToBrowse">
+    <span class="btn-text">Browse</span>
   </button>
 </template>
 
 <script setup lang="ts">
-const handleCompleteOrder = () => {
-  // Complete order logic here
-  console.log('Order completed');
-  window.location.href = '/orderconfirmation';
-};
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const navigateToBrowse = () => {
+  router.push({ name: 'Browse' })
+}
 </script>
 
 <style scoped>
-.complete-order-btn {
+.browse-btn {
   background: transparent;
   border: 2px solid #333;
   padding: 12px 28px;
@@ -34,14 +35,14 @@ const handleCompleteOrder = () => {
   text-transform: uppercase;
 }
 
-.complete-order-btn:hover {
+.browse-btn:hover {
   background-color: #333;
   color: #fff;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.complete-order-btn:active {
+.browse-btn:active {
   transform: translateY(0);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
@@ -55,3 +56,4 @@ const handleCompleteOrder = () => {
   letter-spacing: 0.05em;
 }
 </style>
+
