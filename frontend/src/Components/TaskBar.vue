@@ -19,7 +19,7 @@ providing navigation links and quick access to key features.
       <li><a href="/about">About</a></li>
       <li><a href="/help">Help</a></li>
     </ul>
-    <a href="/checkout" class="cart-button">
+    <a href="/cart" class="cart-button">
       <svg class="cart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
         <circle cx="9" cy="21" r="1"></circle>
         <circle cx="20" cy="21" r="1"></circle>

@@ -1,18 +1,24 @@
+<!--
+Users will press this button to complete their order and be taken to the order confirmation page.
+-->
+
 <template>
-  <button class="checkout-btn" @click="handleCheckout">
+  <button class="complete-order-btn" @click="handleCompleteOrder">
     <span class="btn-icon">✓</span>
-    <span class="btn-text">Checkout</span>
+    <span class="btn-text">Complete Order</span>
   </button>
 </template>
 
 <script setup lang="ts">
-const handleCheckout = () => {
-  window.location.href = '/checkout';
+const handleCompleteOrder = () => {
+  // Complete order logic here
+  console.log('Order completed');
+  // window.location.href = '/order-confirmation';
 };
 </script>
 
 <style scoped>
-.checkout-btn {
+.complete-order-btn {
   background: transparent;
   border: 2px solid #333;
   padding: 12px 28px;
@@ -28,14 +34,14 @@ const handleCheckout = () => {
   text-transform: uppercase;
 }
 
-.checkout-btn:hover {
+.complete-order-btn:hover {
   background-color: #333;
   color: #fff;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.checkout-btn:active {
+.complete-order-btn:active {
   transform: translateY(0);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
