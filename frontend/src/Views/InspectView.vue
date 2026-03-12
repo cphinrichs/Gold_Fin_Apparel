@@ -44,7 +44,7 @@
                     <div class="size-options">
                         <button class ="size-btn" v-for="(size, index) in productData.sizes" :key="index">{{ size }}</button>
                     </div>
-                    <router-link :to="{ name: 'Help' }" class="size-guide">Size Guide</router-link>
+                    <router-link :to="{ name: 'SizeCharts' }" class="size-guide">Size Guide</router-link>
                 </div>
             </div>
             

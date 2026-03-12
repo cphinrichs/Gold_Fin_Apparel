@@ -37,6 +37,26 @@ const router = createRouter({
       component: () => import('../Views/HelpView.vue')
     },
     {
+      path: '/contactus',
+      name: 'ContactUs',
+      component: () => import('../Views/ContactUsView.vue')
+    },
+    {
+      path: '/returnpolicy',
+      name: 'ReturnPolicy',
+      component: () => import('../Views/ReturnPolicyView.vue')
+    },
+    {
+      path: '/shippinginformation',
+      name: 'ShippingInformation',
+      component: () => import('../Views/ShippingInformationView.vue')
+    },
+    {
+      path: '/sizecharts',
+      name: 'SizeCharts',
+      component: () => import('../Views/SizeChartsView.vue')
+    },
+    {
       path: '/inspect',
       name: 'Inspect',
       component: () => import('../Views/InspectView.vue')

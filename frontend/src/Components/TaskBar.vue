@@ -17,7 +17,15 @@ providing navigation links and quick access to key features.
         </ul>
       </li>
       <li><a href="/about">About</a></li>
-      <li><a href="/help">Help</a></li>
+      <li>
+        <a href="/help">Help</a>
+        <ul class="dropdown">
+          <li><a href="/contactus">Contact Us</a></li>
+          <li><a href="/returnpolicy">Return Policy</a></li>
+          <li><a href="/shippinginformation">Shipping Information</a></li>
+          <li><a href="/sizecharts">Size Charts</a></li>
+        </ul>
+      </li>
     </ul>
     <a href="/cart" class="cart-button">
       <svg class="cart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -101,12 +109,17 @@ providing navigation links and quick access to key features.
   border-radius: 4px;
   padding: 0.5rem 0;
   min-width: 150px;
-  display: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
   z-index: 1001;
 }
 
 .taskbar li:hover > .dropdown {
-  display: block;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
 }
 
 .dropdown li {
