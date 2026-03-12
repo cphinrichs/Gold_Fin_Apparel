@@ -9,7 +9,7 @@ class Settings(object):
     
     @staticmethod
     def logger_config_file() -> str:
-        file_name = "logger.json"
+        file_name = "logger_config.json"
         return os.path.join(Settings.dir_name, file_name)
 
     # @staticmethod

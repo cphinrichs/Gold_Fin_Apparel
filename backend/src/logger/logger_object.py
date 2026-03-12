@@ -64,8 +64,9 @@ class _Logger(object):
         caller = getframeinfo(stack()[1][0]) # The path in the project where the call came from
         path = pathlib.PurePath(caller.filename)
         parts = list(path.parts) # Split filepath into list of directories
-        packageName = "/".join(parts[-2:])
-        output = "{}/{}/{}:{} - {}".format(packageName, path.stem, caller.function, caller.lineno, msg)
+        # print(parts[-2:])
+        packageName = "/".join(parts[-3:])
+        output = "{}:{} - {}".format(packageName, caller.lineno, msg)
         
 
         if level == Level.DEBUG.name:
