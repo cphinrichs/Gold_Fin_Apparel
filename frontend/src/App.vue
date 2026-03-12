@@ -5,13 +5,19 @@ import TaskBar from "./Components/TaskBar.vue";
 
 <template>
   <TaskBar />
-  <RouterView />
+  <div class="main-content">
+    <RouterView />
+  </div>
   <footer class="container">
     <p>&copy; 2026 GoldFin Apparel. All rights reserved.</p>
   </footer>
 </template>
 
 <style>
+.main-content {
+  margin-top: 80px; 
+  min-height: calc(100vh - 80px - 60px);
+}
 .container {
   font-family: Arial, sans-serif;
 }
