@@ -21,6 +21,7 @@ def hello():
 def getInventory():
     log.log(Level.DEBUG, "Request to get inventory received. Processing...")
     query_fields = dict(request.headers)
+    # query_fields = {"Size": "M "}
     log.log(Level.DEBUG, "Request processed. Querying database...")
     query_results = db.select_inventory(query_fields)
     
@@ -30,8 +31,23 @@ def getInventory():
 
 @app.get("/designs")
 def getDesigns():
-    abort(418)
+    log.log(Level.DEBUG, "Request to get designs received. Processing...")
+    query_fields = dict(request.headers)
+    # query_fields = {"Size": "M"}
+    log.log(Level.DEBUG, "Request processed. Querying database...")
+    query_results = db.select_designs(query_fields)
+    
+    log.log(Level.DEBUG, "Database queried successfully. Returning results...")
+    return query_results
 
 @app.post("/order")
 def postOrder():
+    query_fields = request.json
+
+    # TODO: validate the request and return a 400 status code if it's not valid
+    
+    # TODO: call the DAO using the request dict
+
+    # TODO: return a 200 status code if successful
+
     abort(418)

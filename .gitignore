@@ -1,5 +1,3 @@
 .venv
-./root.log
-./security.log
-root.log
-root.log
+**/*.log
+/*.log

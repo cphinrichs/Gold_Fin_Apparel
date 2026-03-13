@@ -32,7 +32,7 @@ class _Db2DAO:
                 self.creds = json.load(file)
         
             self.conn_str = (
-                f"DATABASE={self.creds["database"]};"
+                f"DATABASE={self.creds["db_instance"]};"
                 f"HOSTNAME={self.creds["host"]};"
                 f"PORT={self.creds["port"]};"
                 f"PROTOCOL={self.creds["protocol"]};"
@@ -53,28 +53,38 @@ class _Db2DAO:
             log.log(Level.CRITICAL, e.args[0])
 
     def create_order(self, order_data: dict):
+        # TODO: check if customer is in database already, and if not, add them
+        # TODO: add the order to the database
+        # TODO: for each order item in the request, add it to the database
+        
+        
+        
         pass
 
     def select_inventory(self, search_fields: dict) -> list[tuple]:
         try:
             
             log.log(Level.DEBUG, "Preparing SQL query to display inventory...")
-            sql = """
-            SELECT * FROM USER13.Inventory
+            sql = f"""
+            SELECT * FROM {self.creds["db_name"]}.Inventory
             """
             params = []
 
-
             for field in ["Size", "Style", "Material", "Color"]:
                 if field in search_fields:
-                    sql += f"WHERE {field} LIKE %?%"
+                    if len(params) == 0:
+                        sql += f" WHERE {field} = ?"
+                    else:
+                        sql += f" AND {field} = ?"                    
                     params.append(search_fields[field])
 
-            sql += "ORDER BY Price "
-            if "ascending" in search_fields and search_fields["ascending"]:
+            sql += " ORDER BY Price "
+            if "Ascending" in search_fields and search_fields["Ascending"].lower() == "true":
                 sql += "ASC;"
             else:
                 sql += "DESC;"
+
+            print(sql)
             
             log.log(Level.DEBUG, "Executing query...")
             self.cursor.execute(sql, params)
@@ -85,6 +95,53 @@ class _Db2DAO:
             log.log(Level.ERROR, "Error occured during inventory query: " + e.args[0])
             raise Exception(e.args[0])
 
+    def select_designs(self, search_fields: dict) -> list[tuple]:
+        try:
+            
+            log.log(Level.DEBUG, "Preparing SQL query to display designs...")
+            # sql = f"""
+            # SELECT * FROM {self.creds["db_name"]}.Designs
+            # """
 
-    def select_designs(self, search_fields: dict):
-        pass
+            sql = f"""
+            SELECT * FROM USER13.Design
+            """
+            params = []
+
+            if "Min_Price" in search_fields and not "Max_Price" in search_fields:
+                sql += f" WHERE Price >= ?"
+                params.append(search_fields["Min_Price"])
+            elif "Max_Price" in search_fields and not "Min_Price" in search_fields:
+                sql += f" WHERE Price <= ?"
+                params.append(search_fields["Max_Price"])
+            elif "Min_Price" in search_fields and "Max_Price" in search_fields:
+                sql += f" WHERE Price BETWEEN ? AND ?"
+                params.append(search_fields["Min_Price"])
+                params.append(search_fields["Max_Price"])
+
+            if "Name" in search_fields:
+                if len(params) == 0:
+                    sql += " WHERE Name LIKE %?%"
+                else:
+                    sql += " AND Name LIKE %?%"
+                params.append(search_fields["Name"])
+
+            if "Sort_By_Price" in search_fields and search_fields["Sort_By_Price"].lower() == "true":
+                sql += " ORDER BY Price "
+            else:
+                sql += " ORDER BY Name "
+            if "Ascending" in search_fields and search_fields["Ascending"].lower() == "true":
+                sql += "ASC;"
+            else:
+                sql += "DESC;"
+
+            
+            
+            log.log(Level.DEBUG, "Executing query...")
+            self.cursor.execute(sql, params)
+            query_results = self.cursor.fetchall()
+
+            return query_results
+        except Exception as e:
+            log.log(Level.ERROR, "Error occured during designs query: " + e.args[0])
+            raise Exception(e.args[0])
