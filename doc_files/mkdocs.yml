@@ -25,7 +25,8 @@ theme:
     - navigation.indexes
   
 nav:
-- Introduction: index.md
+- User Guide: topics/user-guide.md
+- Release Notes: topics/release-notes.md
 
 markdown_extensions:
   - admonition
