@@ -14,7 +14,7 @@
     <div class="shipping-box">
       <div class="shipping-option">
         <h3>Standard Shipping</h3>
-        <p class="shipping-detail">FREE on orders over $50</p>
+        <p class="shipping-detail">FREE on all orders</p>
         <p>Delivery: 5-7 business days</p>
       </div>
       <div class="shipping-option">
@@ -24,7 +24,7 @@
       </div>
       <div class="shipping-option">
         <h3>Overnight Shipping</h3>
-        <p class="shipping-detail">$24.99</p>
+        <p class="shipping-detail">$14.99</p>
         <p>Delivery: Next business day</p>
       </div>
     </div>
@@ -59,7 +59,7 @@
 <style scoped>
 h1 {
   font-size: 2.5rem;
-  color: #333;
+  color: #000000;
   border-bottom: 3px solid #000000;
   padding-bottom: 1rem;
   margin: 2rem 0;
@@ -67,30 +67,23 @@ h1 {
 
 h2 {
   font-size: 1.3rem;
-  color: #333;
-  margin-top: 0;
+  color: #000000;
+  border-bottom: #000000 solid 2px;
+  border-top: #000000 solid 2px;
+  padding: 1.5rem 0;
   margin-bottom: 1rem;
 }
 
 h3 {
   font-size: 1.1rem;
-  color: #333;
+  color: #000000;
   margin: 0 0 0.5rem 0;
 }
 
 .intro-section {
-  max-width: 900px;
-  padding: 2rem;
-  background: #f9f9f9;
-  border-left: 4px solid #e0e0e0;
-  border-top: 2px solid #e0e0e0;
-  border-right: 2px solid #e0e0e0;
-  border-bottom: 2px solid #e0e0e0;
-  border-radius: 4px;
-  margin: 2rem 0;
   font-size: 1.1rem;
-  line-height: 1.8;
-  color: #555;
+  line-height: 1.2;
+  color: #000000;
 }
 
 .shipping-section {
@@ -99,11 +92,6 @@ h3 {
 
 .shipping-box {
   padding: 2rem;
-  background: white;
-  border-left: 4px solid #e0e0e0;
-  border-top: 2px solid #e0e0e0;
-  border-right: 2px solid #e0e0e0;
-  border-bottom: 2px solid #e0e0e0;
   border-radius: 4px;
 }
 
@@ -124,14 +112,14 @@ h3 {
 
 .shipping-detail {
   font-weight: 600;
-  color: #333;
+  color: #000000;
   margin: 0.5rem 0 0.5rem 0;
 }
 
 .shipping-box p {
   font-size: 1rem;
-  line-height: 1.7;
-  color: #555;
+  line-height: 1.2;
+  color: #000000;
   margin: 1rem 0;
 }
 

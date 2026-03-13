@@ -3,15 +3,19 @@ Cancel button component for the Checkout page. When clicked, it will return the 
 -->
 
 <template>
-  <button class="cancel-btn" @click="handleCancel">
+  <button type="button" class="cancel-btn" @click="handleCancel">
     <span class="btn-icon">✕</span>
     <span class="btn-text">Cancel</span>
   </button>
 </template>
 
 <script setup lang="ts">
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
 const handleCancel = () => {
-  window.history.back();
+  router.push({ name: 'Cart' });
 };
 </script>
 

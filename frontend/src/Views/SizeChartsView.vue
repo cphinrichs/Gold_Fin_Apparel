@@ -114,6 +114,18 @@
   z-index: 10;
 }
 
+h1{
+    font-size: 2.5rem;
+  color: #000000;
+  border-bottom: 3px solid #000000;
+  padding-bottom: 1rem;
+  margin: 2rem 0;
+}
+
+h2{
+  font-size: 1.5rem;
+  color: #000000;
+}
 .size-chart {
   margin-left: .5rem;
 }
@@ -162,5 +174,11 @@
 
 .size-table tbody tr:nth-child(even):hover {
   background: #e8e8e8;
+}
+
+section {
+  padding: 60px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 </style>

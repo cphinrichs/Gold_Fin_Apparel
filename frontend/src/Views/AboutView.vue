@@ -62,7 +62,7 @@ const showMembers = ref(false);
 h1 {
   margin-left: 10px;
   font-size: 2.5rem;
-  color: #333;
+  color: #000000;
   border-bottom: 3px solid #000000;
   padding-bottom: 1rem;
   margin-top: 0rem;

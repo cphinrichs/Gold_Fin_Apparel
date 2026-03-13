@@ -48,7 +48,7 @@
 <style scoped>
 h1 {
   font-size: 2.5rem;
-  color: #333;
+  color: #000000;
   border-bottom: 3px solid #000000;
   padding-bottom: 1rem;
   margin: 2rem 0;
@@ -56,7 +56,10 @@ h1 {
 
 h2 {
   font-size: 1.3rem;
-  color: #333;
+  color: #000000;
+  border-bottom: #000000 solid 2px;
+  border-top: #000000 solid 2px;
+  padding: 1.5rem 0;
   margin-top: 0;
   margin-bottom: 1rem;
 }
@@ -66,7 +69,7 @@ h2 {
   border-radius: 4px;
   margin: 2rem 0;
   font-size: 1.3rem;
-  color: #555;
+  color: #000000;
 }
 
 .policy-section {
@@ -75,21 +78,19 @@ h2 {
 
 .policy-box {
   padding: 2rem;
-  border-bottom: #000000 solid 2px;
-  border-top: #000000 solid 2px;
 }
 
 .policy-box p {
   font-size: 1.2rem;
-  line-height: 1;
-  color: #555;
+  line-height: 1.2;
+  color: #000000;
   margin: 1rem 0;
 }
 
 .policy-box ol {
   padding-left: 2rem;
-  color: #555;
-  line-height: 1.0;
+  color: #000000;
+  line-height: 1.2;
 }
 
 .policy-box li {

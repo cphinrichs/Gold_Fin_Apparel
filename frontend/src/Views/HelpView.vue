@@ -42,9 +42,8 @@
 h1 {
   margin-left: 10px;
   font-size: 2.5rem;
-  color: #333;
+  color: #000000;
   border-bottom: 3px solid #000000;
-  margin-top: 0rem;
   padding-bottom: 0.5rem;
   max-width: 800px;
 }
@@ -55,11 +54,7 @@ h1 {
   margin-right: 0;
   padding: 20px;
   max-width: 800px;
-  background: #f9f9f9;
-  border-left: 2px solid #e0e0e0;
-  border-top: 2px solid #e0e0e0;
-  border-right: 2px solid #e0e0e0;
-  border-bottom: 2px solid #e0e0e0;
+  padding: 1.5rem 0;
   border-radius: 4px;
   color: #555;
 }
@@ -107,5 +102,11 @@ h1 {
   margin: 0;
   color: #666;
   font-size: 0.95rem;
+}
+
+section {
+  padding: 60px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 </style>

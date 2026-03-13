@@ -4,22 +4,33 @@ import TaskBar from "./Components/TaskBar.vue";
 </script>
 
 <template>
-  <TaskBar />
-  <div class="main-content">
-    <RouterView />
+  <div class="app-wrapper">
+    <TaskBar />
+    <div class="main-content">
+      <RouterView />
+    </div>
+    <footer class="footer">
+      <p>&copy; 2026 GoldFin Apparel. All rights reserved.</p>
+    </footer>
   </div>
-  <footer class="container">
-    <p>&copy; 2026 GoldFin Apparel. All rights reserved.</p>
-  </footer>
 </template>
 
 <style>
-.main-content {
-  margin-top: 80px; 
-  min-height: calc(100vh - 80px - 60px);
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
-.container {
+
+.main-content {
+  flex: 1;
+  margin-top: 80px;
+}
+
+.footer {
   font-family: Arial, sans-serif;
+  padding: 1rem 2rem;
+  text-align: left;
 }
 
 body {

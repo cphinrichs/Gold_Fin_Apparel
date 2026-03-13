@@ -3,17 +3,17 @@ Users will press this button to complete their order and be taken to the order c
 -->
 
 <template>
-  <button class="complete-order-btn" @click="handleCompleteOrder">
+  <button type="button" class="complete-order-btn" @click="handleCompleteOrder">
     <span class="btn-icon">✓</span>
     <span class="btn-text">Complete Order</span>
   </button>
 </template>
 
 <script setup lang="ts">
+const emit = defineEmits(['complete']);
+
 const handleCompleteOrder = () => {
-  // Complete order logic here
-  console.log('Order completed');
-  window.location.href = '/orderconfirmation';
+  emit('complete');
 };
 </script>
 
