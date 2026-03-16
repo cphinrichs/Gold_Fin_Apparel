@@ -1,14 +1,28 @@
 <script lang="ts" setup>
+import SortFilterWidget from '../Components/Widgets/SortFilterWidget.vue';
+
+const handleFiltersChanged = (filters: any) => {
+  console.log('Filters applied:', filters);
+};
 </script>
 
 <template>
-  <section>
-    <div class="tops">
-      <h1>Tops Page</h1>
-      <p>Here, users will be able to browse our collection of tops.</p>
-      <p>Discover a variety of styles, colors, and sizes to suit your preferences.
-          Whether you're looking for casual t-shirts, stylish blouses, or trendy crop tops, our collection has something for everyone. Explore our selection and find the perfect top to complete your outfit.
-      </p>
-    </div>
-  </section>
+  <div class="page-wrapper">
+    <SortFilterWidget @filtersChanged="handleFiltersChanged" />
+    <section class="page-section">
+      <h1>Tops</h1>
+      <p>Browse our collection of tops. Use the filter panel on the left to narrow your results.</p>
+    </section>
+  </div>
 </template>
+
+<style scoped>
+.page-wrapper {
+  position: relative;
+}
+.page-section {
+  padding: 60px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+</style>
