@@ -1,6 +1,8 @@
 <template>
-  <section>
-    <div class="browse">
+  <div class="page-wrapper">
+    <SortFilterWidget @filtersChanged="handleFiltersChanged" />
+    <section>
+      <div class="browse">
       <h1>Browse Products</h1>
       <div class="product-list">
         <button
@@ -12,10 +14,16 @@
       </div>
     </div>
   </section>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import productImage from '../Assets/Designer(5).png'
+import SortFilterWidget from '../Components/Widgets/SortFilterWidget.vue';
+
+const handleFiltersChanged = (filters: any) => {
+  console.log('Filters applied:', filters);
+};
 
 const products = [
   {
@@ -34,6 +42,10 @@ const products = [
 </script>
 
 <style scoped>
+.page-wrapper {
+  position: relative;
+}
+
 .browse {
   padding: 20px;
 }
