@@ -6,6 +6,8 @@ from logger import log
 from logger.logger_object import Level
 from config.settings import Settings
 from pathlib import Path
+from order_validation.order_validator import Order
+import datetime
 
 # clidriver_path = Path(__file__).parent.parent.parent.parent
 # os.add_dll_directory(f"{clidriver_path}/bin")
@@ -31,7 +33,7 @@ class _Db2DAO:
             with open(config_path, "r") as file:
                 self.creds = json.load(file)
         
-            self.conn_str = (
+            self._conn_str = (
                 f"DATABASE={self.creds["db_instance"]};"
                 f"HOSTNAME={self.creds["host"]};"
                 f"PORT={self.creds["port"]};"
@@ -41,25 +43,108 @@ class _Db2DAO:
                 f"PWD={self.creds["password"]};"
             )
 
-            self.conn = ibm_db_dbi.Connection(ibm_db.connect(self.conn_str, "", ""))
-            self.cursor = self.conn.cursor()
+            conn = ibm_db_dbi.Connection(ibm_db.connect(self._conn_str, "", ""))
+            conn.close()
             
             log.log(Level.INFO, "Successfully connected to Db2.")
-
-            # test_dictionary = {}
+            print("test")
             # test_dictionary["ascending"] = True
-            # self.select_inventory(test_dictionary)
+
+            # test_dictionary = {
+            #     "Customer": "Kara Lynch",
+            #     "Items": [
+            #         {
+            #             "Product_Id": 1,
+            #             "Design_Id": 1,
+            #             "Quantity": 3
+            #         }
+            #     ]
+            # }
+            # self.create_order(Order(test_dictionary))
         except Exception as e:
             log.log(Level.CRITICAL, e.args[0])
 
-    def create_order(self, order_data: dict):
-        # TODO: check if customer is in database already, and if not, add them
-        # TODO: add the order to the database
-        # TODO: for each order item in the request, add it to the database
+    def get_pooled_connection(self) -> ibm_db_dbi.Connection:
+        """Gets a connection with ibm_db_dbi"""
+        new_connection = ibm_db.pconnect(self._conn_str,"","")
+        assert(isinstance(new_connection, ibm_db.IBM_DBConnection))
+        return ibm_db_dbi.Connection(new_connection)
+
+    def create_order(self, order_data: Order):
+        log.log(Level.DEBUG, "Successfully connected to Db2.")
+        customer_check_sql = f"""
+        SELECT * FROM {self.creds["db_name"]}.Customers
+        WHERE Name = ?;
+        """
+        conn = self.get_pooled_connection()
+        cursor = conn.cursor()
+
+
+        cursor.execute(customer_check_sql, [order_data.get_customer()["Name"]])
+        customer_query_results = cursor.fetchall()
+
+        print(customer_query_results)
+
+        if len(customer_query_results) == 0:
+            cust_id = self.add_customer(conn, order_data.get_customer())
+        else:
+            cust_id = customer_query_results[0][0]
+
+        add_order_sql = f"""
+        SELECT ID
+        FROM FINAL TABLE
+        (INSERT INTO {self.creds["db_name"]}.Orders (Customer_ID, Total_Price, Order_Date)
+        VALUES (?, ?, ?));
+        """
+        
+        order_price = self.get_order_price(order_data)
+
+        current_time = datetime.datetime.today().strftime("%Y-%m-%d")
+
+        order_params = [cust_id, order_price, current_time]
+
+        cursor.execute(add_order_sql, order_params)
+        order_id = cursor.fetchall()[0][0]
+        
+        order_items_sql = f"""
+        INSERT INTO {self.creds["db_name"]}.Order_Items (Order_ID, Product_Id, Quantity, Design_Id, Price)
+        VALUES(?, ?, ?, ?, ?)"""
+
+        order_items = order_data.get_items()
+
+        for item in order_items:
+            order_items_params = [order_id, item["Product_Id"], item["Quantity"], item["Design_Id"], self.get_item_price(item)]
+            cursor.execute(order_items_sql, order_items_params)
+
+        conn.close()
         
         
+    def add_customer(self, conn: ibm_db_dbi.Connection, cust_data: dict) -> int:
+        sql = f"""
+        SELECT ID
+        FROM FINAL TABLE
+        (INSERT INTO {self.creds["db_name"]}.Customers (Name, Address)
+        VALUES(?, ?));
+        """
+        cursor = conn.cursor()
+
+        log.log(Level.DEBUG, "Executing add customer query...")
+        cursor.execute(sql, [cust_data["Name"], cust_data["Address"]])
+        query_results = cursor.fetchall()[0][0]
+        # print(query_results)
         
-        pass
+        if isinstance(query_results, int):
+            return query_results
+        
+        
+        return 0
+    
+    def get_order_price(self, order_data: Order) -> float:
+        return 0.0
+    
+    def get_item_price(self, item_data: dict) -> float:
+        return 0.0
+        
 
     def select_inventory(self, search_fields: dict) -> list[tuple]:
         try:
@@ -85,12 +170,17 @@ class _Db2DAO:
                 sql += "DESC;"
 
             print(sql)
-            
-            log.log(Level.DEBUG, "Executing query...")
-            self.cursor.execute(sql, params)
-            query_results = self.cursor.fetchall()
 
+            conn = self.get_pooled_connection()
+            cursor = conn.cursor()
+            log.log(Level.DEBUG, "Executing query...")
+            cursor.execute(sql, params)
+            query_results = cursor.fetchall()
+
+            conn.close()
             return query_results
+        
+            #TODO: refactor to include left joins and price calc
         except Exception as e:
             log.log(Level.ERROR, "Error occured during inventory query: " + e.args[0])
             raise Exception(e.args[0])
@@ -104,7 +194,7 @@ class _Db2DAO:
             # """
 
             sql = f"""
-            SELECT * FROM USER13.Design
+            SELECT * FROM USER13.Designs
             """
             params = []
 
@@ -137,11 +227,15 @@ class _Db2DAO:
 
             
             
-            log.log(Level.DEBUG, "Executing query...")
-            self.cursor.execute(sql, params)
-            query_results = self.cursor.fetchall()
+            conn = self.get_pooled_connection()
+            cursor = conn.cursor()
 
+            log.log(Level.DEBUG, "Executing query...")
+            cursor.execute(sql, params)
+            query_results = cursor.fetchall()
+
+            conn.close()
             return query_results
         except Exception as e:
-            log.log(Level.ERROR, "Error occured during designs query: " + e.args[0])
+            log.log(Level.ERROR, "Error occured during designs query: " + str(e.args))
             raise Exception(e.args[0])
