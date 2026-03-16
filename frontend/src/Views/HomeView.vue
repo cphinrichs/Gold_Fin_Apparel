@@ -4,13 +4,13 @@
   <section class="product-list">
     <ul>
       <li class="product-item">
-        <a href="/inspect"><img src="../Assets/Designer(5).png" alt="Product Image"></a>
+        <a href="/inspect"><img src="../Assets/Kimono/Designer(5).png" alt="Product Image"></a>
       </li>
       <li class="product-item">
-        <a href="/inspect"><img src="../Assets/Designer(5).png" alt="Product Image"></a>
+        <a href="/inspect"><img src="../Assets/Kimono/Designer(5).png" alt="Product Image"></a>
       </li>
       <li class="product-item">
-        <a href="/inspect"><img src="../Assets/Designer(5).png" alt="Product Image"></a>
+        <a href="/inspect"><img src="../Assets/Kimono/Designer(5).png" alt="Product Image"></a>
       </li>
     </ul>
   </section>
@@ -23,8 +23,9 @@
 .home {
   width: 100%;
   height: 100vh;
+  background-color: #D8CEC5;
   font-family: Arial, sans-serif;
-  background-image: url('../Assets/Designer(5).png');
+  background-image: url('../Assets/T-shirt/T-shirt(front).png');
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
@@ -33,6 +34,7 @@
 .products {
   padding: 3rem 2rem;
   background-color: #f5f5f5;
+
 }
 
 .products h2 {

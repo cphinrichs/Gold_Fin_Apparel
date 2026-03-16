@@ -91,16 +91,17 @@
 
 <script lang="ts" setup>
 import { ref, computed } from 'vue'
-import productKimFront from '../Assets/Designer(5).png'
-import productKimLeft from '../Assets/Designer(6).png'
-import productKimBack from '../Assets/Designer(7).png'
-import productKimRight from '../Assets/Designer(8).png'
-import productKimDetail from '../Assets/Designer(9).png'
-// import materialCotton from '../Assets/Textures/material-cotton.png'
-// import materialPolyester from '../Assets/Textures/material-polyester.png'
+import productKimFront from '../Assets/Kimono/Designer(5).png'
+import productKimLeft from '../Assets/Kimono/Designer(6).png'
+import productKimBack from '../Assets/Kimono/Designer(7).png'
+import productKimRight from '../Assets/Kimono/Designer(8).png'
+import productKimDetail from '../Assets/Kimono/Designer(9).png'
+import materialCotton from '../Assets/Textures/material-cotton.png'
+import materialPolyester from '../Assets/Textures/material-polyester.png'
+import materialLeather from '../Assets/Textures/material-leather.png'
 import materialWool from '../Assets/Textures/material-wool.png'
-// import materialSilk from '../Assets/Textures/material-silk.png'
-// import materialKevlar from '../Assets/Textures/material-kevlar.png'
+import materialBlend from '../Assets/Textures/material-blend.png'
+import materialKevlar from '../Assets/Textures/material-kevlar.png'
 
 const selectedImage = ref(0)
 const selectedColor = ref('#f5f5f5')
@@ -108,11 +109,11 @@ const selectedMaterial = ref('')
 
 const materialTextures: Record<string, string> = {
     'Wool': materialWool,
-    // Add other materials here as their texture images become available
-    // 'Cotton': materialCotton,
-    // 'Polyester': materialPolyester,
-    // 'Silk': materialSilk,
-    // 'Kevlar': materialKevlar
+    'Leather': materialLeather,
+    'Blend': materialBlend,
+    'Cotton': materialCotton,
+    'Polyester': materialPolyester,
+    'Kevlar': materialKevlar
 }
 
 const materialBackgroundImage = computed(() => {
@@ -160,7 +161,7 @@ const productData = ref({
     rating: 5,
     reviewCount: 200,
     description: 'Test',
-    materials: ['Cotton', 'Polyester', 'Wool', 'Silk', 'Kevlar'],
+    materials: ['Cotton', 'Polyester', 'Wool', 'Blend', 'Leather', 'Kevlar'],
     features: [
         'Screen Print with Sleeve Graphics',
         '100% Cotton, Pre-Shrunk Jersey',
@@ -187,7 +188,6 @@ const productData = ref({
 }
 
 .image-gallery {
-    flex: 1;
     display: flex;
     gap: 1rem;
     align-items: stretch;
@@ -203,7 +203,6 @@ const productData = ref({
 .thumbnail-item {
     width: 80px;
     flex: 1;
-    min-height: 0;
     border: 2px solid transparent;
     cursor: pointer;
     padding: 0;
@@ -230,7 +229,6 @@ const productData = ref({
 
 .main-image img {
     max-width: 100%;
-    /* max-height: 600px; */
     max-height: 100%;
     object-fit: contain;
 }

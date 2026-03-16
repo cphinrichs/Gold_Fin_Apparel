@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts" setup>
-import productImage from '../Assets/Designer(5).png'
+import productImage from '../Assets/Kimono/Designer(5).png'
 
 const products = [
   {
