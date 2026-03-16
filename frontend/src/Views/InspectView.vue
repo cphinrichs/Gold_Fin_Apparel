@@ -6,17 +6,18 @@
                     v-for="(image, index) in productImages" 
                     :key="index"
                     :class="['thumbnail-item', { active: selectedImage === index }]"
-                    @click="selectedImage = index"
-                >
-                    <img :src="image" alt="Product thumbnail">
+                    :style="{ backgroundColor: selectedColor}"
+                    @click="selectedImage = index">
+                    <img :src="image" :alt="`Product thumbnail`">
                 </button>
             </div>
-            <div class="main-image">
-                <img :src="productImages[selectedImage]" alt="Product Image">
+            <div class="main-image" :style="{ backgroundColor: selectedColor, backgroundImage: materialBackgroundImage }">
+                <img :src="productImages[selectedImage]" :alt="`Product Image`">
             </div>
         </section>
         
         <aside class="product-details">
+            <h2 class ="product-style">{{ productData.style }}</h2>
             <h1 class="product-title">{{ productData.name }}</h1>
             <div class="product-rating">
                 <span class="stars">{{ '★'.repeat(productData.rating) + '☆'.repeat(5 - productData.rating) }}</span>
@@ -28,22 +29,42 @@
             </p>
             
             <ul class="product-features">
-                <li v-for="(feature, index) in productData.features" :key="index">{{ feature }}</li>
+                <li v-for="(feature, index) in productData.features" 
+                :key="index">{{ feature }}
+                </li>
             </ul>
             
             <div class="product-options">
                 <div class="color-selector">
                     <label>Color</label>
                     <div class="color-options">
-                        <button class ="color-btn" v-for="(color, index) in productData.colors" :key="index" :style="{ background: color }"></button>
+                        <button class ="color-btn" v-for="(color, index) in productData.colors" 
+                        :key="index" 
+                        :style="{ background: color }" 
+                        @click="activeColor($event, color)">
+                        </button>
                     </div>
                 </div>
+
+                <div class="material-selector">
+                    <label>Material</label>
+                        <div class="material-options">
+                            <button class ="material-btn" 
+                                v-for="(material, index) in productData.materials" 
+                                :key="index" 
+                                @click="activeMaterial($event, material)">{{ material }}
+                            </button>
+                        </div>
+                    </div>
                 
                 <div class="size-selector">
                     <label>Size</label>
-                    <div class="size-options">
-                        <button class ="size-btn" v-for="(size, index) in productData.sizes" :key="index">{{ size }}</button>
-                    </div>
+                        <div class="size-options">
+                            <button class ="size-btn" 
+                                v-for="(size, index) in productData.sizes" 
+                                :key="index" @click="activeSize">{{ size }}
+                            </button>
+                        </div>
                     <router-link :to="{ name: 'SizeCharts' }" class="size-guide">Size Guide</router-link>
                 </div>
             </div>
@@ -69,30 +90,84 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import productKimFront from '../Assets/Designer(5).png'
+import productKimLeft from '../Assets/Designer(6).png'
+import productKimBack from '../Assets/Designer(7).png'
+import productKimRight from '../Assets/Designer(8).png'
+import productKimDetail from '../Assets/Designer(9).png'
+// import materialCotton from '../Assets/Textures/material-cotton.png'
+// import materialPolyester from '../Assets/Textures/material-polyester.png'
+import materialWool from '../Assets/Textures/material-wool.png'
+// import materialSilk from '../Assets/Textures/material-silk.png'
+// import materialKevlar from '../Assets/Textures/material-kevlar.png'
 
 const selectedImage = ref(0)
+const selectedColor = ref('#f5f5f5')
+const selectedMaterial = ref('')
+
+const materialTextures: Record<string, string> = {
+    'Wool': materialWool,
+    // Add other materials here as their texture images become available
+    // 'Cotton': materialCotton,
+    // 'Polyester': materialPolyester,
+    // 'Silk': materialSilk,
+    // 'Kevlar': materialKevlar
+}
+
+const materialBackgroundImage = computed(() => {
+    if (selectedMaterial.value && materialTextures[selectedMaterial.value]) {
+        return `url(${materialTextures[selectedMaterial.value]})`
+    }
+    return 'none'
+})
+
+const activeColor = (event: Event, color: string) => {
+    const buttons = document.querySelectorAll('.color-btn')
+    buttons.forEach(btn => btn.classList.remove('active'))
+    const target = event.currentTarget as HTMLElement
+    target?.classList.add('active')
+    selectedColor.value = color
+}
+
+const activeSize = (event: Event) => {
+    const buttons = document.querySelectorAll('.size-btn')
+    buttons.forEach(btn => btn.classList.remove('active'))
+    const target = event.currentTarget as HTMLElement
+    target?.classList.add('active')
+}
+
+const activeMaterial = (event: Event, material: string) => {
+    const buttons = document.querySelectorAll('.material-btn')
+    buttons.forEach(btn => btn.classList.remove('active'))
+    const target = event.currentTarget as HTMLElement
+    target?.classList.add('active')
+    selectedMaterial.value = material
+}
+
 const productImages = [
-    '../Assets/Designer(5).png',
-    '../Assets/Designer(5).png',
-    '../Assets/Designer(5).png',
-    '../Assets/Designer(5).png',
-    '../Assets/Designer(5).png'
+    productKimFront,
+    productKimLeft,
+    productKimBack,
+    productKimRight,
+    productKimDetail
 ]
 
 // Mock product data - replace with API call later
 const productData = ref({
-    name: 'Product Name',
-    rating: 2,
-    reviewCount: 19,
+    name: 'Kyoto Signature',
+    style: 'Kimono',
+    rating: 5,
+    reviewCount: 200,
     description: 'Test',
+    materials: ['Cotton', 'Polyester', 'Wool', 'Silk', 'Kevlar'],
     features: [
         'Screen Print with Sleeve Graphics',
         '100% Cotton, Pre-Shrunk Jersey',
         'Ribbed Collar with Double Needle Stitching',
     ],
     price: 37.00,
-    colors: ['#FFFFFF', '#000000', '#FF0000', '#0000FF', '#008000', '#FFFF00'],
+    colors: ['#FFFFFF', '#000000', '#FF0000', '#0000FF', '#008000'],
     sizes: ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL']
 })
 
@@ -109,29 +184,29 @@ const productData = ref({
     gap: 3rem;
     padding: 2rem;
     max-width: 1400px;
-    margin: 0 auto;
 }
 
 .image-gallery {
     flex: 1;
     display: flex;
     gap: 1rem;
+    align-items: stretch;
 }
 
 .thumbnail-list {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    flex: 0 0 80px;
 }
 
 .thumbnail-item {
     width: 80px;
-    height: 80px;
+    flex: 1;
+    min-height: 0;
     border: 2px solid transparent;
     cursor: pointer;
     padding: 0;
-    background: white;
-    transition: border-color 0.2s;
 }
 
 .thumbnail-item:hover,
@@ -151,12 +226,12 @@ const productData = ref({
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 2rem;
 }
 
 .main-image img {
     max-width: 100%;
-    max-height: 600px;
+    /* max-height: 600px; */
+    max-height: 100%;
     object-fit: contain;
 }
 
@@ -165,6 +240,12 @@ const productData = ref({
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+}
+.product-style {
+    font-size: 1.2rem;
+    color: #666;
+    text-transform: uppercase;
+    margin: 0;
 }
 
 .product-title {
@@ -211,6 +292,7 @@ const productData = ref({
     margin-bottom: 0.5rem;
 }
 
+.material-options,
 .color-options,
 .size-options {
     display: flex;
@@ -218,6 +300,7 @@ const productData = ref({
     flex-wrap: wrap;
 }
 
+.material-btn,
 .color-btn,
 .size-btn {
     padding: 0.75rem 1.25rem;
@@ -228,6 +311,7 @@ const productData = ref({
     font-weight: 500;
 }
 
+.material-btn.active,
 .color-btn.active,
 .size-btn.active {
     border-color: #333;
@@ -255,7 +339,6 @@ const productData = ref({
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.3s;
 }
 
 .add-to-cart:hover {
