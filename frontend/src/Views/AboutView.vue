@@ -86,7 +86,7 @@ h2 {
 .logo {
   position: absolute;
   top: 0px;
-  right: -570px;
+  right: -510px;
   width: 500px;
   height: auto;
   z-index: 10;
