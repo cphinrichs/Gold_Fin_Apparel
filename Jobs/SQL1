@@ -2,36 +2,36 @@
 -- Customer Orders: Product+Design Combinations with Quantity
 ---------------------------------------------------------------
 SELECT
-    OR.CUSTOMER_ID,
+    O.CUSTOMER_ID,
     OI.PRODUCT_ID,
     OI.DESIGN_ID,
     SUM(OI.QUANTITY) AS TOTAL_QUANTITY
 FROM
-    USER13.ORDERS OR
-    JOIN USER13.ORDER_ITEMS OI
-        ON OR.ORDER_ID = OI.ORDER_ID
+    DBGOLDFI.ORDERS O
+    INNER JOIN DBGOLDFI.ORDER_ITEMS OI
+        ON O.ID = OI.ORDER_ID
 GROUP BY
-    OR.CUSTOMER_ID,
+    O.CUSTOMER_ID,
     OI.PRODUCT_ID,
     OI.DESIGN_ID
 ORDER BY
-    OR.CUSTOMER_ID,
+    O.CUSTOMER_ID,
     TOTAL_QUANTITY DESC;
 
 ---------------------------------------------------------------
 -- Orders by Date: Product+Design Combinations with Quantity
 ---------------------------------------------------------------
 SELECT
-    DATE(OR.ORDER_TS) AS ORDER_DATE,
+    DATE(O.ORDER_DATE) AS ORDER_DATE,
     OI.PRODUCT_ID,
     OI.DESIGN_ID,
     SUM(OI.QUANTITY) AS TOTAL_QUANTITY
 FROM
-    USER13.ORDERS OR
-    JOIN USER13.ORDER_ITEMS OI
-        ON OR.ORDER_ID = OI.ORDER_ID
+    DBGOLDFI.ORDERS O
+    INNER JOIN DBGOLDFI.ORDER_ITEMS OI
+        ON O.ID = OI.ORDER_ID
 GROUP BY
-    DATE(OR.ORDER_TS),
+    DATE(O.ORDER_DATE),
     OI.PRODUCT_ID,
     OI.DESIGN_ID
 ORDER BY
@@ -43,20 +43,26 @@ ORDER BY
 ---------------------------------------------------------------
 SELECT
     I.PRODUCT_ID,
-    I.SIZE,
-    I.STYLE,
-    I.MATERIAL,
+    SZ.NAME AS SIZE,
+    ST.NAME AS STYLE,
+    M.NAME AS MATERIAL,
     I.COLOR,
     SUM(OI.QUANTITY) AS TOTAL_QUANTITY_ORDERED
 FROM
-    USER13.INVENTORY I
-    JOIN USER13.ORDER_ITEMS OI
+    DBGOLDFI.INVENTORY I
+    INNER JOIN DBGOLDFI.ORDER_ITEMS OI
         ON I.PRODUCT_ID = OI.PRODUCT_ID
+    LEFT JOIN DBGOLDFI.SIZES SZ
+        ON I.SIZE_ID = SZ.ID
+    LEFT JOIN DBGOLDFI.STYLES ST
+        ON I.STYLE_ID = ST.ID
+    LEFT JOIN DBGOLDFI.MATERIALS M
+        ON I.MATERIAL_ID = M.ID
 GROUP BY
     I.PRODUCT_ID,
-    I.SIZE,
-    I.STYLE,
-    I.MATERIAL,
+    SZ.NAME,
+    ST.NAME,
+    M.NAME,
     I.COLOR
 ORDER BY
     TOTAL_QUANTITY_ORDERED DESC;
