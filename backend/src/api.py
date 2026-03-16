@@ -25,8 +25,20 @@ def getInventory():
     log.log(Level.DEBUG, "Request processed. Querying database...")
     query_results = db.select_inventory(query_fields)
     
-    log.log(Level.DEBUG, "Database queried successfully. Returning results...")
-    return query_results
+    log.log(Level.DEBUG, "Database queried successfully. Converting to dictionary...")
+    # Convert list of tuples to list of dictionaries
+    inventory_list = []
+    for row in query_results:
+        inventory_list.append({
+            "product_id": row[0],
+            "size": row[1],
+            "style": row[2],
+            "material": row[3],
+            "color": row[4],
+            "stock": row[5]
+        })
+    
+    return jsonify({"inventory": inventory_list})
 
 
 @app.get("/designs")
@@ -37,8 +49,17 @@ def getDesigns():
     log.log(Level.DEBUG, "Request processed. Querying database...")
     query_results = db.select_designs(query_fields)
     
-    log.log(Level.DEBUG, "Database queried successfully. Returning results...")
-    return query_results
+    log.log(Level.DEBUG, "Database queried successfully. Converting to dictionary...")
+    # Convert list of tuples to list of dictionaries
+    designs_list = []
+    for row in query_results:
+        designs_list.append({
+            "id": row[0],
+            "name": row[1],
+            "price": float(row[2]) if row[2] else None
+        })
+    
+    return jsonify({"designs": designs_list})
 
 @app.post("/order")
 def postOrder():

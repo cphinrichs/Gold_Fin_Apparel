@@ -14,7 +14,7 @@ from pathlib import Path
 # os.environ["PATH"] = clidriver_path + ";" + os.environ.get("PATH", "")
 
 project_root = Path(__file__).parent.parent.parent.parent
-venv_path = project_root / ".venv" / "Lib" / "site-packages" / "clidriver"
+venv_path = project_root / "venv" / "Lib" / "site-packages" / "clidriver"
 clidriver_bin = venv_path / "bin"
 clidriver_crt = clidriver_bin / "amd64.VC12.CRT"
 
@@ -26,19 +26,23 @@ import ibm_db_dbi
 
 class _Db2DAO:
     def __init__(self):
+        self.creds = None
+        self.conn = None
+        self.cursor = None
+        
         try:
             config_path = Settings.db_config_file()
             with open(config_path, "r") as file:
                 self.creds = json.load(file)
         
             self.conn_str = (
-                f"DATABASE={self.creds["db_instance"]};"
-                f"HOSTNAME={self.creds["host"]};"
-                f"PORT={self.creds["port"]};"
-                f"PROTOCOL={self.creds["protocol"]};"
+                f"DATABASE={self.creds['db_instance']};"
+                f"HOSTNAME={self.creds['host']};"
+                f"PORT={self.creds['port']};"
+                f"PROTOCOL={self.creds['protocol']};"
                 f"AUTHENTICATION=SERVER;"
-                f"UID={self.creds["username"]};"
-                f"PWD={self.creds["password"]};"
+                f"UID={self.creds['username']};"
+                f"PWD={self.creds['password']};"
             )
 
             self.conn = ibm_db_dbi.Connection(ibm_db.connect(self.conn_str, "", ""))
@@ -50,7 +54,8 @@ class _Db2DAO:
             # test_dictionary["ascending"] = True
             # self.select_inventory(test_dictionary)
         except Exception as e:
-            log.log(Level.CRITICAL, e.args[0])
+            log.log(Level.CRITICAL, f"Failed to initialize DB2 connection: {e}")
+            raise
 
     def create_order(self, order_data: dict):
         # TODO: check if customer is in database already, and if not, add them
@@ -66,19 +71,42 @@ class _Db2DAO:
             
             log.log(Level.DEBUG, "Preparing SQL query to display inventory...")
             sql = f"""
-            SELECT * FROM {self.creds["db_name"]}.Inventory
+            SELECT 
+                I.PRODUCT_ID,
+                SZ.NAME AS SIZE,
+                ST.NAME AS STYLE,
+                M.NAME AS MATERIAL,
+                I.COLOR,
+                I.STOCK
+            FROM {self.creds["db_name"]}.INVENTORY I
+            LEFT JOIN {self.creds["db_name"]}.SIZES SZ
+                ON I.SIZE_ID = SZ.ID
+            LEFT JOIN {self.creds["db_name"]}.STYLES ST
+                ON I.STYLE_ID = ST.ID
+            LEFT JOIN {self.creds["db_name"]}.MATERIALS M
+                ON I.MATERIAL_ID = M.ID
             """
             params = []
 
             for field in ["Size", "Style", "Material", "Color"]:
                 if field in search_fields:
                     if len(params) == 0:
-                        sql += f" WHERE {field} = ?"
+                        sql += f" WHERE "
                     else:
-                        sql += f" AND {field} = ?"                    
+                        sql += f" AND "
+                    
+                    if field == "Size":
+                        sql += "SZ.NAME = ?"
+                    elif field == "Style":
+                        sql += "ST.NAME = ?"
+                    elif field == "Material":
+                        sql += "M.NAME = ?"
+                    elif field == "Color":
+                        sql += "I.COLOR = ?"
+                    
                     params.append(search_fields[field])
 
-            sql += " ORDER BY Price "
+            sql += " ORDER BY I.STOCK "
             if "Ascending" in search_fields and search_fields["Ascending"].lower() == "true":
                 sql += "ASC;"
             else:
@@ -99,12 +127,9 @@ class _Db2DAO:
         try:
             
             log.log(Level.DEBUG, "Preparing SQL query to display designs...")
-            # sql = f"""
-            # SELECT * FROM {self.creds["db_name"]}.Designs
-            # """
-
+            
             sql = f"""
-            SELECT * FROM USER13.Design
+            SELECT * FROM {self.creds["db_name"]}.DESIGNS
             """
             params = []
 
