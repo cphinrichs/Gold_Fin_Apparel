@@ -34,13 +34,13 @@
 .logo {
   display: block;
   margin: 3rem auto 0;
-  width: 700px;
+  width: min(700px, 100%);
   height: auto;
   z-index: 10;
 }
 
 h1 {
-  margin-left: 10px;
+  
   font-size: 2.5rem;
   color: #000000;
   border-bottom: 3px solid #000000;
@@ -104,9 +104,30 @@ h1 {
   font-size: 0.95rem;
 }
 
+.p2{
+  max-width: 900px;
+  line-height: 1.3;
+  border-radius: 4px;
+  margin: 2rem 0;
+  font-size: 1.3rem;
+  color: #000000;
+}
+
 section {
-  padding: 0px 20px;
+  padding: 20px clamp(16px, 5vw, 60px);
   max-width: 1200px;
   margin: 0 auto;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+h1 {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  max-width: 100%;
+  text-align: center;
+}
+
+.help-links {
+  grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
 }
 </style>

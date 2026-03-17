@@ -19,10 +19,21 @@ const handleFiltersChanged = (filters: any) => {
 <style scoped>
 .page-wrapper {
   position: relative;
+  width: 100%;
+  box-sizing: border-box;
 }
 .page-section {
-  padding: 60px 20px;
+  padding: clamp(30px, 5vw, 60px) clamp(16px, 5vw, 60px);
   max-width: 1200px;
   margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+.page-section h1 {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+}
+.page-section p {
+  font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+  max-width: 700px;
 }
 </style>

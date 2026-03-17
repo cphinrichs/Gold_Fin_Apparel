@@ -52,6 +52,8 @@ h1 {
   border-bottom: 3px solid #000000;
   padding-bottom: 1rem;
   margin: 2rem 0;
+  text-align: center;
+
 }
 
 h2 {
@@ -66,6 +68,7 @@ h2 {
 
 .intro-section {
   max-width: 900px;
+  line-height: 1.3;
   border-radius: 4px;
   margin: 2rem 0;
   font-size: 1.3rem;
@@ -99,8 +102,24 @@ h2 {
 }
 
 section {
-  padding: 0px 20px;
+  padding: 20px clamp(16px, 5vw, 60px);
   max-width: 1200px;
   margin: 0 auto;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.intro-section p,
+.policy-box p,
+.policy-box li {
+  font-size: clamp(1rem, 1.5vw, 1.2rem);
+}
+
+h1 {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+}
+
+h2 {
+  font-size: clamp(1.1rem, 2vw, 1.3rem);
 }
 </style>

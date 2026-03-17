@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import CancelButton from '../Components/Buttons/CancelButton.vue';
 import CompleteOrderButton from '../Components/Buttons/CompleteOrderButton.vue';
@@ -27,29 +27,126 @@ const formData = ref({
 
 const sectionTitles = ['Delivery Options', 'Personal Information', 'Shipping Method', 'Payment'];
 
+// Track which fields the user has blurred (to show errors only after interaction)
+const touched = reactive<Record<string, boolean>>({});
+const touch = (field: string) => { touched[field] = true; };
+
+// Validators
+const validateName = (v: string) => /^[a-zA-Z\s\-']{2,}$/.test(v.trim());
+const validateEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+const validateCity = (v: string) => /^[a-zA-Z\s\-']{2,}$/.test(v.trim());
+const validateState = (v: string) => /^[a-zA-Z\s]{2,}$/.test(v.trim());
+const validatePostalCode = (v: string) => /^\d{5}(-\d{4})?$/.test(v.trim());
+const validatePhone = (v: string) => /^\(\d{3}\) \d{3}-\d{4}$/.test(v.trim());
+
+const validateExpiration = (v: string): boolean => {
+  if (!/^\d{2}\/\d{2}$/.test(v)) return false;
+  const [mm, yy] = v.split('/').map(Number);
+  if (mm < 1 || mm > 12) return false;
+  const now = new Date();
+  const expYear = 2000 + yy;
+  const expMonth = mm; // 1-based
+  const nowYear = now.getFullYear();
+  const nowMonth = now.getMonth() + 1; // 1-based
+  const isFuture = expYear > nowYear || (expYear === nowYear && expMonth > nowMonth);
+  const isWithinMax = expYear <= nowYear + 5;
+  return isFuture && isWithinMax;
+};
+
+const fieldErrors: Record<string, string> = {
+  firstName: 'First name must contain only letters',
+  lastName: 'Last name must contain only letters',
+  email: 'Enter a valid email address (e.g. name@example.com)',
+  city: 'City must contain only letters',
+  state: 'Enter a valid state name or abbreviation',
+  postalCode: 'Enter a valid 5-digit ZIP code (e.g. 72701)',
+  phoneNumber: 'Enter a valid 10-digit phone number (e.g. (479) 555-0123)',
+  expirationDate: 'Expiration date must be a valid (1 - 12) and future month within 5 years (MM/YY)',
+};
+
+const isFieldValid = (field: string): boolean => {
+  const v = formData.value[field as keyof typeof formData.value];
+  switch (field) {
+    case 'firstName':  return validateName(v);
+    case 'lastName':   return validateName(v);
+    case 'email':      return validateEmail(v);
+    case 'city':       return validateCity(v);
+    case 'state':      return validateState(v);
+    case 'postalCode': return validatePostalCode(v);
+    case 'phoneNumber':return validatePhone(v);
+    case 'expirationDate': return validateExpiration(v);
+    default:           return !!v;
+  }
+};
+
+const showError = (field: string): boolean => touched[field] && !isFieldValid(field);
+
+// Auto-format phone to (XXX) XXX-XXXX
+const formatPhone = (e: Event) => {
+  const input = e.target as HTMLInputElement;
+  const digits = input.value.replace(/\D/g, '').slice(0, 10);
+  let formatted = digits;
+  if (digits.length > 6) formatted = `(${digits.slice(0,3)}) ${digits.slice(3,6)}-${digits.slice(6)}`;
+  else if (digits.length > 3) formatted = `(${digits.slice(0,3)}) ${digits.slice(3)}`;
+  else if (digits.length > 0) formatted = `(${digits}`;
+  formData.value.phoneNumber = formatted;
+  input.value = formatted;
+};
+
+// Postal code: digits only, max 5
+const formatPostalCode = (e: Event) => {
+  const input = e.target as HTMLInputElement;
+  const digits = input.value.replace(/\D/g, '').slice(0, 5);
+  formData.value.postalCode = digits;
+  input.value = digits;
+};
+
 const handleSaveAndContinue = (section: number) => {
   activeSection.value = section + 1;
 };
 
 const isPersonalInfoComplete = (): boolean => {
   return !!(
-    formData.value.email &&
-    formData.value.firstName &&
-    formData.value.lastName &&
+    validateName(formData.value.firstName) &&
+    validateName(formData.value.lastName) &&
     formData.value.address &&
-    formData.value.city &&
-    formData.value.state &&
-    formData.value.postalCode &&
-    formData.value.phoneNumber
+    validateEmail(formData.value.email) &&
+    validateCity(formData.value.city) &&
+    validateState(formData.value.state) &&
+    validatePostalCode(formData.value.postalCode) &&
+    validatePhone(formData.value.phoneNumber)
   );
 };
 
 const isPaymentComplete = (): boolean => {
-  return !!(
-    formData.value.cardNumber &&
-    formData.value.expirationDate &&
-    formData.value.cvv
+  return (
+    formData.value.cardNumber.replace(/\s/g, '').length === 16 &&
+    validateExpiration(formData.value.expirationDate) &&
+    formData.value.cvv.length === 3
   );
+};
+
+const formatCardNumber = (e: Event) => {
+  const input = e.target as HTMLInputElement;
+  const digits = input.value.replace(/\D/g, '').slice(0, 16);
+  const formatted = digits.replace(/(\d{4})(?=\d)/g, '$1 ');
+  formData.value.cardNumber = formatted;
+  input.value = formatted;
+};
+
+const formatExpiration = (e: Event) => {
+  const input = e.target as HTMLInputElement;
+  const raw = input.value.replace(/\D/g, '').slice(0, 4);
+  const formatted = raw.length > 2 ? raw.slice(0, 2) + '/' + raw.slice(2) : raw;
+  formData.value.expirationDate = formatted;
+  input.value = formatted;
+};
+
+const formatCvv = (e: Event) => {
+  const input = e.target as HTMLInputElement;
+  const digits = input.value.replace(/\D/g, '').slice(0, 3);
+  formData.value.cvv = digits;
+  input.value = digits;
 };
 
 const completeOrder = () => {
@@ -138,8 +235,11 @@ const completeOrder = () => {
               id="email" 
               v-model="formData.email" 
               placeholder="Enter your email"
+              @blur="touch('email')"
+              :class="{ 'input-error': showError('email') }"
               required
             />
+            <span class="error-msg" v-if="showError('email')">{{ fieldErrors.email }}</span>
           </div>
         </div>
         <div class="form-group-row">
@@ -150,8 +250,11 @@ const completeOrder = () => {
               id="firstName" 
               v-model="formData.firstName" 
               placeholder="First name"
+              @blur="touch('firstName')"
+              :class="{ 'input-error': showError('firstName') }"
               required
             />
+            <span class="error-msg" v-if="showError('firstName')">{{ fieldErrors.firstName }}</span>
           </div>
           <div class="form-group">
             <label for="lastName">Last Name</label>
@@ -160,8 +263,11 @@ const completeOrder = () => {
               id="lastName" 
               v-model="formData.lastName" 
               placeholder="Last name"
+              @blur="touch('lastName')"
+              :class="{ 'input-error': showError('lastName') }"
               required
             />
+            <span class="error-msg" v-if="showError('lastName')">{{ fieldErrors.lastName }}</span>
           </div>
         </div>
         <div class="form-group-row">
@@ -184,8 +290,11 @@ const completeOrder = () => {
               id="city" 
               v-model="formData.city" 
               placeholder="City"
+              @blur="touch('city')"
+              :class="{ 'input-error': showError('city') }"
               required
             />
+            <span class="error-msg" v-if="showError('city')">{{ fieldErrors.city }}</span>
           </div>
           <div class="form-group">
             <label for="state">State</label>
@@ -194,18 +303,27 @@ const completeOrder = () => {
               id="state" 
               v-model="formData.state" 
               placeholder="State"
+              @blur="touch('state')"
+              :class="{ 'input-error': showError('state') }"
               required
             />
+            <span class="error-msg" v-if="showError('state')">{{ fieldErrors.state }}</span>
           </div>
           <div class="form-group">
             <label for="postalCode">Postal Code</label>
             <input 
               type="text" 
               id="postalCode" 
-              v-model="formData.postalCode" 
-              placeholder="Postal code"
+              :value="formData.postalCode"
+              @input="formatPostalCode"
+              placeholder="72701"
+              maxlength="5"
+              inputmode="numeric"
+              @blur="touch('postalCode')"
+              :class="{ 'input-error': showError('postalCode') }"
               required
             />
+            <span class="error-msg" v-if="showError('postalCode')">{{ fieldErrors.postalCode }}</span>
           </div>
         </div>
         <div class="form-group-row">
@@ -214,10 +332,15 @@ const completeOrder = () => {
             <input 
               type="tel" 
               id="phoneNumber" 
-              v-model="formData.phoneNumber" 
-              placeholder="(123) 456-7890"
+              :value="formData.phoneNumber"
+              @input="formatPhone"
+              placeholder="(479) 555-0123"
+              maxlength="14"
+              @blur="touch('phoneNumber')"
+              :class="{ 'input-error': showError('phoneNumber') }"
               required
             />
+            <span class="error-msg" v-if="showError('phoneNumber')">{{ fieldErrors.phoneNumber }}</span>
           </div>
         </div>
         <div class="section-actions" v-if="activeSection === 1">
@@ -303,9 +426,11 @@ const completeOrder = () => {
             <input 
               type="text" 
               id="cardNumber" 
-              v-model="formData.cardNumber" 
+              :value="formData.cardNumber"
+              @input="formatCardNumber"
               placeholder="1234 5678 9012 3456"
               maxlength="19"
+              inputmode="numeric"
               required
             />
           </div>
@@ -316,20 +441,27 @@ const completeOrder = () => {
             <input 
               type="text" 
               id="expirationDate" 
-              v-model="formData.expirationDate" 
+              :value="formData.expirationDate"
+              @input="formatExpiration"
               placeholder="MM/YY"
               maxlength="5"
+              inputmode="numeric"
+              @blur="touch('expirationDate')"
+              :class="{ 'input-error': showError('expirationDate') }"
               required
             />
+            <span class="error-msg" v-if="showError('expirationDate')">{{ fieldErrors.expirationDate }}</span>
           </div>
           <div class="form-group">
             <label for="cvv">CVV</label>
             <input 
               type="text" 
               id="cvv" 
-              v-model="formData.cvv" 
+              :value="formData.cvv"
+              @input="formatCvv"
               placeholder="123"
-              maxlength="4"
+              maxlength="3"
+              inputmode="numeric"
               required
             />
           </div>
@@ -496,6 +628,17 @@ const completeOrder = () => {
   outline: none;
   border-color: #FFD700;
   box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+}
+
+.form-group input.input-error {
+  border-color: #e53935;
+  box-shadow: 0 0 0 3px rgba(229, 57, 53, 0.1);
+}
+
+.error-msg {
+  margin-top: 0.3rem;
+  font-size: 0.8rem;
+  color: #e53935;
 }
 
 .delivery-options,

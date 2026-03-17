@@ -7,17 +7,18 @@ const showMembers = ref(false);
 </script>
 
 <template>
-  <section class="about"> 
-    <div class="aboutus"> 
-         <h1>About Us</h1>
-    <!-- simple, easy to edit inline logo placed top right -->
-    <img src="../Assets/goldenfinger.png" alt="GoldFinger Logo" class="logo"/>
+  <section class="about">
+    <div class="about-header">
+      <div class="aboutus">
+        <h1>About Us</h1>
     <p class = "p">
     Welcome to Gold Fin Apparel! We are a company dedicated to providing high-quality, stylish clothing for our customers. Our mission is to create unique and fashionable apparel that allows individuals to express their personality and stand out from the crowd.
     At Gold Fin Apparel, we believe in the power of self-expression through fashion. We strive to design clothing that not only looks great but also makes our customers feel confident and empowered. Our team of talented designers works tirelessly to create innovative and trendy pieces that cater to a wide range of styles and preferences.
     Our values are rooted in creativity, quality, and customer satisfaction. We are committed to using sustainable materials and ethical manufacturing practices to minimize our environmental impact. We also prioritize customer feedback and continuously seek ways to improve our products and services.
     Thank you for choosing Gold Fin Apparel. We look forward to being a part of your fashion journey and helping you express your unique style!
      </p>
+      </div>
+      <img src="../Assets/goldenfinger.png" alt="GoldFinger Logo" class="logo"/>
     </div>
 
   <button class="members-toggle" @click="showMembers = !showMembers">
@@ -75,21 +76,27 @@ h2 {
   margin-bottom: 0.25rem;
 }
 
+.about-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 2rem;
+  width: 100%;
+}
+
 .aboutus {
   padding: 0px;
-  max-width: 800px;
-  margin: 0;
+  flex: 1 1 min(500px, 100%);
+  min-width: 0;
   text-align: left;
-  position: relative;
 }
 
 .logo {
-  position: absolute;
-  top: -10px;
-  right: -510px;
-  width: 500px;
+  flex: 0 1 min(400px, 100%);
+  width: min(400px, 100%);
   height: auto;
-  z-index: 10;
+  object-fit: contain;
+  align-self: flex-start;
 }
 
 .p {
@@ -120,7 +127,19 @@ h2 {
 }
 
 section {
-  padding: 20px 5px;
+  padding: 20px clamp(16px, 5vw, 60px);
+  max-width: 1200px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+h1 {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+}
+
+h2 {
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
 }
 
 .members-toggle {

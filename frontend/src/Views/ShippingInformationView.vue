@@ -6,26 +6,28 @@
 <section class="shipping-information"> 
   <h1>Shipping Information</h1>
   <div class="intro-section">
-    <p>We're committed to getting your order to you quickly and safely. Learn more about our shipping options, timelines, and policies below.</p>
+    <p class="p2">We're committed to getting your order to you quickly and safely. Learn more about our shipping options, timelines, and policies below.</p>
   </div>
 
   <div class="shipping-section">
-    <h2>Shipping Methods</h2>
+    <h2>Shipping Methods & Costs</h2>
     <div class="shipping-box">
-      <div class="shipping-option">
-        <h3>Standard Shipping</h3>
-        <p class="shipping-detail">FREE on all orders</p>
-        <p>Delivery: 5-7 business days</p>
-      </div>
-      <div class="shipping-option">
-        <h3>Express Shipping</h3>
-        <p class="shipping-detail">$9.99</p>
-        <p>Delivery: 2-3 business days</p>
-      </div>
-      <div class="shipping-option">
-        <h3>Overnight Shipping</h3>
-        <p class="shipping-detail">$14.99</p>
-        <p>Delivery: Next business day</p>
+      <div class="shipping-options-grid">
+        <div class="shipping-option">
+          <h3>Standard Shipping</h3>
+          <p class="shipping-detail">FREE on all orders</p>
+          <p>Delivery: 5-7 business days</p>
+        </div>
+        <div class="shipping-option">
+          <h3>Express Shipping</h3>
+          <p class="shipping-detail">$9.99</p>
+          <p>Delivery: 2-3 business days</p>
+        </div>
+        <div class="shipping-option">
+          <h3>Overnight Shipping</h3>
+          <p class="shipping-detail">$14.99</p>
+          <p>Delivery: Next business day</p>
+        </div>
       </div>
     </div>
   </div>
@@ -45,14 +47,6 @@
       <p>We currently ship to all 50 US states. For international orders or questions about shipping to your location, please contact our support team.</p>
     </div>
   </div>
-
-  <div class="shipping-section">
-    <h2>Shipping Costs</h2>
-    <div class="shipping-box">
-      <p><strong>Free shipping</strong> on all standard shipping orders over $50. Standard shipping is also available for a flat rate of $5.99 on orders under $50.</p>
-      <p>Express and overnight shipping rates are calculated based on weight and destination at checkout.</p>
-    </div>
-  </div>
 </section>
 </template>
 
@@ -63,6 +57,8 @@ h1 {
   border-bottom: 3px solid #000000;
   padding-bottom: 1rem;
   margin: 2rem 0;
+  text-align: center;
+  
 }
 
 h2 {
@@ -86,24 +82,33 @@ h3 {
   color: #000000;
 }
 
+.p2 {
+  max-width: 900px;
+  line-height: 1.3;
+  border-radius: 4px;
+  margin: 2rem 0;
+  font-size: 1.3rem;
+  color: #000000;
+}
+
 .shipping-section {
   margin: 2.5rem 0;
 }
 
 .shipping-box {
-  padding: 2rem;
+  padding: clamp(1rem, 3vw, 2rem);
   border-radius: 4px;
 }
 
-.shipping-option {
-  display: inline-block;
-  width: calc(33.333% - 1.5rem);
-  margin-right: 2rem;
-  vertical-align: top;
+.shipping-options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+  gap: 1.5rem;
 }
 
-.shipping-option:nth-child(3n) {
-  margin-right: 0;
+.shipping-option {
+  display: block;
+  width: 100%;
 }
 
 .shipping-option h3 {
@@ -124,8 +129,18 @@ h3 {
 }
 
 section {
-  padding: 0px 20px;
+  padding: 20px clamp(16px, 5vw, 60px);
   max-width: 1200px;
   margin: 0 auto;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+h1 {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+}
+
+h2 {
+  font-size: clamp(1rem, 2vw, 1.3rem);
 }
 </style>

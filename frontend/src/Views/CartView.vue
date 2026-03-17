@@ -11,3 +11,15 @@ import Cart from '../Components/Cart.vue';
   <Cart />
   </section>
 </template>
+
+<style scoped>
+section{
+  padding: 0px 20px;
+  max-width: 1200px;
+  margin: 0 auto 0 0px;
+}
+
+
+
+
+</style>
