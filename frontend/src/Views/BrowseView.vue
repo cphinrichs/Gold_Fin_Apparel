@@ -1,6 +1,6 @@
 <template>
   <div class="page-wrapper">
-    <SortFilterWidget @filtersChanged="handleFiltersChanged" />
+    <!-- <SortFilterWidget @filtersChanged="handleFiltersChanged" /> -->
     <section>
       <div class="browse">
       <h1>Browse Products</h1>
