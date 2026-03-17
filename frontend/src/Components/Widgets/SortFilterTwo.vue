@@ -116,22 +116,6 @@ const emit = defineEmits<{ (e: 'filtersChanged', filters: Filters): void }>();
       </div>
     </div>
 
-    <!-- Style -->
-    <div class="filter-group">
-      <h3>Style</h3>
-      <div class="filter-options">
-        <label
-          v-for="style in styleOptions"
-          :key="style"
-          class="filter-chip"
-          :class="{ selected: isSelected('styles', style) }"
-          @click="toggleFilter('styles', style)"
-        >
-          {{ style }}
-        </label>
-      </div>
-    </div>
-
     <button class="apply-btn" @click="emit('filtersChanged', filters); isOpen = false">
       Apply Filters
     </button>

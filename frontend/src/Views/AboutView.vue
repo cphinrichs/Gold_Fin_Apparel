@@ -35,7 +35,7 @@ const showMembers = ref(false);
     <p class = "info">
         Dillon is responsible for overseeing the development of our applications and ensuring that our team is working efficiently. With a strong background in software engineering, he leads the charge in creating innovative solutions for our customers.
     </p>
-    <h2>Kara Lynch - Backend Developer, & DBA</h2>
+    <h2>Kara Lynch - Backend Developer & DBA</h2>
     <p class = "info">
         Kara is responsible for developing and maintaining our backend systems and databases. With a strong background in software engineering, she ensures that our applications run smoothly and efficiently. As a DBA, Kara also manages our data integrity and performance, ensuring that our systems are reliable and secure.
     </p>

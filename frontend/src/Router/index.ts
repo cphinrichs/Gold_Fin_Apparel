@@ -64,24 +64,34 @@ const router = createRouter({
       component: InspectView
     },
     {
-      path: '/tops',
-      name: 'Tops',
-      component: () => import('../ProductViewPages/TopsView.vue')
+      path: '/tshirts',
+      name: 'T-Shirts',
+      component: () => import('../ProductViewPages/TShirtsView.vue')
     },
     {
-      path: '/hats',
-      name: 'Hats',
-      component: () => import('../ProductViewPages/HatsView.vue')
+      path: '/longsleeves',
+      name: 'Long Sleeves',
+      component: () => import('../ProductViewPages/LongSleevesView.vue')
     },
     {
-      path: '/socks',
-      name: 'Socks',
-      component: () => import('../ProductViewPages/SocksView.vue')
+      path: '/hoodies',
+      name: 'Hoodies',
+      component: () => import('../ProductViewPages/HoodiesView.vue')
     },
     {
-      path: '/accessories',
-      name: 'Accessories',
-      component: () => import('../ProductViewPages/AccessoriesView.vue')
+      path: '/tanktops',
+      name: 'Tank Tops',
+      component: () => import('../ProductViewPages/TankTopsView.vue')
+    },
+    {
+      path: '/vests',
+      name: 'Vests',
+      component: () => import('../ProductViewPages/VestsView.vue')
+    },
+    {
+      path: '/kimonos',
+      name: 'Kimonos',
+      component: () => import('../ProductViewPages/KimonosView.vue')
     },
     {
       path: '/orderconfirmation',

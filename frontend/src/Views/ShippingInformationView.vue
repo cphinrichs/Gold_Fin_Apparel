@@ -68,6 +68,7 @@ h2 {
   border-top: #000000 solid 2px;
   padding: 1.5rem 0;
   margin-bottom: 1rem;
+  text-align: center   ;
 }
 
 h3 {

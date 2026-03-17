@@ -10,10 +10,12 @@ providing navigation links and quick access to key features.
       <li>
         <a href="/browse">Browse</a>
         <ul class="dropdown">
-          <li><a href="/tops">Tops</a></li>
-          <li><a href="/hats">Hats</a></li>
-          <li><a href="/socks">Socks</a></li>
-          <li><a href="/accessories">Accessories</a></li>
+          <li><a href="/tanktops">Tank Tops</a></li>
+          <li><a href="/tshirts">T-Shirts</a></li>
+          <li><a href="/longsleeves">Long Sleeves</a></li>
+          <li><a href="/hoodies">Hoodies</a></li>
+          <li><a href="/vests">Vests</a></li>
+          <li><a href="/kimonos">Kimonos</a></li>
         </ul>
       </li>
       <li><a href="/about">About</a></li>
