@@ -64,6 +64,7 @@ h2 {
   padding: 1.5rem 0;
   margin-top: 0;
   margin-bottom: 1rem;
+  text-align: center;
 }
 
 .intro-section {
