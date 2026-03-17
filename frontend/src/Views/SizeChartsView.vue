@@ -8,7 +8,7 @@
   <h1>Size Charts</h1>
   <h2>Tops Size Chart</h2>
     <div class="size-chart">
-      <p>To help you find the perfect fit, please refer to our size chart below:</p>
+      <p>To help you find the perfect fit, please refer to our size chart below</p>
       <table class="size-table">
         <thead>
           <tr>
@@ -43,7 +43,7 @@
     </div>
     <h2>Socks Size Chart</h2>
     <div class="size-chart">
-      <p>Find your perfect sock fit using our size chart:</p>
+      <p>Find your perfect sock fit using our size chart</p>
       <table class="size-table">
         <thead>
           <tr>
@@ -73,7 +73,7 @@
     </div>
     <h2>Hats Size Chart</h2>
     <div class="size-chart">
-      <p>Choose the right hat size based on head circumference:</p>
+      <p>Choose the right hat size based on head circumference</p>
       <table class="size-table">
         <thead>
           <tr>
@@ -115,19 +115,37 @@
 }
 
 h1{
-    font-size: 2.5rem;
+  font-size: 2.5rem;
   color: #000000;
   border-bottom: 3px solid #000000;
   padding-bottom: 1rem;
   margin: 2rem 0;
+  text-align: center;
+
 }
 
 h2{
+  max-width: 600px;
+  margin-left: 0.5rem;
+  text-align: center;
   font-size: 1.5rem;
   color: #000000;
 }
+
+p{
+  max-width: 600px;
+  text-align: center;
+  line-height: 1.0;
+  margin: 1rem 0;
+  font-size: 1.2rem;
+  color: #000000;
+}
 .size-chart {
-  margin-left: .5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 600px;
 }
 
 .size-table {
@@ -177,8 +195,25 @@ h2{
 }
 
 section {
-  padding: 0px 20px;
+  padding: 20px clamp(16px, 5vw, 60px);
   max-width: 1200px;
   margin: 0 auto;
+  box-sizing: border-box;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h1 {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+}
+
+.size-table {
+  width: 100%;
+  max-width: 600px;
 }
 </style>
