@@ -1,0 +1,16 @@
+---
+description: Viewing sales reports is an important aspect of managing Gold Fin Apparel, and the reports manager provides valuable insights into customer orders and product performance.
+---
+# Managing Sales Reports
+
+Viewing sales reports is an important aspect of managing Gold Fin Apparel, and the reports manager provides valuable insights into customer orders and product performance. You can view reports that show unique orders and quantities by customer, sales data by date, and every unique item ordered along with its attributes and the total quantity sold for each item. This can be used to make informed decisions about inventory management, marketing strategies, and overall business performance.
+
+## Viewing Sales Reports
+
+!!! note "Prerequisites"
+
+    To view sales reports, you need to have the Zowe Explorer v3.4.2 Extension for Visual Studio Code installed and configured to connect to your mainframe environment where Gold Fin Apparel is deployed.
+
+1. Open Visual Studio Code and navigate to the Zowe Explorer panel.
+
+1. 
