@@ -99,7 +99,7 @@ h2 {
 }
 
 section {
-  padding: 60px 20px;
+  padding: 0px 20px;
   max-width: 1200px;
   margin: 0 auto;
 }

@@ -49,7 +49,7 @@ import BrowseButton from './Buttons/BrowseButton.vue';
 .checkout-browse-footer {
   position: fixed;
   bottom: 20px;
-  left: 20px;
+  right: 20px;
   z-index: 999;
 }
 </style>

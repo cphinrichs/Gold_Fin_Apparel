@@ -71,7 +71,7 @@ h1 {
 h2 {
   margin-left: 10px;
   font-size: 1.5rem;
-  color: #333;
+  color: #000000;
   margin-bottom: 0.25rem;
 }
 
@@ -85,7 +85,7 @@ h2 {
 
 .logo {
   position: absolute;
-  top: 0px;
+  top: -10px;
   right: -510px;
   width: 500px;
   height: auto;
@@ -97,7 +97,7 @@ h2 {
   margin-right: 0;
   margin-left: 10px;
   padding: 5px;
-  color: #555;
+  color: #000000;
   border-bottom: 3px solid #0000;
 }
 

@@ -1,11 +1,28 @@
 <script lang="ts" setup>
+import SortFilterWidget from '../Components/Widgets/SortFilterWidget.vue';
+
+const handleFiltersChanged = (filters: any) => {
+  console.log('Filters applied:', filters);
+};
 </script>
 
 <template>
- <section>
-  <div class="accessories">
-    <h1>Accessories Page</h1>
-    <p>Here, users will be able to browse our collection of accessories.</p>
+  <div class="page-wrapper">
+    <SortFilterWidget @filtersChanged="handleFiltersChanged" />
+    <section class="page-section">
+      <h1>Accessories</h1>
+      <p>Browse our collection of accessories. Use the filter panel on the left to narrow your results.</p>
+    </section>
   </div>
-  </section>
 </template>
+
+<style scoped>
+.page-wrapper {
+  position: relative;
+}
+.page-section {
+  padding: 60px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+</style>

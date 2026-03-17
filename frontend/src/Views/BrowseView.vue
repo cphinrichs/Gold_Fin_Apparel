@@ -1,6 +1,8 @@
 <template>
-  <section>
-    <div class="browse">
+  <div class="page-wrapper">
+    <SortFilterWidget @filtersChanged="handleFiltersChanged" />
+    <section>
+      <div class="browse">
       <h1>Browse Products</h1>
       <div v-if="loading" class="loading">Loading products...</div>
       <div v-else-if="error" class="error">{{ error }}</div>
@@ -21,6 +23,7 @@
       </div>
     </div>
   </section>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -72,6 +75,10 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.page-wrapper {
+  position: relative;
+}
+
 .browse {
   padding: 20px;
 }
