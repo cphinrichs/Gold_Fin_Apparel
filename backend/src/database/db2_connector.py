@@ -8,7 +8,7 @@ from config.settings import Settings
 from pathlib import Path
 from order_validation.order_validator import Order
 import datetime
-import dao_helper_functions as helper
+from database import dao_helper_functions as helper
 
 # clidriver_path = Path(__file__).parent.parent.parent.parent
 # os.add_dll_directory(f"{clidriver_path}/bin")
@@ -17,7 +17,7 @@ import dao_helper_functions as helper
 # os.environ["PATH"] = clidriver_path + ";" + os.environ.get("PATH", "")
 
 project_root = Path(__file__).parent.parent.parent.parent
-venv_path = project_root / "venv" / "Lib" / "site-packages" / "clidriver"
+venv_path = project_root / ".venv" / "Lib" / "site-packages" / "clidriver"
 clidriver_bin = venv_path / "bin"
 clidriver_crt = clidriver_bin / "amd64.VC12.CRT"
 
@@ -71,12 +71,34 @@ class _Db2DAO:
             raise Exception
 
     def create_order(self, order_data: Order):
+        #step 0: ensure that there are items attached to the order
+        order_items = order_data.get_items()
+        if len(order_items) == 0:
+            log.log(Level.ERROR, "Aborting order. No items were included.")
+            raise IndexError
+        
+        #step 1: validate that we have everything in stock. and if we do, get its pricing data
+        log.log(Level.DEBUG, "Checking price information and ensuring all items are in stock...")
+        order_items = order_data.get_items()
+
+        conn = helper.get_pooled_connection(self._conn_str)
+        
+        price_data = self.validate_and_lookup_item_prices(conn, order_data)
+
+        #step 2: calculate the prices for the order and for each item
+
+        order_price, order_items = helper.get_order_price(price_data, order_items)
+
+        
+        
+
+        #step 3: check if the customer exists in the database
+        #if they do, get their ID number. if they don't, add them and get the new ID
         log.log(Level.DEBUG, "Initializing SQL query to check if the customer exists...")
         customer_check_sql = f"""
         SELECT * FROM {self.creds["db_name"]}.CUSTOMERS
         WHERE NAME = ?;
         """
-        conn = helper.get_pooled_connection(self._conn_str)
         cursor = conn.cursor()
 
 
@@ -89,50 +111,50 @@ class _Db2DAO:
             cust_id = self.add_customer_and_return_id(conn, order_data.get_customer())
         else:
             cust_id = customer_query_results[0][0]
-
+        
+        #step 4: add the order to the table using the customer's ID and the order data
+        #then get the order ID for the next step
         add_order_sql = f"""
         SELECT ID
         FROM FINAL TABLE
         (INSERT INTO {self.creds["db_name"]}.ORDERS (CUSTOMER_ID, TOTAL, ORDER_DATE)
         VALUES (?, ?, ?));
         """
-        
-        order_price = helper.get_order_price(order_data)
 
         current_time = datetime.datetime.today().strftime("%Y-%m-%d")
+
 
         order_params = [cust_id, order_price, current_time]
 
         cursor.execute(add_order_sql, order_params)
         order_id = cursor.fetchall()[0][0]
+
+        #step 5: add each of the order items to the table
+
         
         order_items_sql = f"""
         INSERT INTO {self.creds["db_name"]}.ORDER_ITEMS (ORDER_ID, PRODUCT_ID, QUANTITY, DESIGN_ID, PRICE)
         VALUES(?, ?, ?, ?, ?)"""
 
-        order_items = order_data.get_items()
-
         for item in order_items:
             order_items_params = [order_id, item["Product_Id"], item["Quantity"], item["Design_Id"], helper.get_item_price(item)]
             cursor.execute(order_items_sql, order_items_params)
 
+        #step 6: for each order item, decrement the inventory table by its quantity
+
         conn.close()
     
-    def lookup_inventory_by_id(self, conn: ibm_db_dbi.Connection, id_list: list[int]) -> list[dict]:
-        # this method is only meant for use by other parts of the DAO
-        # which is why it takes a connection as input
-
-        if len(id_list) == 0:
-            log.log(Level.ERROR, "Aborting inventory lookup by id. No ids were given -- this likely means an empty order was made.")
-            return [{}]
+    def validate_and_lookup_item_prices (self, conn: ibm_db_dbi.Connection, order_data: Order) -> dict[int, dict[str, int | float]]:
+        order_items = order_data.get_items()
         
-        sql = f"""
+        product_ids, design_ids = set()
+        for item in order_items:
+            product_ids.add(item["Product_Id"])
+            design_ids.add(item["Design_Id"])
+        
+        product_lookup_sql = f"""
         SELECT 
             INVENTORY.PRODUCT_ID,
-            SIZES.NAME AS SIZE,
-            STYLES.NAME AS STYLE,
-            MATERIAL.NAME AS MATERIAL,
-            INVENTORY.COLOR,
             INVENTORY.STOCK,
             SIZES.PRICE_FACTOR AS SIZE_FACTOR,
             STYLES.PRICE AS STYLE_PRICE,
@@ -149,59 +171,31 @@ class _Db2DAO:
 
         params = []
         
-        for id in id_list:
-            sql += "?"
-            if len(params) < len(id_list) - 1:
-                sql += ", "
-            elif len(params) == len(id_list) - 1:
-                sql += ");"
+        for id in product_ids:
+            product_lookup_sql += "?"
+            if len(params) < len(product_ids) - 1:
+                product_lookup_sql += ", "
+            elif len(params) == len(product_ids) - 1:
+                product_lookup_sql += ");"
             params.append(id)
         
         cursor = conn.cursor()
-        cursor.execute(sql, params)
+        cursor.execute(product_lookup_sql, params)
         query_results = cursor.fetchall()
 
-        inventory_list = []
+        inventory_dict = {}
         for row in query_results:
-            inventory_list.append(helper.convert_inventory_data(row))
-        
-        return inventory_list
-    
-    def lookup_design_prices_by_id(self, conn: ibm_db_dbi.Connection, id_list: list[int]) -> list[dict]:
-        # this method is only meant for use by other parts of the DAO
-        # which is why it takes a connection as input
-        sql = f"""
-        SELECT ID, PRICE
-        FROM {self.creds["db_name"]}.DESIGNS
-        WHERE ID IN (
-        """
+            inventory_dict[row[0]] = helper.convert_inventory_price_data(row)
+        item = {}
 
-        if len(id_list) == 0:
-            log.log(Level.ERROR, "Aborting inventory lookup by id. No ids were given -- this likely means an empty order was made.")
-            return [{}]
+        try:
+            for item in order_items:
+                assert item["Quantity"] <= inventory_dict[item["Product_Id"]]["Stock"]
+        except AssertionError:
+            log.log(Level.ERROR, "Aborting order. Insufficient stock for item of id " + item["Product_Id"])
+            raise Exception
 
-        params = []
-        
-        for id in id_list:
-            sql += "?"
-            if len(params) < len(id_list) - 1:
-                sql += ", "
-            elif len(params) == len(id_list) - 1:
-                sql += ");"
-            params.append(id)
-        
-        cursor = conn.cursor()
-        cursor.execute(sql, params)
-        query_results = cursor.fetchall()
-        
-        inventory_list = []
-        for row in query_results:
-            inventory_list.append(helper.convert_inventory_data(row))
-        
-        return inventory_list
-    
-    
-        
+        return inventory_dict
         
     def add_customer_and_return_id(self, conn: ibm_db_dbi.Connection, cust_data: dict) -> int:
         sql = f"""
@@ -230,22 +224,22 @@ class _Db2DAO:
             log.log(Level.DEBUG, "Preparing SQL query to display inventory...")
             sql = f"""
             SELECT 
-                INVENTORY.PRODUCT_ID,
-                SIZES.NAME AS SIZE,
-                STYLES.NAME AS STYLE,
-                MATERIAL.NAME AS MATERIAL,
-                INVENTORY.COLOR,
-                INVENTORY.STOCK,
-                SIZES.PRICE_FACTOR AS SIZE_FACTOR,
-                STYLES.PRICE AS STYLE_PRICE,
-                MATERIAL.PRICE AS MATERIAL_PRICE
+                {self.creds["db_name"]}.INVENTORY.PRODUCT_ID,
+                {self.creds["db_name"]}.SIZES.NAME AS SIZE,
+                {self.creds["db_name"]}.STYLES.NAME AS STYLE,
+                {self.creds["db_name"]}.MATERIALS.NAME AS MATERIAL,
+                {self.creds["db_name"]}.INVENTORY.COLOR,
+                {self.creds["db_name"]}.INVENTORY.STOCK,
+                {self.creds["db_name"]}.SIZES.PRICE_FACTOR AS SIZE_FACTOR,
+                {self.creds["db_name"]}.STYLES.PRICE AS STYLE_PRICE,
+                {self.creds["db_name"]}.MATERIALS.PRICE AS MATERIAL_PRICE
             FROM {self.creds["db_name"]}.INVENTORY
             LEFT JOIN {self.creds["db_name"]}.SIZES
-                ON INVENTORY.SIZE_ID = SIZES.ID
+                ON {self.creds["db_name"]}.INVENTORY.SIZE_ID = {self.creds["db_name"]}.SIZES.ID
             LEFT JOIN {self.creds["db_name"]}.STYLES
-                ON INVENTORY.STYLE_ID = STYLES.ID
+                ON {self.creds["db_name"]}.INVENTORY.STYLE_ID = {self.creds["db_name"]}.STYLES.ID
             LEFT JOIN {self.creds["db_name"]}.MATERIALS
-                ON INVENTORY.MATERIAL_ID = MATERIALS.ID
+                ON {self.creds["db_name"]}.INVENTORY.MATERIAL_ID = {self.creds["db_name"]}.MATERIALS.ID
             """
             params = []
 
@@ -263,7 +257,7 @@ class _Db2DAO:
                     
                     params.append(search_fields[field])
 
-            sql += " ORDER BY INVENTORY.STOCK "
+            sql += f" ORDER BY {self.creds["db_name"]}.INVENTORY.STOCK "
             if "Ascending" in search_fields and search_fields["Ascending"].lower() == "true":
                 sql += "ASC;"
             else:
@@ -286,8 +280,6 @@ class _Db2DAO:
                 inventory_list.append(helper.convert_inventory_data(row))
             
             return inventory_list
-        
-            #TODO: refactor to include left joins and price calc
         except Exception as e:
             log.log(Level.ERROR, "Error occured during inventory query: " + e.args[0])
             raise Exception(e.args[0])
