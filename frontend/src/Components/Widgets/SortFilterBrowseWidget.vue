@@ -24,7 +24,7 @@ const filters = reactive<Filters>({
 const colorOptions = ['White', 'Black', 'Red', 'Blue', 'Green'];
 const materialOptions = ['Cotton', 'Polyester', 'Wool', 'Silk', 'Kevlar'];
 const sizeOptions = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL'];
-const styleOptions = ['Short Sleeve', 'Long Sleeve', 'Hoodie', 'Sweater', 'Vest', 'Kimono'];
+const styleOptions = ['Tank Top', 'Short Sleeve', 'Long Sleeve', 'Hoodie', 'Vest', 'Kimono'];
 
 const activeFilterCount = computed(() =>
   filters.colors.length + filters.materials.length + filters.sizes.length + filters.styles.length
