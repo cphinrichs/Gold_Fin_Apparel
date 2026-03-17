@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import SortFilterWidget from '../Components/Widgets/SortFilterWidget.vue';
+import SortFilterTwo from '../Components/Widgets/SortFilterTwo.vue';
 
 const handleFiltersChanged = (filters: any) => {
   console.log('Filters applied:', filters);
@@ -8,10 +8,10 @@ const handleFiltersChanged = (filters: any) => {
 
 <template>
   <div class="page-wrapper">
-    <SortFilterWidget @filtersChanged="handleFiltersChanged" />
+    <SortFilterTwo @filtersChanged="handleFiltersChanged" />
     <section class="page-section">
-      <h1>Tops</h1>
-      <p>Browse our collection of tops. Use the filter panel on the left to narrow your results.</p>
+      <h1>Vests</h1>
+      <p>Browse our collection of vests. Use the filter panel on the left to narrow your results.</p>
     </section>
   </div>
 </template>
