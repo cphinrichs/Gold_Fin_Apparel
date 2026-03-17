@@ -7,7 +7,7 @@ from order_validation.order_validator import Order
 import json
 
 project_root = Path(__file__).parent.parent.parent.parent
-venv_path = project_root / "venv" / "Lib" / "site-packages" / "clidriver"
+venv_path = project_root / ".venv" / "Lib" / "site-packages" / "clidriver"
 clidriver_bin = venv_path / "bin"
 clidriver_crt = clidriver_bin / "amd64.VC12.CRT"
 
@@ -33,8 +33,9 @@ def get_pooled_connection(conn_str) -> ibm_db_dbi.Connection:
     assert(isinstance(new_connection, ibm_db.IBM_DBConnection))
     return ibm_db_dbi.Connection(new_connection)
     
-def get_order_price(order_data: Order) -> float:
-    return 0.0
+def get_order_price(order_price_data: dict[int, dict[str, int | float]], order_items: list[dict]) -> tuple[float, list[dict]]:
+    
+    return (0.0, [{}])
 
 def get_item_price(item_data: dict) -> float:
     running_total = item_data["Style_Price"] * item_data["Size_Factor"]
@@ -48,11 +49,11 @@ def get_item_price(item_data: dict) -> float:
     
 def convert_inventory_data(row: tuple) -> dict:
     price_info = {
-        "Size_Factor": row[6],
-        "Style_Price": row[7],
-        "Material_Price": row[8],
+        "Size_Factor": float(row[6]),
+        "Style_Price": float(row[7]),
+        "Material_Price": float(row[8]),
         "Design_Price": 0.0,
-        "Trim": False
+        "Gold_Trim": 0
     }
     item_price = get_item_price(price_info)
     return {
@@ -64,3 +65,18 @@ def convert_inventory_data(row: tuple) -> dict:
         "Stock": row[5],
         "Price": item_price
     }
+
+def convert_inventory_price_data(row: tuple) -> dict[str, int | float]:
+    # INVENTORY.PRODUCT_ID,
+    # INVENTORY.STOCK,
+    # SIZES.PRICE_FACTOR AS SIZE_FACTOR,
+    # STYLES.PRICE AS STYLE_PRICE,
+    # MATERIAL.PRICE AS MATERIAL_PRICE,
+    price_data = {}
+    
+    price_data["Stock"] = row[1]
+    price_data["Size_Factor"] = row[1]
+    price_data["Style_Price"] = row[2],
+    price_data["Material_Price"] = row[3]
+    
+    return price_data

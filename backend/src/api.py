@@ -31,7 +31,7 @@ def getInventory():
     # Convert list of tuples to list of dictionaries
     
     
-    return jsonify({"inventory": query_results})
+    return query_results
 
 
 @app.get("/designs")
