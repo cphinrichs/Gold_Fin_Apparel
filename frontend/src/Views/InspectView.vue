@@ -91,17 +91,59 @@
 
 <script lang="ts" setup>
 import { ref, computed } from 'vue'
+// Product images - Kimono
 import productKimFront from '../Assets/Kimono/Designer(5).png'
 import productKimLeft from '../Assets/Kimono/Designer(6).png'
 import productKimBack from '../Assets/Kimono/Designer(7).png'
 import productKimRight from '../Assets/Kimono/Designer(8).png'
 import productKimDetail from '../Assets/Kimono/Designer(9).png'
+
+// Product images - Vest
+import productVestFront from '../Assets/Vest/vest(1).png'
+import productVestLeft from '../Assets/Vest/vest(2).png'
+import productVestBack from '../Assets/Vest/vest(3).png'
+import productVestRight from '../Assets/Vest/vest(4).png'
+import productVestDetail from '../Assets/Vest/vest(5).png'
+
+// Product images - T-Shirt
+import prodcutShirtFront from '../Assets/T-Shirt/shirt(1).png'
+import prodcutShirtLeft from '../Assets/T-Shirt/shirt(2).png'
+import prodcutShirtBack from '../Assets/T-Shirt/shirt(3).png'
+import prodcutShirtRight from '../Assets/T-Shirt/shirt(4).png'
+import prodcutShirtDetail from '../Assets/T-Shirt/shirt(5).png'
+
+// Material textures
 import materialCotton from '../Assets/Textures/material-cotton.png'
 import materialPolyester from '../Assets/Textures/material-polyester.png'
 import materialLeather from '../Assets/Textures/material-leather.png'
 import materialWool from '../Assets/Textures/material-wool.png'
 import materialBlend from '../Assets/Textures/material-blend.png'
 import materialKevlar from '../Assets/Textures/material-kevlar.png'
+
+// Image mapping by style
+const styleImages: Record<string, string[]> = {
+    'Kimono': [
+        productKimFront,
+        productKimLeft,
+        productKimBack,
+        productKimRight,
+        productKimDetail
+    ],
+    'Vest': [
+        productVestFront,
+        productVestLeft,
+        productVestBack,
+        productVestRight,
+        productVestDetail
+    ],
+    'T-Shirt': [
+        prodcutShirtFront,
+        prodcutShirtLeft,
+        prodcutShirtBack,
+        prodcutShirtRight,
+        prodcutShirtDetail
+    ]
+}
 
 const selectedImage = ref(0)
 const selectedColor = ref('#f5f5f5')
@@ -121,6 +163,11 @@ const materialBackgroundImage = computed(() => {
         return `url(${materialTextures[selectedMaterial.value]})`
     }
     return 'none'
+})
+
+// Computed property to get images based on product style
+const productImages = computed(() => {
+    return styleImages[productData.value.style] || []
 })
 
 const activeColor = (event: Event, color: string) => {
@@ -146,18 +193,10 @@ const activeMaterial = (event: Event, material: string) => {
     selectedMaterial.value = material
 }
 
-const productImages = [
-    productKimFront,
-    productKimLeft,
-    productKimBack,
-    productKimRight,
-    productKimDetail
-]
-
 // Mock product data - replace with API call later
 const productData = ref({
     name: 'Kyoto Signature',
-    style: 'Kimono',
+    style: 'Vest', 
     rating: 5,
     reviewCount: 200,
     description: 'Test',
