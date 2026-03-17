@@ -7,6 +7,7 @@ This allows testing without requiring a live DB2 connection.
 
 import unittest
 import sys
+import json
 from pathlib import Path
 from unittest.mock import patch, MagicMock, Mock
 
@@ -197,8 +198,8 @@ class TestGetDesigns(unittest.TestCase):
     def test_designs_no_filters(self):
         """Test GET /designs with no filter headers returns all designs"""
         db_module.select_designs.return_value = [
-            ("Design1", 29.99, "Description1"),
-            ("Design2", 39.99, "Description2")
+            (1, "Design1", 29.99, "Description1"),
+            (2, "Design2", 39.99, "Description2")
         ]
         
         response = self.client.get("/designs")
@@ -209,7 +210,7 @@ class TestGetDesigns(unittest.TestCase):
     def test_designs_with_min_price(self):
         """Test GET /designs with Min_Price header filters correctly"""
         db_module.select_designs.return_value = [
-            ("Design2", 39.99, "Description2")
+            (2, "Design2", 39.99, "Description2")
         ]
         
         response = self.client.get("/designs", headers={"Min_Price": "30"})
@@ -224,22 +225,22 @@ class TestGetDesigns(unittest.TestCase):
     def test_designs_with_max_price(self):
         """Test GET /designs with Max_Price header filters correctly"""
         db_module.select_designs.return_value = [
-            ("Design1", 29.99, "Description1")
+            (1, "Design1", 29.99, "Description1")
         ]
         
-        response = self.client.get("/designs", headers={"Max_Price": "35"})
+        response = self.client.get("/designs", headers={"Max_Price": "30"})
         
         call_args = db_module.select_designs.call_args[0][0]
         # HTTP converts underscores to hyphens in headers
         self.assertIn("Max-Price", call_args)
-        self.assertEqual(call_args["Max-Price"], "35")
+        self.assertEqual(call_args["Max-Price"], "30")
         
         self.assertEqual(response.status_code, 200)
 
     def test_designs_with_price_range(self):
         """Test GET /designs with both Min_Price and Max_Price"""
         db_module.select_designs.return_value = [
-            ("Design2", 34.99, "Description2")
+            (2, "Design2", 34.99, "Description2")
         ]
         
         response = self.client.get("/designs", headers={
@@ -257,7 +258,7 @@ class TestGetDesigns(unittest.TestCase):
     def test_designs_with_name_filter(self):
         """Test GET /designs with Name header filters correctly"""
         db_module.select_designs.return_value = [
-            ("Floral Design", 29.99, "Description1")
+            (1, "Floral Design", 29.99, "Description1")
         ]
         
         response = self.client.get("/designs", headers={"Name": "Floral"})
@@ -271,8 +272,8 @@ class TestGetDesigns(unittest.TestCase):
     def test_designs_sort_by_price(self):
         """Test GET /designs with Sort_By_Price: true"""
         db_module.select_designs.return_value = [
-            ("Design1", 29.99, "Description1"),
-            ("Design2", 39.99, "Description2")
+            (1, "Design1", 29.99, "Description1"),
+            (2, "Design2", 39.99, "Description2")
         ]
         
         response = self.client.get("/designs", headers={"Sort_By_Price": "true"})
@@ -287,8 +288,8 @@ class TestGetDesigns(unittest.TestCase):
     def test_designs_sort_by_name(self):
         """Test GET /designs with Sort_By_Price: false (defaults to name sort)"""
         db_module.select_designs.return_value = [
-            ("Design1", 39.99, "Description2"),
-            ("Design2", 29.99, "Description1")
+            (1, "Design1", 39.99, "Description2"),
+            (2, "Design2", 29.99, "Description1")
         ]
         
         response = self.client.get("/designs", headers={"Sort_By_Price": "false"})
@@ -302,8 +303,8 @@ class TestGetDesigns(unittest.TestCase):
     def test_designs_ascending_order(self):
         """Test GET /designs with Ascending: true"""
         db_module.select_designs.return_value = [
-            ("Design1", 29.99, "Description1"),
-            ("Design2", 39.99, "Description2")
+            (1, "Design1", 29.99, "Description1"),
+            (2, "Design2", 39.99, "Description2")
         ]
         
         response = self.client.get("/designs", headers={"Ascending": "true"})
@@ -317,8 +318,8 @@ class TestGetDesigns(unittest.TestCase):
     def test_designs_descending_order(self):
         """Test GET /designs with Ascending: false"""
         db_module.select_designs.return_value = [
-            ("Design2", 39.99, "Description2"),
-            ("Design1", 29.99, "Description1")
+            (2, "Design2", 39.99, "Description2"),
+            (1, "Design1", 29.99, "Description1")
         ]
         
         response = self.client.get("/designs", headers={"Ascending": "false"})
@@ -331,7 +332,7 @@ class TestGetDesigns(unittest.TestCase):
     def test_designs_complex_filter(self):
         """Test GET /designs with multiple filters combined"""
         db_module.select_designs.return_value = [
-            ("Floral Design", 34.99, "Beautiful floral pattern")
+            (1, "Floral Design", 34.99, "Beautiful floral pattern")
         ]
         
         response = self.client.get("/designs", headers={
@@ -359,6 +360,136 @@ class TestGetDesigns(unittest.TestCase):
         # Flask catches the exception and returns a 500 error
         response = self.client.get("/designs")
         self.assertEqual(response.status_code, 500)
+
+
+class TestHelloWorld(unittest.TestCase):
+    """Test cases for GET /hello_world endpoint"""
+
+    def setUp(self):
+        """Set up test client"""
+        # Import here to avoid import issues in other test classes
+        sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+        from api import app  # pylint: disable=import-error,import-outside-toplevel
+        self.client = app.test_client()
+
+    def tearDown(self):
+        """Clean up after tests"""
+        pass
+
+    def test_hello_world_returns_200(self):
+        """Test GET /hello_world returns 200 status code"""
+        response = self.client.get("/hello_world")
+        
+        self.assertEqual(response.status_code, 200)
+
+    def test_hello_world_returns_html(self):
+        """Test GET /hello_world returns HTML content"""
+        response = self.client.get("/hello_world")
+        
+        self.assertEqual(response.content_type, "text/html; charset=utf-8")
+
+    def test_hello_world_contains_hello(self):
+        """Test GET /hello_world response contains 'Hello'"""
+        response = self.client.get("/hello_world")
+        
+        self.assertIn(b"Hello", response.data)
+
+
+class TestPostOrder(unittest.TestCase):
+    """Test cases for POST /order endpoint"""
+
+    @classmethod
+    def setUpClass(cls):
+        """Set up once for all tests"""
+        sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+
+    def setUp(self):
+        """Set up test client with mocked database"""
+        from api import app  # pylint: disable=import-error,import-outside-toplevel
+        import database as db_module  # pylint: disable=import-error,import-outside-toplevel
+        
+        self.db_module = db_module
+        self.db_module.db = Mock()
+        self.db_module.db.create_order = Mock()
+        
+        self.client = app.test_client()
+
+    def tearDown(self):
+        """Clean up mocks"""
+        self.db_module.db.create_order.reset_mock()
+
+    def test_post_order_missing_customer(self):
+        """Test POST /order with missing customer information"""
+        invalid_order = {
+            "Items": [
+                {
+                    "Product_Id": 1,
+                    "Design_Id": 1,
+                    "Quantity": 2
+                }
+            ]
+        }
+        
+        response = self.client.post(
+            "/order",
+            data=json.dumps(invalid_order),
+            content_type="application/json"
+        )
+        
+        # Should return 401 due to validation failure
+        self.assertEqual(response.status_code, 401)
+
+    def test_post_order_missing_items(self):
+        """Test POST /order with missing items"""
+        invalid_order = {
+            "Customer": {"Name": "John Doe", "Address": "123 Main St"},
+            "Items": []
+        }
+        
+        response = self.client.post(
+            "/order",
+            data=json.dumps(invalid_order),
+            content_type="application/json"
+        )
+        
+        # Should return 401 due to validation failure
+        self.assertEqual(response.status_code, 401)
+
+    def test_post_order_invalid_json(self):
+        """Test POST /order with invalid JSON"""
+        response = self.client.post(
+            "/order",
+            data="not valid json",
+            content_type="application/json"
+        )
+        
+        # Should return 400 or 500 due to JSON parsing error
+        self.assertIn(response.status_code, [400, 415, 500])
+
+    def test_post_order_database_error(self):
+        """Test POST /order handles database errors"""
+        self.db_module.db.create_order.side_effect = Exception("Database error")
+        
+        valid_order = {
+            "Customer": {"Name": "Jane Smith", "Address": "456 Oak Ave"},
+            "Items": [
+                {
+                    "Product_Id": 2,
+                    "Design_Id": 3,
+                    "Quantity": 1
+                }
+            ]
+        }
+        
+        response = self.client.post(
+            "/order",
+            data=json.dumps(valid_order),
+            content_type="application/json"
+        )
+        
+        # Should handle the exception gracefully
+        # Current implementation may return 500
+        self.assertIn(response.status_code, [401, 500])
 
 
 if __name__ == "__main__":
