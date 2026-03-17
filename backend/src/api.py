@@ -29,18 +29,9 @@ def getInventory():
     
     log.log(Level.DEBUG, "Database queried successfully. Converting to dictionary...")
     # Convert list of tuples to list of dictionaries
-    inventory_list = []
-    for row in query_results:
-        inventory_list.append({
-            "product_id": row[0],
-            "size": row[1],
-            "style": row[2],
-            "material": row[3],
-            "color": row[4],
-            "stock": row[5]
-        })
     
-    return jsonify({"inventory": inventory_list})
+    
+    return jsonify({"inventory": query_results})
 
 
 @app.get("/designs")

@@ -8,6 +8,7 @@ from config.settings import Settings
 from pathlib import Path
 from order_validation.order_validator import Order
 import datetime
+import dao_helper_functions as helper
 
 # clidriver_path = Path(__file__).parent.parent.parent.parent
 # os.add_dll_directory(f"{clidriver_path}/bin")
@@ -28,7 +29,7 @@ import ibm_db_dbi
 
 class _Db2DAO:
     def __init__(self):
-        self.creds = None
+        # self.creds = None
         self.conn = None
         self.cursor = None
         
@@ -37,7 +38,7 @@ class _Db2DAO:
             with open(config_path, "r") as file:
                 self.creds = json.load(file)
         
-            self.conn_str = (
+            self._conn_str = (
                 f"DATABASE={self.creds['db_instance']};"
                 f"HOSTNAME={self.creds['host']};"
                 f"PORT={self.creds['port']};"
@@ -67,21 +68,15 @@ class _Db2DAO:
             # self.create_order(Order(test_dictionary))
         except Exception as e:
             log.log(Level.CRITICAL, f"Failed to initialize DB2 connection: {e}")
-            raise
-
-    def get_pooled_connection(self) -> ibm_db_dbi.Connection:
-        """Gets a connection with ibm_db_dbi"""
-        new_connection = ibm_db.pconnect(self._conn_str,"","")
-        assert(isinstance(new_connection, ibm_db.IBM_DBConnection))
-        return ibm_db_dbi.Connection(new_connection)
+            raise Exception
 
     def create_order(self, order_data: Order):
-        log.log(Level.DEBUG, "Successfully connected to Db2.")
+        log.log(Level.DEBUG, "Initializing SQL query to check if the customer exists...")
         customer_check_sql = f"""
-        SELECT * FROM {self.creds["db_name"]}.Customers
-        WHERE Name = ?;
+        SELECT * FROM {self.creds["db_name"]}.CUSTOMERS
+        WHERE NAME = ?;
         """
-        conn = self.get_pooled_connection()
+        conn = helper.get_pooled_connection(self._conn_str)
         cursor = conn.cursor()
 
 
@@ -91,18 +86,18 @@ class _Db2DAO:
         print(customer_query_results)
 
         if len(customer_query_results) == 0:
-            cust_id = self.add_customer(conn, order_data.get_customer())
+            cust_id = self.add_customer_and_return_id(conn, order_data.get_customer())
         else:
             cust_id = customer_query_results[0][0]
 
         add_order_sql = f"""
         SELECT ID
         FROM FINAL TABLE
-        (INSERT INTO {self.creds["db_name"]}.Orders (Customer_ID, Total_Price, Order_Date)
+        (INSERT INTO {self.creds["db_name"]}.ORDERS (CUSTOMER_ID, TOTAL, ORDER_DATE)
         VALUES (?, ?, ?));
         """
         
-        order_price = self.get_order_price(order_data)
+        order_price = helper.get_order_price(order_data)
 
         current_time = datetime.datetime.today().strftime("%Y-%m-%d")
 
@@ -112,23 +107,107 @@ class _Db2DAO:
         order_id = cursor.fetchall()[0][0]
         
         order_items_sql = f"""
-        INSERT INTO {self.creds["db_name"]}.Order_Items (Order_ID, Product_Id, Quantity, Design_Id, Price)
+        INSERT INTO {self.creds["db_name"]}.ORDER_ITEMS (ORDER_ID, PRODUCT_ID, QUANTITY, DESIGN_ID, PRICE)
         VALUES(?, ?, ?, ?, ?)"""
 
         order_items = order_data.get_items()
 
         for item in order_items:
-            order_items_params = [order_id, item["Product_Id"], item["Quantity"], item["Design_Id"], self.get_item_price(item)]
+            order_items_params = [order_id, item["Product_Id"], item["Quantity"], item["Design_Id"], helper.get_item_price(item)]
             cursor.execute(order_items_sql, order_items_params)
 
         conn.close()
+    
+    def lookup_inventory_by_id(self, conn: ibm_db_dbi.Connection, id_list: list[int]) -> list[dict]:
+        # this method is only meant for use by other parts of the DAO
+        # which is why it takes a connection as input
+
+        if len(id_list) == 0:
+            log.log(Level.ERROR, "Aborting inventory lookup by id. No ids were given -- this likely means an empty order was made.")
+            return [{}]
+        
+        sql = f"""
+        SELECT 
+            INVENTORY.PRODUCT_ID,
+            SIZES.NAME AS SIZE,
+            STYLES.NAME AS STYLE,
+            MATERIAL.NAME AS MATERIAL,
+            INVENTORY.COLOR,
+            INVENTORY.STOCK,
+            SIZES.PRICE_FACTOR AS SIZE_FACTOR,
+            STYLES.PRICE AS STYLE_PRICE,
+            MATERIAL.PRICE AS MATERIAL_PRICE,
+        FROM {self.creds["db_name"]}.INVENTORY
+        LEFT JOIN {self.creds["db_name"]}.SIZES
+            ON INVENTORY.SIZE_ID = SIZES.ID
+        LEFT JOIN {self.creds["db_name"]}.STYLES
+            ON INVENTORY.STYLE_ID = STYLES.ID
+        LEFT JOIN {self.creds["db_name"]}.MATERIALS
+            ON INVENTORY.MATERIAL_ID = MATERIALS.ID
+        WHERE INVENTORY.PRODUCT_ID IN (
+        """
+
+        params = []
+        
+        for id in id_list:
+            sql += "?"
+            if len(params) < len(id_list) - 1:
+                sql += ", "
+            elif len(params) == len(id_list) - 1:
+                sql += ");"
+            params.append(id)
+        
+        cursor = conn.cursor()
+        cursor.execute(sql, params)
+        query_results = cursor.fetchall()
+
+        inventory_list = []
+        for row in query_results:
+            inventory_list.append(helper.convert_inventory_data(row))
+        
+        return inventory_list
+    
+    def lookup_design_prices_by_id(self, conn: ibm_db_dbi.Connection, id_list: list[int]) -> list[dict]:
+        # this method is only meant for use by other parts of the DAO
+        # which is why it takes a connection as input
+        sql = f"""
+        SELECT ID, PRICE
+        FROM {self.creds["db_name"]}.DESIGNS
+        WHERE ID IN (
+        """
+
+        if len(id_list) == 0:
+            log.log(Level.ERROR, "Aborting inventory lookup by id. No ids were given -- this likely means an empty order was made.")
+            return [{}]
+
+        params = []
+        
+        for id in id_list:
+            sql += "?"
+            if len(params) < len(id_list) - 1:
+                sql += ", "
+            elif len(params) == len(id_list) - 1:
+                sql += ");"
+            params.append(id)
+        
+        cursor = conn.cursor()
+        cursor.execute(sql, params)
+        query_results = cursor.fetchall()
+        
+        inventory_list = []
+        for row in query_results:
+            inventory_list.append(helper.convert_inventory_data(row))
+        
+        return inventory_list
+    
+    
         
         
-    def add_customer(self, conn: ibm_db_dbi.Connection, cust_data: dict) -> int:
+    def add_customer_and_return_id(self, conn: ibm_db_dbi.Connection, cust_data: dict) -> int:
         sql = f"""
         SELECT ID
         FROM FINAL TABLE
-        (INSERT INTO {self.creds["db_name"]}.Customers (Name, Address)
+        (INSERT INTO {self.creds["db_name"]}.CUSTOMERS (NAME, ADDRESS)
         VALUES(?, ?));
         """
         cursor = conn.cursor()
@@ -143,33 +222,30 @@ class _Db2DAO:
         
         
         return 0
-    
-    def get_order_price(self, order_data: Order) -> float:
-        return 0.0
-    
-    def get_item_price(self, item_data: dict) -> float:
-        return 0.0
         
 
-    def select_inventory(self, search_fields: dict) -> list[tuple]:
+    def select_inventory(self, search_fields: dict) -> list[dict]:
         try:
             
             log.log(Level.DEBUG, "Preparing SQL query to display inventory...")
             sql = f"""
             SELECT 
-                I.PRODUCT_ID,
-                SZ.NAME AS SIZE,
-                ST.NAME AS STYLE,
-                M.NAME AS MATERIAL,
-                I.COLOR,
-                I.STOCK
-            FROM {self.creds["db_name"]}.INVENTORY I
-            LEFT JOIN {self.creds["db_name"]}.SIZES SZ
-                ON I.SIZE_ID = SZ.ID
-            LEFT JOIN {self.creds["db_name"]}.STYLES ST
-                ON I.STYLE_ID = ST.ID
-            LEFT JOIN {self.creds["db_name"]}.MATERIALS M
-                ON I.MATERIAL_ID = M.ID
+                INVENTORY.PRODUCT_ID,
+                SIZES.NAME AS SIZE,
+                STYLES.NAME AS STYLE,
+                MATERIAL.NAME AS MATERIAL,
+                INVENTORY.COLOR,
+                INVENTORY.STOCK,
+                SIZES.PRICE_FACTOR AS SIZE_FACTOR,
+                STYLES.PRICE AS STYLE_PRICE,
+                MATERIAL.PRICE AS MATERIAL_PRICE
+            FROM {self.creds["db_name"]}.INVENTORY
+            LEFT JOIN {self.creds["db_name"]}.SIZES
+                ON INVENTORY.SIZE_ID = SIZES.ID
+            LEFT JOIN {self.creds["db_name"]}.STYLES
+                ON INVENTORY.STYLE_ID = STYLES.ID
+            LEFT JOIN {self.creds["db_name"]}.MATERIALS
+                ON INVENTORY.MATERIAL_ID = MATERIALS.ID
             """
             params = []
 
@@ -179,19 +255,15 @@ class _Db2DAO:
                         sql += f" WHERE "
                     else:
                         sql += f" AND "
-                    
-                    if field == "Size":
-                        sql += "SZ.NAME = ?"
-                    elif field == "Style":
-                        sql += "ST.NAME = ?"
-                    elif field == "Material":
-                        sql += "M.NAME = ?"
-                    elif field == "Color":
-                        sql += "I.COLOR = ?"
+
+                    if field == "Color":
+                        sql += "INVENTORY.COLOR = ?"
+                    else:
+                        sql += f"{field}S.NAME = ?"
                     
                     params.append(search_fields[field])
 
-            sql += " ORDER BY I.STOCK "
+            sql += " ORDER BY INVENTORY.STOCK "
             if "Ascending" in search_fields and search_fields["Ascending"].lower() == "true":
                 sql += "ASC;"
             else:
@@ -199,14 +271,21 @@ class _Db2DAO:
 
             print(sql)
 
-            conn = self.get_pooled_connection()
+            conn = helper.get_pooled_connection(self._conn_str)
             cursor = conn.cursor()
             log.log(Level.DEBUG, "Executing query...")
             cursor.execute(sql, params)
             query_results = cursor.fetchall()
 
             conn.close()
-            return query_results
+
+            
+
+            inventory_list = []
+            for row in query_results:
+                inventory_list.append(helper.convert_inventory_data(row))
+            
+            return inventory_list
         
             #TODO: refactor to include left joins and price calc
         except Exception as e:
@@ -224,27 +303,27 @@ class _Db2DAO:
             params = []
 
             if "Min_Price" in search_fields and not "Max_Price" in search_fields:
-                sql += f" WHERE Price >= ?"
+                sql += f" WHERE PRICE >= ?"
                 params.append(search_fields["Min_Price"])
             elif "Max_Price" in search_fields and not "Min_Price" in search_fields:
-                sql += f" WHERE Price <= ?"
+                sql += f" WHERE PRICE <= ?"
                 params.append(search_fields["Max_Price"])
             elif "Min_Price" in search_fields and "Max_Price" in search_fields:
-                sql += f" WHERE Price BETWEEN ? AND ?"
+                sql += f" WHERE PRICE BETWEEN ? AND ?"
                 params.append(search_fields["Min_Price"])
                 params.append(search_fields["Max_Price"])
 
             if "Name" in search_fields:
                 if len(params) == 0:
-                    sql += " WHERE Name LIKE %?%"
+                    sql += " WHERE NAME LIKE %?%"
                 else:
-                    sql += " AND Name LIKE %?%"
+                    sql += " AND NAME LIKE %?%"
                 params.append(search_fields["Name"])
 
             if "Sort_By_Price" in search_fields and search_fields["Sort_By_Price"].lower() == "true":
-                sql += " ORDER BY Price "
+                sql += " ORDER BY PRICE "
             else:
-                sql += " ORDER BY Name "
+                sql += " ORDER BY NAME "
             if "Ascending" in search_fields and search_fields["Ascending"].lower() == "true":
                 sql += "ASC;"
             else:
@@ -252,14 +331,17 @@ class _Db2DAO:
 
             
             
-            conn = self.get_pooled_connection()
+            conn = helper.get_pooled_connection(self._conn_str)
             cursor = conn.cursor()
 
             log.log(Level.DEBUG, "Executing query...")
             cursor.execute(sql, params)
             query_results = cursor.fetchall()
-
             conn.close()
+            
+            
+
+
             return query_results
         except Exception as e:
             log.log(Level.ERROR, "Error occured during designs query: " + str(e.args))

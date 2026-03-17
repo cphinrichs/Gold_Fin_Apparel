@@ -22,6 +22,11 @@ class Settings(object):
         file_name = "db_credentials.json"
         return os.path.join(Settings.dir_name, file_name)
 
+    @staticmethod
+    def backend_config_file() -> str:
+        file_name = "backend_settings.json"
+        return os.path.join(Settings.dir_name, file_name)
+
 """
 TO USE:
 
