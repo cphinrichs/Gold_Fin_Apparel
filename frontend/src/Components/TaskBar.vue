@@ -11,9 +11,9 @@ providing navigation links and quick access to key features.
         <a href="/browse">Browse</a>
         <ul class="dropdown">
           <li><a href="/tops">Tops</a></li>
-          <li><a href="/hats">Hats</a></li>
+          <!-- <li><a href="/hats">Hats</a></li>
           <li><a href="/socks">Socks</a></li>
-          <li><a href="/accessories">Accessories</a></li>
+          <li><a href="/accessories">Accessories</a></li> -->
         </ul>
       </li>
       <li><a href="/about">About</a></li>
