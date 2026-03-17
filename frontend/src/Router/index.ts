@@ -3,8 +3,10 @@
 
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../Views/HomeView.vue'
+import BrowseView from '../Views/BrowseView.vue'
+import InspectView from '../Views/InspectView.vue'
 const router = createRouter({
-  history: createWebHistory('/'),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
         path: '/',
@@ -19,7 +21,7 @@ const router = createRouter({
     {
       path: '/browse',
       name: 'Browse',
-      component: () => import('../Views/BrowseView.vue')
+      component: BrowseView
     },
     {
       path: '/cart',
@@ -57,9 +59,9 @@ const router = createRouter({
       component: () => import('../Views/SizeChartsView.vue')
     },
     {
-      path: '/inspect',
+      path: '/inspect/:id',
       name: 'Inspect',
-      component: () => import('../Views/InspectView.vue')
+      component: InspectView
     },
     {
       path: '/tops',

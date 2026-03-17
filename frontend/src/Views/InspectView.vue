@@ -8,10 +8,12 @@
                     :class="['thumbnail-item', { active: selectedImage === index }]"
                     :style="{ backgroundColor: selectedColor}"
                     @click="selectedImage = index">
+                    <div class="thumbnail-overlay" :style="{ backgroundImage: styleOverlayImage }"></div>
                     <img :src="image" :alt="`Product thumbnail`">
                 </button>
             </div>
             <div class="main-image" :style="{ backgroundColor: selectedColor, backgroundImage: materialBackgroundImage }">
+                <div class="style-overlay" :style="{ backgroundImage: styleOverlayImage }"></div>
                 <img :src="productImages[selectedImage]" :alt="`Product Image`">
             </div>
         </section>
@@ -40,6 +42,7 @@
                     <div class="color-options">
                         <button class ="color-btn" v-for="(color, index) in productData.colors" 
                         :key="index" 
+                        :class="{ active: index === 0 }"
                         :style="{ background: color }" 
                         @click="activeColor($event, color)">
                         </button>
@@ -51,7 +54,8 @@
                         <div class="material-options">
                             <button class ="material-btn" 
                                 v-for="(material, index) in productData.materials" 
-                                :key="index" 
+                                :key="index"
+                                :class="{ active: index === 0 }"
                                 @click="activeMaterial($event, material)">{{ material }}
                             </button>
                         </div>
@@ -90,7 +94,9 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+
 // Product images - Kimono
 import productKimFront from '../Assets/Kimono/Designer(5).png'
 import productKimLeft from '../Assets/Kimono/Designer(6).png'
@@ -120,6 +126,10 @@ import materialWool from '../Assets/Textures/material-wool.png'
 import materialBlend from '../Assets/Textures/material-blend.png'
 import materialKevlar from '../Assets/Textures/material-kevlar.png'
 
+// Style overlay images (add your actual style overlay images)
+import styleOverlay from '../Assets/Test_Style/example.png'
+
+
 // Image mapping by style
 const styleImages: Record<string, string[]> = {
     'Kimono': [
@@ -142,11 +152,32 @@ const styleImages: Record<string, string[]> = {
         prodcutShirtBack,
         prodcutShirtRight,
         prodcutShirtDetail
+    ],
+    'Short Sleeve': [
+        prodcutShirtFront,
+        prodcutShirtLeft,
+        prodcutShirtBack,
+        prodcutShirtRight,
+        prodcutShirtDetail
+    ],
+    'Tank Top': [
+        prodcutShirtFront,
+        prodcutShirtLeft,
+        prodcutShirtBack,
+        prodcutShirtRight,
+        prodcutShirtDetail
+    ],
+    'Hoodie': [
+        productKimFront,
+        productKimLeft,
+        productKimBack,
+        productKimRight,
+        productKimDetail
     ]
 }
 
 const selectedImage = ref(0)
-const selectedColor = ref('#f5f5f5')
+const selectedColor = ref('')
 const selectedMaterial = ref('')
 
 const materialTextures: Record<string, string> = {
@@ -163,6 +194,17 @@ const materialBackgroundImage = computed(() => {
         return `url(${materialTextures[selectedMaterial.value]})`
     }
     return 'none'
+})
+
+// Mapping for style overlays
+const styleOverlayLayer: Record<string, string> = {
+    'Vest': styleOverlay
+}
+
+// Computed property for style overlay
+const styleOverlayImage = computed(() => {
+    const overlay = styleOverlayLayer[productData.value.style]
+    return overlay ? `url(${overlay})` : 'none'
 })
 
 // Computed property to get images based on product style
@@ -193,23 +235,132 @@ const activeMaterial = (event: Event, material: string) => {
     selectedMaterial.value = material
 }
 
-// Mock product data - replace with API call later
+// Route object to access route parameters
+const route = useRoute()
+
+// Add interface for API response
+interface ProductApiResponse {
+  Product_Id: number
+  Style: string
+  Color: string
+  Material: string
+  Size: string
+  Stock: number
+  Price: number
+}
+
+// Initialize product data with default values
 const productData = ref({
-    name: 'Kyoto Signature',
-    style: 'Vest', 
+    name: 'Loading...',
+    style: 'Loading...', 
     rating: 5,
     reviewCount: 200,
-    description: 'Test',
+    description: 'Loading product details...',
     materials: ['Cotton', 'Polyester', 'Wool', 'Blend', 'Leather', 'Kevlar'],
     features: [
         'Screen Print with Sleeve Graphics',
         '100% Cotton, Pre-Shrunk Jersey',
         'Ribbed Collar with Double Needle Stitching',
     ],
-    price: 37.00,
+    price: 0,
     colors: ['#FFFFFF', '#000000', '#FF0000', '#0000FF', '#008000'],
     sizes: ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL']
 })
+
+// Fetch product data from API
+const fetchProductData = async (productId: string) => {
+    try {
+        console.log('Fetching product with ID:', productId)
+        const response = await fetch('/api/inventory')
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        
+        const responseData = await response.json()
+        console.log('Full inventory response:', responseData)
+        
+        // Handle both response formats (array or object with inventory property)
+        let inventory: ProductApiResponse[]
+        if (Array.isArray(responseData)) {
+            inventory = responseData
+            console.log('Response is array')
+        } else if (responseData.inventory && Array.isArray(responseData.inventory)) {
+            inventory = responseData.inventory
+            console.log('Response has inventory property')
+        } else {
+            throw new Error('Unexpected API response format')
+        }
+        
+        // Find the specific product by ID
+        const currentProduct: ProductApiResponse | undefined = inventory.find(
+            (product: ProductApiResponse) => product.Product_Id === parseInt(productId)
+        )
+        
+        if (!currentProduct) {
+            throw new Error(`Product with ID ${productId} not found`)
+        }
+        
+        console.log('Found product:', currentProduct)
+        console.log('Product style:', currentProduct.Style)
+        
+        // Find ALL products with the same style
+        const matchingProducts: ProductApiResponse[] = inventory.filter(
+            (product: ProductApiResponse) => product.Style === currentProduct.Style
+        )
+        
+        console.log('Matching products:', matchingProducts)
+        
+        // Extract unique colors, materials, and sizes
+        const uniqueColors = Array.from(new Set(matchingProducts.map(p => `#${p.Color}`)))
+        const uniqueMaterials = Array.from(new Set(matchingProducts.map(p => p.Material)))
+        const uniqueSizes = Array.from(new Set(matchingProducts.map(p => p.Size.trim())))
+        
+        console.log('Unique colors:', uniqueColors)
+        console.log('Unique materials:', uniqueMaterials)
+        console.log('Unique sizes:', uniqueSizes)
+        
+        // Update product data with API response
+        productData.value = {
+            ...productData.value,
+            name: `${currentProduct.Style} - ${currentProduct.Material}`,
+            style: currentProduct.Style,
+            price: currentProduct.Price,
+            materials: uniqueMaterials,
+            colors: uniqueColors,
+            sizes: uniqueSizes,
+            description: `${currentProduct.Style} made from ${currentProduct.Material}. Available in stock: ${currentProduct.Stock} units.`,
+            features: [
+                'High-quality construction',
+                'Multiple color and material options',
+                'Available in various sizes'
+            ]
+        }
+        
+        console.log('Updated productData style:', productData.value.style)
+        
+        // Set default selections to the current product
+        selectedColor.value = `#${currentProduct.Color}`
+        selectedMaterial.value = currentProduct.Material
+        
+    } catch (error) {
+        console.error('Error fetching product:', error)
+        productData.value.name = 'Error loading product'
+        productData.value.description = 'Failed to load product details'
+    }
+}
+
+// Initialize on mount
+onMounted(() => {
+    const productId = route.params.id as string
+    if (productId) {
+        fetchProductData(productId)
+    }
+})
+
+// Set default selections after productData is initialized
+selectedColor.value = productData.value.colors[0]
+selectedMaterial.value = productData.value.materials[0]
 
 // TODO: Replace with actual API call
 // const fetchProductData = async (productId: string) => {
@@ -245,17 +396,25 @@ const productData = ref({
     border: 2px solid transparent;
     cursor: pointer;
     padding: 0;
+    position: relative;
 }
 
-.thumbnail-item:hover,
-.thumbnail-item.active {
-    border-color: #333;
+.thumbnail-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
 }
 
 .thumbnail-item img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    position: relative;
+    z-index: 2;
 }
 
 .main-image {
@@ -264,12 +423,25 @@ const productData = ref({
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+}
+
+.style-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
 }
 
 .main-image img {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
+    position: relative;
+    z-index: 2;
 }
 
 .product-details {

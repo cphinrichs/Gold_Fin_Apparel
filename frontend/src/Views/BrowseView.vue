@@ -1,23 +1,25 @@
 <template>
   <div class="page-wrapper">
-    <!-- <SortFilterWidget @filtersChanged="handleFiltersChanged" /> -->
     <section>
       <div class="browse">
       <h1>Browse Products</h1>
       <div v-if="loading" class="loading">Loading products...</div>
       <div v-else-if="error" class="error">{{ error }}</div>
+      <div v-else-if="!products || products.length === 0" class="no-products">
+        No products found. Products array: {{ products }}
+      </div>
       <div v-else class="product-list">
         <button
           v-for="product in products"
-          :key="product.product_id"
+          :key="product.Product_Id"
           :class="['product-item']"
-          :style="{ backgroundColor: `#${product.color}` }"
-          @click="navigateToProduct(product.product_id)">
+          :style="{ backgroundColor: `#${product.Color}` }"
+          @click="navigateToProduct(product.Product_Id)">
           <div class="product-info">
-            <h3>{{ product.style }}</h3>
-            <p>{{ product.material }}</p>
-            <p>Size: {{ product.size.trim() }}</p>
-            <p>Stock: {{ product.stock }}</p>
+            <h3>{{ product.Style }}</h3>
+            <p>{{ product.Material }}</p>
+            <p>Size: {{ product.Size.trim() }}</p>
+            <p>Stock: {{ product.Stock }}</p>
           </div>
         </button>
       </div>
@@ -31,12 +33,13 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 interface Product {
-  product_id: number
-  style: string
-  color: string
-  material: string
-  size: string
-  stock: number
+  Product_Id: number
+  Style: string
+  Color: string
+  Material: string
+  Size: string
+  Stock: number
+  Price: number
 }
 
 const router = useRouter()
@@ -49,27 +52,51 @@ const fetchProducts = async () => {
     loading.value = true
     error.value = null
   
+    console.log('Fetching products from /api/inventory...')
     const response = await fetch('/api/inventory')
+    console.log('Response status:', response.status)
+    console.log('Response ok:', response.ok)
     
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
     
     const data = await response.json()
-    products.value = data.inventory
+    console.log('Full API response:', data)
+    console.log('Type of data:', typeof data)
+    console.log('Is array?', Array.isArray(data))
+    
+    // Handle both response formats
+    if (Array.isArray(data)) {
+      products.value = data
+      console.log('Data is array, set directly')
+    } else if (data.inventory && Array.isArray(data.inventory)) {
+      products.value = data.inventory
+      console.log('Data has inventory property')
+    } else {
+      console.error('Unexpected data format:', data)
+      products.value = []
+    }
+    
+    console.log('products.value set to:', products.value)
+    console.log('Number of products:', products.value.length)
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to load products'
     console.error('Error fetching products:', err)
+    products.value = []
   } finally {
     loading.value = false
+    console.log('Loading complete. Products count:', products.value.length)
   }
 }
 
 const navigateToProduct = (productId: number) => {
-  router.push({ name: 'Inspect', params: { id: productId } })
+  console.log('Navigating to product:', productId)
+  router.push({ name: 'Inspect', params: { id: productId.toString() } })
 }
 
 onMounted(() => {
+  console.log('BrowseView mounted, fetching products...')
   fetchProducts()
 })
 </script>
