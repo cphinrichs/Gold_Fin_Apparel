@@ -4,38 +4,38 @@ providing navigation links and quick access to key features.
 -->
 <template>
   <nav class="taskbar">
-    <a href="/"><h1 class="logo">GOLDFIN</h1></a>
+    <router-link to="/"><h1 class="logo">GOLDFIN</h1></router-link>
     <ul>
-      <li><a href="/">Home</a></li>
+      <li><router-link to="/">Home</router-link></li>
       <li>
-        <a href="/browse">Browse</a>
+        <router-link to="/browse">Browse</router-link>
         <ul class="dropdown">
-          <li><a href="/tanktops">Tank Tops</a></li>
-          <li><a href="/tshirts">T-Shirts</a></li>
-          <li><a href="/longsleeves">Long Sleeves</a></li>
-          <li><a href="/hoodies">Hoodies</a></li>
-          <li><a href="/vests">Vests</a></li>
-          <li><a href="/kimonos">Kimonos</a></li>
+          <li><router-link to="/browse?style=Tank Top">Tank Tops</router-link></li>
+          <li><router-link to="/browse?style=Short Sleeve">T-Shirts</router-link></li>
+          <li><router-link to="/browse?style=Long Sleeve">Long Sleeves</router-link></li>
+          <li><router-link to="/browse?style=Hoodie">Hoodies</router-link></li>
+          <li><router-link to="/browse?style=Vest">Vests</router-link></li>
+          <li><router-link to="/browse?style=Kimono">Kimonos</router-link></li>
         </ul>
       </li>
-      <li><a href="/about">About</a></li>
+      <li><router-link to="/about">About</router-link></li>
       <li>
-        <a href="/help">Help</a>
+        <router-link to="/help">Help</router-link>
         <ul class="dropdown">
-          <li><a href="/contactus">Contact Us</a></li>
-          <li><a href="/returnpolicy">Return Policy</a></li>
-          <li><a href="/shippinginformation">Shipping Information</a></li>
-          <li><a href="/sizecharts">Size Charts</a></li>
+          <li><router-link to="/contactus">Contact Us</router-link></li>
+          <li><router-link to="/returnpolicy">Return Policy</router-link></li>
+          <li><router-link to="/shippinginformation">Shipping Information</router-link></li>
+          <li><router-link to="/sizecharts">Size Charts</router-link></li>
         </ul>
       </li>
     </ul>
-    <a href="/cart" class="cart-button">
+    <router-link to="/cart" class="cart-button">
       <svg class="cart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
         <circle cx="9" cy="21" r="1"></circle>
         <circle cx="20" cy="21" r="1"></circle>
         <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
       </svg>
-    </a>
+    </router-link>
   </nav>
 </template>
 
