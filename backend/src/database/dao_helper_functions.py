@@ -7,7 +7,7 @@ from order_validation.order_validator import Order
 import json
 
 project_root = Path(__file__).parent.parent.parent.parent
-venv_path = project_root / "venv" / "Lib" / "site-packages" / "clidriver"
+venv_path = project_root / ".venv" / "Lib" / "site-packages" / "clidriver"
 clidriver_bin = venv_path / "bin"
 clidriver_crt = clidriver_bin / "amd64.VC12.CRT"
 
@@ -17,7 +17,7 @@ os.environ["PATH"] = str(clidriver_crt) + ";" + os.environ.get("PATH", "")
 import ibm_db
 import ibm_db_dbi
 
-config_path = Settings.db_config_file()
+config_path = Settings.backend_config_file()
 with open(config_path, "r") as file:
     backend_settings = json.load(file)
 
@@ -31,9 +31,10 @@ def get_pooled_connection(conn_str) -> ibm_db_dbi.Connection:
     """Gets a connection with ibm_db_dbi"""
     new_connection = ibm_db.pconnect(conn_str,"","")
     assert(isinstance(new_connection, ibm_db.IBM_DBConnection))
+    ibm_db.autocommit(new_connection, ibm_db.SQL_AUTOCOMMIT_OFF)
     return ibm_db_dbi.Connection(new_connection)
     
-def get_order_price(order_price_data: dict[int, dict[str, int | float]], order_items: list[dict]) -> tuple[float, list[dict]]:
+def get_order_price(product_data: dict[int, dict[str, int | float]], design_data: dict[int, float], order_items: list[dict]) -> tuple[float, list[dict]]:
     """
     Calculate the total price of an order and the price for each item.
     
@@ -50,20 +51,21 @@ def get_order_price(order_price_data: dict[int, dict[str, int | float]], order_i
     for item in order_items:
         product_id = item["Product_Id"]
         quantity = item["Quantity"]
+        design_id = item["Design_Id"]
         
         # Get the price data for this product
-        if product_id not in order_price_data:
+        if product_id not in product_data:
             log.log(Level.ERROR, f"Product ID {product_id} not found in price data")
             raise ValueError(f"Product ID {product_id} not found")
         
-        price_data = order_price_data[product_id]
+        price_data = product_data[product_id]
         
         # Build the item data dict for get_item_price
         item_price_data = {
             "Size_Factor": float(price_data["Size_Factor"]),
             "Style_Price": float(price_data["Style_Price"]),
             "Material_Price": float(price_data["Material_Price"]),
-            "Design_Price": 0.0,  # TODO: Need to look up design price from Design_Id
+            "Design_Price": float(design_data[design_id]),
             "Gold_Trim": item.get("Gold_Trim", False)  # Check if item has gold trim
         }
         
@@ -89,6 +91,7 @@ def get_item_price(item_data: dict) -> float:
     running_total += item_data["Material_Price"] + item_data["Design_Price"]
     if "Gold_Trim" in item_data and item_data["Gold_Trim"]:
         running_total += backend_settings["Gold_Trim_Price"]
+        # running_total += 3000.0
 
     return running_total
 

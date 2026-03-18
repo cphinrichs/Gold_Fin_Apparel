@@ -17,7 +17,7 @@ from database import dao_helper_functions as helper
 # os.environ["PATH"] = clidriver_path + ";" + os.environ.get("PATH", "")
 
 project_root = Path(__file__).parent.parent.parent.parent
-venv_path = project_root / "venv" / "Lib" / "site-packages" / "clidriver"
+venv_path = project_root / ".venv" / "Lib" / "site-packages" / "clidriver"
 clidriver_bin = venv_path / "bin"
 clidriver_crt = clidriver_bin / "amd64.VC12.CRT"
 
@@ -83,11 +83,11 @@ class _Db2DAO:
 
         conn = helper.get_pooled_connection(self._conn_str)
         
-        price_data = self.validate_and_lookup_item_prices(conn, order_data)
+        product_data, design_data = self.validate_and_lookup_item_prices(conn, order_data)
 
         #step 2: calculate the prices for the order and for each item
 
-        order_price, order_items = helper.get_order_price(price_data, order_items)
+        order_price, order_items = helper.get_order_price(product_data, design_data, order_items)
 
         
         
@@ -142,9 +142,20 @@ class _Db2DAO:
 
         #step 6: for each order item, decrement the inventory table by its quantity
 
+        decrement_items_sql = f"""
+        UPDATE {self.creds["db_name"]}.INVENTORY
+        SET STOCK = STOCK - ?
+        WHERE PRODUCT_ID = ?
+        """
+
+        for item in order_items:
+            decrement_items_params = [item["Quantity"], item["Product_Id"]]
+            cursor.execute(decrement_items_sql, decrement_items_params)
+
+        conn.commit()
         conn.close()
     
-    def validate_and_lookup_item_prices (self, conn: ibm_db_dbi.Connection, order_data: Order) -> dict[int, dict[str, int | float]]:
+    def validate_and_lookup_item_prices (self, conn: ibm_db_dbi.Connection, order_data: Order) -> tuple[dict[int, dict[str, int | float]], dict[int, float]]:
         order_items = order_data.get_items()
         
         product_ids = set()
@@ -170,22 +181,22 @@ class _Db2DAO:
         WHERE INV.PRODUCT_ID IN (
         """
 
-        params = []
+        product_lookup_params = []
         
         for id in product_ids:
             product_lookup_sql += "?"
-            if len(params) < len(product_ids) - 1:
+            if len(product_lookup_params) < len(product_ids) - 1:
                 product_lookup_sql += ", "
-            elif len(params) == len(product_ids) - 1:
+            elif len(product_lookup_params) == len(product_ids) - 1:
                 product_lookup_sql += ");"
-            params.append(id)
+            product_lookup_params.append(id)
         
         cursor = conn.cursor()
-        cursor.execute(product_lookup_sql, params)
-        query_results = cursor.fetchall()
+        cursor.execute(product_lookup_sql, product_lookup_params)
+        product_results = cursor.fetchall()
 
         inventory_dict = {}
-        for row in query_results:
+        for row in product_results:
             inventory_dict[row[0]] = helper.convert_inventory_price_data(row)
         item = {}
 
@@ -195,8 +206,35 @@ class _Db2DAO:
         except AssertionError:
             log.log(Level.ERROR, "Aborting order. Insufficient stock for item of id " + item["Product_Id"])
             raise Exception
+        
+        design_lookup_sql = f"""
+        SELECT ID, PRICE 
+        FROM {self.creds["db_name"]}.DESIGNS
+        WHERE ID IN (
+        """
 
-        return inventory_dict
+        design_lookup_params = []
+        
+        for id in design_ids:
+            design_lookup_sql += "?"
+            if len(design_lookup_params) < len(design_ids) - 1:
+                design_lookup_sql += ", "
+            elif len(design_lookup_params) == len(design_ids) - 1:
+                design_lookup_sql += ");"
+            design_lookup_params.append(id)
+
+        print(design_lookup_sql)
+        
+        cursor.execute(design_lookup_sql, design_lookup_params)
+        design_results = cursor.fetchall()
+
+        design_dict = {}
+
+        for row in design_results:
+            print(row)
+            design_dict[row[0]] = row[1]
+
+        return inventory_dict, design_dict
         
     def add_customer_and_return_id(self, conn: ibm_db_dbi.Connection, cust_data: dict) -> int:
         sql = f"""
