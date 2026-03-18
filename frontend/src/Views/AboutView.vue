@@ -4,6 +4,7 @@ import { ref } from 'vue';
 //import logo from '../Assets/goldfin_logo.jpg';
 
 const showMembers = ref(false);
+const showDocumentation = ref(false);
 </script>
 
 <template>
@@ -56,6 +57,19 @@ const showMembers = ref(false);
         Janniebeth is responsible for creating and maintaining our documentation and information resources. With a strong background in technical writing, she ensures that our customers have access to clear and concise information about our products and services.
     </p>
   </div>
+
+  <button class="documentation-toggle" @click="showDocumentation = !showDocumentation">
+    <span class="toggle-arrow" :class="{ open: showDocumentation }">▶</span>
+    Documentation
+  </button>
+
+  <div v-if="showDocumentation" class="docs-section">
+    <h1>Documentation</h1>
+    <p class = "p2">
+      Our documentation provides comprehensive information about our products, services, and company policies. It is designed to help our customers understand our offerings and make informed decisions. Whether you're looking for product specifications, return policies, or company history, our documentation has you covered.
+    </p>
+  </div>
+  
   </section>
 </template>
 
@@ -160,7 +174,30 @@ h2 {
   transition: all 0.3s ease;
 }
 
+.documentation-toggle {
+  background: #333;
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 6px;
+  margin: 2rem 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  transition: all 0.3s ease;
+}
+
 .members-toggle:hover {
+  background: #555;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.documentation-toggle:hover {
   background: #555;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
@@ -175,6 +212,10 @@ h2 {
 }
 
 .members-section {
+  animation: slideDown 0.3s ease;
+}
+
+.docs-section {
   animation: slideDown 0.3s ease;
 }
 
