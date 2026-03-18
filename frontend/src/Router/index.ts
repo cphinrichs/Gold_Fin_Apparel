@@ -62,43 +62,7 @@ const router = createRouter({
       path: '/inspect/:id',
       name: 'Inspect',
       component: InspectView
-    },
-    {
-      path: '/tshirts',
-      name: 'T-Shirts',
-      component: () => import('../ProductViewPages/TShirtsView.vue')
-    },
-    {
-      path: '/longsleeves',
-      name: 'Long Sleeves',
-      component: () => import('../ProductViewPages/LongSleevesView.vue')
-    },
-    {
-      path: '/hoodies',
-      name: 'Hoodies',
-      component: () => import('../ProductViewPages/HoodiesView.vue')
-    },
-    {
-      path: '/tanktops',
-      name: 'Tank Tops',
-      component: () => import('../ProductViewPages/TankTopsView.vue')
-    },
-    {
-      path: '/vests',
-      name: 'Vests',
-      component: () => import('../ProductViewPages/VestsView.vue')
-    },
-    {
-      path: '/kimonos',
-      name: 'Kimonos',
-      component: () => import('../ProductViewPages/KimonosView.vue')
-    },
-    {
-      path: '/orderconfirmation',
-      name: 'OrderConfirmation',
-      component: () => import('../Views/OrderConfirmationView.vue')
     }
-
   ],
 })
 
