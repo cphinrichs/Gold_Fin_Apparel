@@ -4,7 +4,6 @@
 
 <template>
 <section class="size-charts"> 
-<img src="../Assets/goldfin_logo.jpg" alt="GoldFin Logo" class="logo"/>
   <h1>Size Charts</h1>
 
   <h2>Tank Tops Size Chart</h2>
@@ -316,14 +315,6 @@
 </template>
 
 <style scoped>
-.logo {
-  position: fixed;
-  bottom: 0px;
-  right: 0px;
-  width: 250px;
-  height: auto;
-  z-index: 10;
-}
 
 h1{
   font-size: 2.5rem;
