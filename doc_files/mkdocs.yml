@@ -25,11 +25,12 @@ theme:
     - navigation.indexes
   
 nav:
-Home: index.md
--Use Guide: 
-   - User Guide: topics/user-guide.md
-   - Management Guide: topics/admin-guide.md
--Release Notes: topics/release-notes.md
+- Introduction: index.md
+- Release Notes: topics/release-notes.md
+- Use Guide: 
+   - User Guide: topics/end-user-guide.md
+   - Management Guide: topics/reports-manager-guide.md
+
 
 markdown_extensions:
   - admonition
