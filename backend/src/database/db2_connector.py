@@ -17,7 +17,7 @@ from database import dao_helper_functions as helper
 # os.environ["PATH"] = clidriver_path + ";" + os.environ.get("PATH", "")
 
 project_root = Path(__file__).parent.parent.parent.parent
-venv_path = project_root / ".venv" / "Lib" / "site-packages" / "clidriver"
+venv_path = project_root / "venv" / "Lib" / "site-packages" / "clidriver"
 clidriver_bin = venv_path / "bin"
 clidriver_crt = clidriver_bin / "amd64.VC12.CRT"
 
@@ -117,7 +117,7 @@ class _Db2DAO:
         add_order_sql = f"""
         SELECT ID
         FROM FINAL TABLE
-        (INSERT INTO {self.creds["db_name"]}.ORDERS (CUSTOMER_ID, TOTAL, ORDER_DATE)
+        (INSERT INTO {self.creds["db_name"]}.ORDERS (CUSTOMER_ID, TOTAL_PRICE, ORDER_DATE)
         VALUES (?, ?, ?));
         """
 
@@ -137,7 +137,7 @@ class _Db2DAO:
         VALUES(?, ?, ?, ?, ?)"""
 
         for item in order_items:
-            order_items_params = [order_id, item["Product_Id"], item["Quantity"], item["Design_Id"], helper.get_item_price(item)]
+            order_items_params = [order_id, item["Product_Id"], item["Quantity"], item["Design_Id"], item["Unit_Price"]]
             cursor.execute(order_items_sql, order_items_params)
 
         #step 6: for each order item, decrement the inventory table by its quantity
@@ -147,26 +147,27 @@ class _Db2DAO:
     def validate_and_lookup_item_prices (self, conn: ibm_db_dbi.Connection, order_data: Order) -> dict[int, dict[str, int | float]]:
         order_items = order_data.get_items()
         
-        product_ids, design_ids = set()
+        product_ids = set()
+        design_ids = set()
         for item in order_items:
             product_ids.add(item["Product_Id"])
             design_ids.add(item["Design_Id"])
         
         product_lookup_sql = f"""
         SELECT 
-            INVENTORY.PRODUCT_ID,
-            INVENTORY.STOCK,
-            SIZES.PRICE_FACTOR AS SIZE_FACTOR,
-            STYLES.PRICE AS STYLE_PRICE,
-            MATERIAL.PRICE AS MATERIAL_PRICE,
-        FROM {self.creds["db_name"]}.INVENTORY
-        LEFT JOIN {self.creds["db_name"]}.SIZES
-            ON INVENTORY.SIZE_ID = SIZES.ID
-        LEFT JOIN {self.creds["db_name"]}.STYLES
-            ON INVENTORY.STYLE_ID = STYLES.ID
-        LEFT JOIN {self.creds["db_name"]}.MATERIALS
-            ON INVENTORY.MATERIAL_ID = MATERIALS.ID
-        WHERE INVENTORY.PRODUCT_ID IN (
+            INV.PRODUCT_ID,
+            INV.STOCK,
+            SZ.PRICE_FACTOR AS SIZE_FACTOR,
+            ST.PRICE AS STYLE_PRICE,
+            MAT.PRICE AS MATERIAL_PRICE
+        FROM {self.creds["db_name"]}.INVENTORY AS INV
+        LEFT JOIN {self.creds["db_name"]}.SIZES AS SZ
+            ON INV.SIZE_ID = SZ.ID
+        LEFT JOIN {self.creds["db_name"]}.STYLES AS ST
+            ON INV.STYLE_ID = ST.ID
+        LEFT JOIN {self.creds["db_name"]}.MATERIALS AS MAT
+            ON INV.MATERIAL_ID = MAT.ID
+        WHERE INV.PRODUCT_ID IN (
         """
 
         params = []
