@@ -1,5 +1,6 @@
 <template>
   <div class="page-wrapper">
+    <SortFilterBrowseWidget @filtersChanged="handleFiltersChanged" />
     <section>
       <div class="browse">
         <h1>Browse Products</h1>
@@ -46,6 +47,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useInventory } from '../Composables/useInventory'
 import { useProductFiltering } from '../Composables/useProductFiltering'
 import { navigateToProductDetail } from '../Utils/navigationHelpers'
+import SortFilterBrowseWidget from '../Components/Widgets/SortFilterBrowseWidget.vue'
 
 // Router setup
 const router = useRouter()
@@ -58,6 +60,10 @@ const { products, loading, error, loadProducts } = useInventory()
 const { filteredProducts, watchRouteChanges } = useProductFiltering(products, route)
 
 // Event handlers
+const handleFiltersChanged = (filters: any) => {
+  console.log('Filters applied:', filters)
+}
+
 const handleProductClick = (productId: number) => {
   navigateToProductDetail(router, productId)
 }
