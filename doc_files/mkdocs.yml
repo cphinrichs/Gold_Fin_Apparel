@@ -26,10 +26,12 @@ theme:
   
 nav:
 - Introduction: index.md
-- Release Notes: topics/release-notes.md
-- Use Guide: 
+- User Guide:
+   - Release Notes: topics/release-notes.md
    - User Guide: topics/end-user-guide.md
+- Employee Guide:
    - Management Guide: topics/reports-manager-guide.md
+   - Installation & Deployment: topics/installation-deployment.md
 
 
 markdown_extensions:
