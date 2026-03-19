@@ -21,15 +21,17 @@ export const useProductSelection = () => {
     }
 
     const handleSizeSelection = (
-        event: Event, 
-        size: string, 
+        event: Event,
+        size: string,
         updateSize: (size: string) => void,
-        clearIncompatible: () => void
+        clearIncompatibleForSize: (size: string) => void
     ) => {
-        const target = event.currentTarget as HTMLElement
-        toggleActiveButton('.size-btn', target)
+        const button = event.target as HTMLButtonElement
+        if (button.classList.contains('unavailable')) {
+            return
+        }
         updateSize(size)
-        clearIncompatible()
+        clearIncompatibleForSize(size)
         selectedSize.value = size
     }
 
