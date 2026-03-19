@@ -1,14 +1,18 @@
 import sys
 import os
+import json
 
 src_path = os.path.curdir + "/backend/src"
 print(src_path)
 sys.path.insert(0, src_path)
 
+from config.settings import Settings
 import database.dao_helper_functions as ibm_db_interface
 from database import db
-DB_NAME: str = "DBGDFTST"
-# DB_NAME: str = "DBGOLDFI"
+
+
+creds: dict = json.load(open(Settings.db_config_file()))
+DB_NAME: str = creds["db_name"]
 
 # TABLESPACES: {TABLENAMES: (DDL, UNIQUE INDEXED KEY, LIST OF INDEXED KEYS)} 
 TABLESPACES_AND_TABLES: dict[str, dict[str, tuple[str, str, list[str]]]] = {
@@ -112,7 +116,6 @@ tablespaces_to_drop = [row[0] for row in cursor.fetchall()]
 for tablespace in tablespaces_to_drop:
    cursor.execute(f"DROP TABLESPACE {DB_NAME}.{tablespace}")
    print(f"Dropped tablespace: {DB_NAME}.{tablespace}")
-
 connection.commit()
 for tablespace, table in TABLESPACES_AND_TABLES.items():
     print(f"Creating TS {tablespace}")
