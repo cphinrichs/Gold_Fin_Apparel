@@ -13,11 +13,11 @@ import productVestRight from '../Assets/Vest/vest(4).png'
 import productVestDetail from '../Assets/Vest/vest(5).png'
 
 // T-Shirt product images
-import prodcutShirtFront from '../Assets/T-Shirt/shirt(1).png'
-import prodcutShirtLeft from '../Assets/T-Shirt/shirt(2).png'
-import prodcutShirtBack from '../Assets/T-Shirt/shirt(3).png'
-import prodcutShirtRight from '../Assets/T-Shirt/shirt(4).png'
-import prodcutShirtDetail from '../Assets/T-Shirt/shirt(5).png'
+import prodcutShirtFront from '../Assets/T-shirt/shirt(1).png'
+import prodcutShirtLeft from '../Assets/T-shirt/shirt(2).png'
+import prodcutShirtBack from '../Assets/T-shirt/shirt(3).png'
+import prodcutShirtRight from '../Assets/T-shirt/shirt(4).png'
+import prodcutShirtDetail from '../Assets/T-shirt/shirt(5).png'
 
 // Material texture images
 import materialCotton from '../Assets/Textures/material-cotton.png'
@@ -28,7 +28,7 @@ import materialBlend from '../Assets/Textures/material-blend.png'
 import materialKevlar from '../Assets/Textures/material-kevlar.png'
 
 // Style overlay images
-import styleOverlay from '../Assets/Test_Style/example.png'
+import styleOverlay from '../Assets/Designs/1.png'
 
 import type { ProductData } from '../Types/product.types'
 
@@ -40,6 +40,12 @@ export const STYLE_TO_IMAGES: Record<string, string[]> = {
     'Short Sleeve': [prodcutShirtFront, prodcutShirtLeft, prodcutShirtBack, prodcutShirtRight, prodcutShirtDetail],
     'Tank Top': [prodcutShirtFront, prodcutShirtLeft, prodcutShirtBack, prodcutShirtRight, prodcutShirtDetail],
     'Hoodie': [productKimFront, productKimLeft, productKimBack, productKimRight, productKimDetail]
+}
+
+// Export function to get the first (front-facing) image for a style
+export const getStyleFrontImage = (style: string): string => {
+    const images = STYLE_TO_IMAGES[style]
+    return images && images.length > 0 ? images[0] : ''
 }
 
 // Map material names to their texture images

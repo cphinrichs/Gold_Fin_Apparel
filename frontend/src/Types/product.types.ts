@@ -1,3 +1,5 @@
+import type { DesignApiResponse } from './design.types'
+
 export interface ProductApiResponse {
     Product_Id: number
     Style: string
@@ -31,4 +33,12 @@ export interface ProductData {
     price: number
     colors: string[]
     sizes: string[]
+}
+
+/**
+ * Represents a combination of an inventory item and a design
+ */
+export interface ProductCombination {
+    inventory: ProductApiResponse
+    design: DesignApiResponse
 }

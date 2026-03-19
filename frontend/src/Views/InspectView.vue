@@ -8,11 +8,15 @@
                     :class="['thumbnail-item', { active: currentImageIndex === index }]"
                     :style="{ backgroundColor: currentColor}"
                     @click="currentImageIndex = index">
+                    <div class="thumbnail-overlay" :style="{ backgroundImage: materialBackgroundImage }"></div>
+                    <div class="thumbnail-design" :style="{ backgroundImage: designBackgroundImage }"></div>
                     <div class="thumbnail-overlay" :style="{ backgroundImage: styleOverlayImage }"></div>
                     <img :src="image" :alt="`Product thumbnail ${index + 1}`">
                 </button>
             </div>
-            <div class="main-image" :style="{ backgroundColor: currentColor, backgroundImage: materialBackgroundImage }">
+            <div class="main-image" :style="{ backgroundColor: currentColor }">
+                <div class="material-layer" :style="{ backgroundImage: materialBackgroundImage }"></div>
+                <div class="design-layer" :style="{ backgroundImage: designBackgroundImage }"></div>
                 <div class="style-overlay" :style="{ backgroundImage: styleOverlayImage }"></div>
                 <img :src="productImages[currentImageIndex]" :alt="`${productData.name} - Main view`">
             </div>
@@ -42,9 +46,12 @@
                             class="color-btn" 
                             v-for="(color, index) in productData.colors" 
                             :key="index" 
-                            :class="{ active: currentColor === color }"
+                            :class="{ 
+                                active: currentColor === color,
+                                unavailable: !isColorAvailable(color)
+                            }"
                             :style="{ background: color }" 
-                            @click="handleColorSelection($event, color, updateColor)">
+                            @click="handleColorSelection($event, color, updateColor, clearIncompatibleForColor)">
                         </button>
                     </div>
                 </div>
@@ -56,8 +63,11 @@
                             class="material-btn" 
                             v-for="(material, index) in productData.materials" 
                             :key="index"
-                            :class="{ active: currentMaterial === material }"
-                            @click="handleMaterialSelection($event, material, updateMaterial)">
+                            :class="{ 
+                                active: currentMaterial === material,
+                                unavailable: !isMaterialAvailable(material)
+                            }"
+                            @click="handleMaterialSelection($event, material, updateMaterial, clearIncompatibleForMaterial)">
                             {{ material }}
                         </button>
                     </div>
@@ -68,9 +78,13 @@
                     <div class="size-options">
                         <button 
                             class="size-btn" 
-                            v-for="(size, index) in productData.sizes" 
-                            :key="index" 
-                            @click="handleSizeSelection($event, size)">
+                            v-for="(size, index) in sortedSizes" 
+                            :key="index"
+                            :class="{ 
+                                active: currentSize === size,
+                                unavailable: !isSizeAvailable(size)
+                            }"
+                            @click="handleSizeSelection($event, size, updateSize, clearIncompatibleForSize)">
                             {{ size }}
                         </button>
                     </div>
@@ -103,7 +117,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useProductData } from '../Composables/useProductData'
 import { useProductSelection } from '../Composables/useProductSelection'
@@ -117,6 +131,7 @@ const {
     productData,
     currentColor,
     currentMaterial,
+    currentSize,
     currentProductId,
     currentStock,
     productImages,
@@ -124,7 +139,13 @@ const {
     styleOverlayImage,
     renderStars,
     formattedPrice,
-    fetchProductData
+    fetchProductData,
+    isMaterialAvailable,
+    isColorAvailable,
+    isSizeAvailable,
+    clearIncompatibleForColor,
+    clearIncompatibleForMaterial,
+    clearIncompatibleForSize
 } = useProductData()
 
 // Selection composable
@@ -135,6 +156,39 @@ const {
     handleSizeSelection,
     handleMaterialSelection
 } = useProductSelection()
+
+// Sort sizes from smallest to largest
+const sortedSizes = computed(() => {
+    const sizeOrder = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL']
+    return [...productData.value.sizes].sort((a, b) => {
+        const indexA = sizeOrder.indexOf(a)
+        const indexB = sizeOrder.indexOf(b)
+        
+        // If both sizes are in the order array, sort by position
+        if (indexA !== -1 && indexB !== -1) {
+            return indexA - indexB
+        }
+        // If only one is in the array, prioritize it
+        if (indexA !== -1) return -1
+        if (indexB !== -1) return 1
+        // If neither is in the array, sort alphabetically
+        return a.localeCompare(b)
+    })
+})
+
+// Get design image from query parameter
+const designBackgroundImage = computed(() => {
+    const designId = route.query.designId as string
+    if (!designId) return ''
+    
+    try {
+        const imageUrl = new URL(`../Assets/Designs/${designId}.png`, import.meta.url).href
+        return `url(${imageUrl})`
+    } catch (e) {
+        console.error(`Failed to load design image for ID ${designId}:`, e)
+        return ''
+    }
+})
 
 // Cart composable
 const { addToCart } = useCart()
@@ -164,6 +218,10 @@ const updateColor = (color: string) => {
 
 const updateMaterial = (material: string) => {
     currentMaterial.value = material
+}
+
+const updateSize = (size: string) => {
+    currentSize.value = size
 }
 
 // Initialize on mount
