@@ -1,0 +1,76 @@
+---------------------------------------------------------------
+-- Customer Orders: Product+Design Combinations with Quantity
+---------------------------------------------------------------
+SELECT
+    O.CUSTOMER_ID,
+    OI.PRODUCT_ID,
+    OI.DESIGN_ID,
+    OI.GOLD_TRIM,
+    SUM(OI.QUANTITY) AS TOTAL_QUANTITY
+FROM
+    DBGOLDFI.ORDERS O
+    INNER JOIN DBGOLDFI.ORDER_ITEMS OI
+        ON O.ID = OI.ORDER_ID
+GROUP BY
+    O.CUSTOMER_ID,
+    OI.PRODUCT_ID,
+    OI.DESIGN_ID,
+    OI.GOLD_TRIM
+ORDER BY
+    O.CUSTOMER_ID,
+    TOTAL_QUANTITY DESC;
+
+---------------------------------------------------------------
+-- Orders by Date: Product+Design Combinations with Quantity
+---------------------------------------------------------------
+SELECT
+    DATE(O.ORDER_DATE) AS ORDER_DATE,
+    OI.PRODUCT_ID,
+    OI.DESIGN_ID,
+    OI.GOLD_TRIM,
+    SUM(OI.QUANTITY) AS TOTAL_QUANTITY
+FROM
+    DBGOLDFI.ORDERS O
+    INNER JOIN DBGOLDFI.ORDER_ITEMS OI
+        ON O.ID = OI.ORDER_ID
+GROUP BY
+    DATE(O.ORDER_DATE),
+    OI.PRODUCT_ID,
+    OI.DESIGN_ID,
+    OI.GOLD_TRIM
+ORDER BY
+    ORDER_DATE DESC,
+    TOTAL_QUANTITY DESC;
+
+---------------------------------------------------------------
+-- Item Level Summary: Products by Attributes with Total Qty
+---------------------------------------------------------------
+SELECT
+    I.PRODUCT_ID,
+    SZ.NAME AS SIZE,
+    ST.NAME AS STYLE,
+    M.NAME AS MATERIAL,
+    I.COLOR,
+    OI.GOLD_TRIM,
+    SUM(OI.QUANTITY) AS TOTAL_QUANTITY_ORDERED
+FROM
+    DBGOLDFI.INVENTORY I
+    INNER JOIN DBGOLDFI.ORDER_ITEMS OI
+        ON I.PRODUCT_ID = OI.PRODUCT_ID
+    LEFT JOIN DBGOLDFI.SIZES SZ
+        ON I.SIZE_ID = SZ.ID
+    LEFT JOIN DBGOLDFI.STYLES ST
+        ON I.STYLE_ID = ST.ID
+    LEFT JOIN DBGOLDFI.MATERIALS M
+        ON I.MATERIAL_ID = M.ID
+GROUP BY
+    I.PRODUCT_ID,
+    SZ.NAME,
+    ST.NAME,
+    M.NAME,
+    I.COLOR,
+    OI.GOLD_TRIM
+ORDER BY
+    TOTAL_QUANTITY_ORDERED DESC;
+
+COMMIT;
