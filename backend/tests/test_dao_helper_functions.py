@@ -20,7 +20,6 @@ sys.modules['ibm_db_dbi'] = Mock()
 
 # Now we can import the helper functions
 from database import dao_helper_functions as helper  # pylint: disable=wrong-import-position
-from order_validation.order_validator import Order  # pylint: disable=wrong-import-position
 
 
 class TestGetItemPrice(unittest.TestCase):
@@ -155,25 +154,189 @@ class TestConvertInventoryData(unittest.TestCase):
             self.assertIn(key, result)
 
 
+class TestConvertInventoryPriceData(unittest.TestCase):
+    """Test cases for convert_inventory_price_data() function"""
+
+    def test_convert_inventory_price_data_complete_row(self):
+        """Test converting a complete database row to price data dictionary"""
+        # Row format: PRODUCT_ID, STOCK, SIZE_FACTOR, STYLE_PRICE, MATERIAL_PRICE
+        row = (101, 50, 1.2, 30.0, 20.0)
+        
+        result = helper.convert_inventory_price_data(row)
+        
+        # Check that result is a dictionary
+        self.assertIsInstance(result, dict)
+        
+        # Check that all expected keys are present
+        expected_keys = ["Stock", "Size_Factor", "Style_Price", "Material_Price"]
+        for key in expected_keys:
+            self.assertIn(key, result)
+        
+        # Check that values are correct
+        self.assertEqual(result["Stock"], 50)
+        self.assertEqual(result["Size_Factor"], 1.2)
+        self.assertEqual(result["Style_Price"], 30.0)
+        self.assertEqual(result["Material_Price"], 20.0)
+
+    def test_convert_inventory_price_data_zero_values(self):
+        """Test conversion with zero stock and prices"""
+        row = (102, 0, 0.0, 0.0, 0.0)
+        
+        result = helper.convert_inventory_price_data(row)
+        
+        self.assertEqual(result["Stock"], 0)
+        self.assertEqual(result["Size_Factor"], 0.0)
+        self.assertEqual(result["Style_Price"], 0.0)
+        self.assertEqual(result["Material_Price"], 0.0)
+
+    def test_convert_inventory_price_data_high_stock(self):
+        """Test conversion with high stock value"""
+        row = (103, 9999, 1.5, 50.0, 40.0)
+        
+        result = helper.convert_inventory_price_data(row)
+        
+        self.assertEqual(result["Stock"], 9999)
+        self.assertEqual(result["Size_Factor"], 1.5)
+        self.assertEqual(result["Style_Price"], 50.0)
+        self.assertEqual(result["Material_Price"], 40.0)
+
+
 class TestGetOrderPrice(unittest.TestCase):
     """Test cases for get_order_price() function"""
 
-    def test_get_order_price_returns_float(self):
-        """Test that get_order_price returns a float"""
-        mock_order = Mock(spec=Order)
+    def test_get_order_price_single_item(self):
+        """Test calculating price for a single item order"""
+        order_price_data = {
+            1: {
+                "Stock": 10,
+                "Size_Factor": 1.0,
+                "Style_Price": 25.0,
+                "Material_Price": 15.0
+            }
+        }
         
-        price = helper.get_order_price(mock_order)
+        design_data = {
+            1: 5.0  # Design price is 5.0
+        }
         
-        self.assertIsInstance(price, float)
+        order_items = [
+            {"Product_Id": 1, "Design_Id": 1, "Quantity": 2}
+        ]
+        
+        total_price, updated_items = helper.get_order_price(order_price_data, design_data, order_items)
+        
+        # Unit price = (Style_Price * Size_Factor) + Material_Price + Design_Price
+        #            = (25.0 * 1.0) + 15.0 + 5.0 = 45.0
+        # Total for item = 45.0 * 2 = 90.0
+        self.assertIsInstance(total_price, float)
+        self.assertEqual(total_price, 90.0)
+        
+        # Check updated items
+        self.assertEqual(len(updated_items), 1)
+        self.assertEqual(updated_items[0]["Unit_Price"], 45.0)
+        self.assertEqual(updated_items[0]["Total_Price"], 90.0)
+        self.assertEqual(updated_items[0]["Product_Id"], 1)
+        self.assertEqual(updated_items[0]["Quantity"], 2)
 
-    def test_get_order_price_returns_zero(self):
-        """Test that get_order_price currently returns 0.0 (TODO implementation)"""
-        mock_order = Mock(spec=Order)
+    def test_get_order_price_multiple_items(self):
+        """Test calculating price for multiple items"""
+        order_price_data = {
+            1: {"Stock": 10, "Size_Factor": 1.0, "Style_Price": 25.0, "Material_Price": 15.0},
+            2: {"Stock": 5, "Size_Factor": 1.2, "Style_Price": 35.0, "Material_Price": 25.0}
+        }
         
-        price = helper.get_order_price(mock_order)
+        design_data = {
+            1: 5.0,  # Design 1 price
+            2: 10.0  # Design 2 price
+        }
         
-        # Current implementation returns 0.0 as placeholder
-        self.assertEqual(price, 0.0)
+        order_items = [
+            {"Product_Id": 1, "Design_Id": 1, "Quantity": 2},
+            {"Product_Id": 2, "Design_Id": 2, "Quantity": 1}
+        ]
+        
+        total_price, updated_items = helper.get_order_price(order_price_data, design_data, order_items)
+        
+        # Item 1: unit_price = (25.0 * 1.0) + 15.0 + 5.0 = 45.0, total = 45.0 * 2 = 90.0
+        # Item 2: unit_price = (35.0 * 1.2) + 25.0 + 10.0 = 77.0, total = 77.0 * 1 = 77.0
+        # Order total = 90.0 + 77.0 = 167.0
+        self.assertEqual(total_price, 167.0)
+        self.assertEqual(len(updated_items), 2)
+        
+        # Check first item
+        self.assertEqual(updated_items[0]["Unit_Price"], 45.0)
+        self.assertEqual(updated_items[0]["Total_Price"], 90.0)
+        
+        # Check second item
+        self.assertEqual(updated_items[1]["Unit_Price"], 77.0)
+        self.assertEqual(updated_items[1]["Total_Price"], 77.0)
+
+    @patch.dict('database.dao_helper_functions.backend_settings', {'Gold_Trim_Price': 10.0})
+    def test_get_order_price_with_gold_trim(self):
+        """Test calculating price with gold trim"""
+        order_price_data = {
+            1: {"Stock": 10, "Size_Factor": 1.0, "Style_Price": 25.0, "Material_Price": 15.0}
+        }
+        
+        design_data = {
+            1: 5.0  # Design price
+        }
+        
+        order_items = [
+            {"Product_Id": 1, "Design_Id": 1, "Quantity": 1, "Gold_Trim": True}
+        ]
+        
+        total_price, updated_items = helper.get_order_price(order_price_data, design_data, order_items)
+        
+        # Base price: (25.0 * 1.0) + 15.0 + 5.0 = 45.0
+        # With gold trim: 45.0 + 10.0 = 55.0
+        self.assertEqual(updated_items[0]["Unit_Price"], 55.0)
+        self.assertEqual(total_price, 55.0)
+
+    def test_get_order_price_missing_product_id(self):
+        """Test error handling when product ID not in price data"""
+        order_price_data = {
+            1: {"Stock": 10, "Size_Factor": 1.0, "Style_Price": 25.0, "Material_Price": 15.0}
+        }
+        
+        design_data = {
+            1: 5.0
+        }
+        
+        order_items = [
+            {"Product_Id": 999, "Design_Id": 1, "Quantity": 1}  # Product 999 not in price data
+        ]
+        
+        with self.assertRaises(ValueError) as context:
+            helper.get_order_price(order_price_data, design_data, order_items)
+        
+        self.assertIn("999", str(context.exception))
+
+    def test_get_order_price_preserves_original_items(self):
+        """Test that original order items are not modified"""
+        order_price_data = {
+            1: {"Stock": 10, "Size_Factor": 1.0, "Style_Price": 25.0, "Material_Price": 15.0}
+        }
+        
+        design_data = {
+            1: 5.0
+        }
+        
+        order_items = [
+            {"Product_Id": 1, "Design_Id": 1, "Quantity": 2}
+        ]
+        
+        original_item = order_items[0].copy()
+        
+        total_price, updated_items = helper.get_order_price(order_price_data, design_data, order_items)
+        
+        # Original item should not have Unit_Price or Total_Price
+        self.assertNotIn("Unit_Price", order_items[0])
+        self.assertNotIn("Total_Price", order_items[0])
+        
+        # Updated items should have them
+        self.assertIn("Unit_Price", updated_items[0])
+        self.assertIn("Total_Price", updated_items[0])
 
 
 class TestGetPooledConnection(unittest.TestCase):

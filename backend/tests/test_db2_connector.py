@@ -77,7 +77,7 @@ class TestSelectInventory(unittest.TestCase):
         # Check SQL structure
         self.assertIn("SELECT", sql)
         self.assertIn("INVENTORY", sql)
-        self.assertIn("ORDER BY INVENTORY.STOCK", sql)
+        self.assertIn("ORDER BY TEST_DB.INVENTORY.STOCK", sql)
         self.assertIn("DESC", sql)  # Default descending
         self.assertEqual(len(params), 0)  # No parameters
         
@@ -141,7 +141,7 @@ class TestSelectInventory(unittest.TestCase):
         call_args = self.mock_cursor.execute.call_args[0]
         sql = call_args[0]
         
-        self.assertIn("ORDER BY INVENTORY.STOCK", sql)
+        self.assertIn("ORDER BY TEST_DB.INVENTORY.STOCK", sql)
         self.assertIn("ASC", sql)
 
     def test_select_inventory_exception_handling(self, mock_get_pooled_conn):
@@ -284,6 +284,145 @@ class TestSelectDesigns(unittest.TestCase):
 
 
 @patch('database.dao_helper_functions.get_pooled_connection')
+class TestValidateAndLookupItemPrices(unittest.TestCase):
+    """Test cases for _Db2DAO.validate_and_lookup_item_prices() method"""
+
+    @classmethod
+    def setUpClass(cls):
+        """Set up once for all tests"""
+        cls.mock_cursor = MagicMock()
+        
+    def setUp(self):
+        """Reset mocks before each test"""
+        self.mock_cursor.reset_mock()
+        self.mock_cursor.execute.return_value = None
+
+    def create_dao_with_mock_cursor(self):
+        """Helper to create DAO with mocked cursor"""
+        dao = MagicMock(spec=_Db2DAO)
+        dao.cursor = self.mock_cursor
+        dao.creds = {"db_name": "TEST_DB"}
+        dao._conn_str = "mocked_connection_string"
+        dao.validate_and_lookup_item_prices = _Db2DAO.validate_and_lookup_item_prices.__get__(dao, _Db2DAO)
+        return dao
+
+    def test_validate_and_lookup_item_prices_success(self, mock_get_pooled_conn):
+        """Test successful validation with sufficient stock"""
+        from order_validation.order_validator import Order
+        
+        # Mock cursor to return inventory data then design data
+        # Format: PRODUCT_ID, STOCK, SIZE_FACTOR, STYLE_PRICE, MATERIAL_PRICE
+        self.mock_cursor.fetchall.side_effect = [
+            [(1, 10, 1.0, 25.0, 15.0), (2, 5, 1.2, 35.0, 25.0)],  # Inventory query
+            [(1, 5.0), (2, 10.0)]  # Design prices query
+        ]
+        
+        mock_conn = MagicMock()
+        mock_conn.cursor.return_value = self.mock_cursor
+        mock_get_pooled_conn.return_value = mock_conn
+        
+        dao = self.create_dao_with_mock_cursor()
+        
+        order_data = Order({
+            "Customer": {"Name": "Test Customer", "Address": "123 Main St"},
+            "Items": [
+                {"Product_Id": 1, "Design_Id": 1, "Quantity": 2},
+                {"Product_Id": 2, "Design_Id": 2, "Quantity": 1}
+            ]
+        })
+        
+        product_data, design_data = dao.validate_and_lookup_item_prices(mock_conn, order_data)
+        
+        # Check that SQL was executed twice (inventory + designs)
+        self.assertEqual(self.mock_cursor.execute.call_count, 2)
+        
+        # Check product_data structure
+        self.assertIsInstance(product_data, dict)
+        self.assertIn(1, product_data)
+        self.assertIn(2, product_data)
+        
+        # Check price data for product 1
+        self.assertEqual(product_data[1]["Stock"], 10)
+        self.assertEqual(product_data[1]["Size_Factor"], 1.0)
+        self.assertEqual(product_data[1]["Style_Price"], 25.0)
+        self.assertEqual(product_data[1]["Material_Price"], 15.0)
+        
+        # Check design_data structure
+        self.assertIsInstance(design_data, dict)
+        self.assertIn(1, design_data)
+        self.assertIn(2, design_data)
+        self.assertEqual(design_data[1], 5.0)
+        self.assertEqual(design_data[2], 10.0)
+
+    def test_validate_and_lookup_item_prices_insufficient_stock(self, mock_get_pooled_conn):
+        """Test error when requested quantity exceeds stock"""
+        from order_validation.order_validator import Order
+        
+        # Mock cursor to return inventory data with low stock, then design data
+        self.mock_cursor.fetchall.side_effect = [
+            [(1, 1, 1.0, 25.0, 15.0)],  # Only 1 in stock
+            [(1, 5.0)]  # Design price
+        ]
+        
+        mock_conn = MagicMock()
+        mock_conn.cursor.return_value = self.mock_cursor
+        mock_get_pooled_conn.return_value = mock_conn
+        
+        dao = self.create_dao_with_mock_cursor()
+        
+        order_data = Order({
+            "Customer": {"Name": "Test Customer", "Address": "123 Main St"},
+            "Items": [
+                {"Product_Id": 1, "Design_Id": 1, "Quantity": 5}  # Requesting 5, only 1 available
+            ]
+        })
+        
+        with self.assertRaises(Exception):
+            dao.validate_and_lookup_item_prices(mock_conn, order_data)
+
+    def test_validate_and_lookup_item_prices_sql_generation(self, mock_get_pooled_conn):
+        """Test that SQL is generated correctly with product IDs"""
+        from order_validation.order_validator import Order
+        
+        self.mock_cursor.fetchall.side_effect = [
+            [(1, 10, 1.0, 25.0, 15.0)],  # Inventory data
+            [(1, 5.0)]  # Design price
+        ]
+        
+        mock_conn = MagicMock()
+        mock_conn.cursor.return_value = self.mock_cursor
+        mock_get_pooled_conn.return_value = mock_conn
+        
+        dao = self.create_dao_with_mock_cursor()
+        
+        order_data = Order({
+            "Customer": {"Name": "Test Customer", "Address": "123 Main St"},
+            "Items": [
+                {"Product_Id": 1, "Design_Id": 1, "Quantity": 2}
+            ]
+        })
+        
+        dao.validate_and_lookup_item_prices(mock_conn, order_data)
+        
+        # Check that execute was called twice (inventory + designs)
+        self.assertEqual(self.mock_cursor.execute.call_count, 2)
+        
+        # Check first call (inventory query)
+        first_call_args = self.mock_cursor.execute.call_args_list[0][0]
+        sql = first_call_args[0]
+        params = first_call_args[1]
+        
+        # Check SQL contains expected elements
+        self.assertIn("SELECT", sql)
+        self.assertIn("INVENTORY", sql)
+        self.assertIn("WHERE", sql)
+        self.assertIn("PRODUCT_ID IN", sql)
+        
+        # Check parameters
+        self.assertIn(1, params)
+
+
+@patch('database.dao_helper_functions.get_pooled_connection')
 class TestCreateOrder(unittest.TestCase):
     """Test cases for _Db2DAO.create_order() method"""
 
@@ -291,14 +430,11 @@ class TestCreateOrder(unittest.TestCase):
     def setUpClass(cls):
         """Set up once for all tests"""
         cls.mock_cursor = MagicMock()
-        cls.mock_cursor.fetchall.return_value = [(1,)]  # Mock order ID return
         
     def setUp(self):
         """Reset mocks before each test"""
         self.mock_cursor.reset_mock()
-        self.mock_cursor.fetchall.return_value = [(1,)]
         self.mock_cursor.execute.return_value = None
-        self.mock_cursor.execute.side_effect = None
 
     def create_dao_with_mock_cursor(self):
         """Helper to create DAO with mocked cursor"""
@@ -307,176 +443,102 @@ class TestCreateOrder(unittest.TestCase):
         dao.creds = {"db_name": "TEST_DB"}
         dao._conn_str = "mocked_connection_string"
         dao.create_order = _Db2DAO.create_order.__get__(dao, _Db2DAO)
+        dao.validate_and_lookup_item_prices = _Db2DAO.validate_and_lookup_item_prices.__get__(dao, _Db2DAO)
         dao.add_customer_and_return_id = _Db2DAO.add_customer_and_return_id.__get__(dao, _Db2DAO)
         return dao
 
+    def test_create_order_no_items(self, mock_get_pooled_conn):
+        """Test that create_order raises error when no items in order"""
+        from order_validation.order_validator import Order
+        
+        dao = self.create_dao_with_mock_cursor()
+        
+        # Create order with one item, then manually set items to empty to bypass Order validation
+        order_data = Order({
+            "Customer": {"Name": "Test Customer", "Address": "123 Main St"},
+            "Items": [{"Product_Id": 1, "Design_Id": 1, "Quantity": 1}]  # Valid for construction
+        })
+        
+        # Manually set items to empty to test create_order validation
+        order_data._items = []
+        
+        with self.assertRaises(IndexError):
+            dao.create_order(order_data)
 
-@patch('database.dao_helper_functions.get_pooled_connection')
-class TestLookupInventoryById(unittest.TestCase):
-    """Test cases for _Db2DAO.lookup_inventory_by_id() method"""
-
-    @classmethod
-    def setUpClass(cls):
-        """Set up once for all tests"""
-        cls.mock_cursor = MagicMock()
-        # Mock inventory data: PRODUCT_ID, SIZE, STYLE, MATERIAL, COLOR, STOCK, SIZE_FACTOR, STYLE_PRICE, MATERIAL_PRICE
-        cls.mock_cursor.fetchall.return_value = [
-            (1, "M", "Casual", "Cotton", "Blue", 10, 1.0, 25.0, 15.0),
-            (2, "L", "Formal", "Silk", "Red", 5, 1.2, 35.0, 25.0)
+    @patch('database.dao_helper_functions.get_order_price')
+    def test_create_order_new_customer(self, mock_get_order_price, mock_get_pooled_conn):
+        """Test creating an order for a new customer"""
+        from order_validation.order_validator import Order
+        
+        # Mock the get_order_price function
+        mock_get_order_price.return_value = (100.0, [
+            {"Product_Id": 1, "Design_Id": 1, "Quantity": 2, "Unit_Price": 40.0, "Total_Price": 80.0}
+        ])
+        
+        # Mock cursor responses
+        self.mock_cursor.fetchall.side_effect = [
+            [(1, 10, 1.0, 25.0, 15.0)],  # validate_and_lookup_item_prices - inventory
+            [(1, 5.0)],  # validate_and_lookup_item_prices - design prices
+            [],  # Customer check (not found)
+            [(123,)],  # add_customer_and_return_id
+            [(456,)]  # Order ID
         ]
         
-    def setUp(self):
-        """Reset mocks before each test"""
-        self.mock_cursor.reset_mock()
-        self.mock_cursor.fetchall.return_value = [
-            (1, "M", "Casual", "Cotton", "Blue", 10, 1.0, 25.0, 15.0),
-            (2, "L", "Formal", "Silk", "Red", 5, 1.2, 35.0, 25.0)
-        ]
-        self.mock_cursor.execute.return_value = None
-
-    def create_dao_with_mock_cursor(self):
-        """Helper to create DAO with mocked cursor"""
-        dao = MagicMock(spec=_Db2DAO)
-        dao.cursor = self.mock_cursor
-        dao.creds = {"db_name": "TEST_DB"}
-        dao._conn_str = "mocked_connection_string"
-        dao.lookup_inventory_by_id = _Db2DAO.lookup_inventory_by_id.__get__(dao, _Db2DAO)
-        return dao
-
-    def test_lookup_inventory_single_id(self, mock_get_pooled_conn):
-        """Test lookup_inventory_by_id with single ID"""
-        # Configure the mock connection
         mock_conn = MagicMock()
         mock_conn.cursor.return_value = self.mock_cursor
         mock_get_pooled_conn.return_value = mock_conn
         
         dao = self.create_dao_with_mock_cursor()
         
-        result = dao.lookup_inventory_by_id(mock_conn, [1])
+        order_data = Order({
+            "Customer": {"Name": "New Customer", "Address": "456 Oak Ave"},
+            "Items": [
+                {"Product_Id": 1, "Design_Id": 1, "Quantity": 2}
+            ]
+        })
         
-        # Verify SQL was executed
-        self.mock_cursor.execute.assert_called_once()
-        call_args = self.mock_cursor.execute.call_args[0]
-        sql = call_args[0]
-        params = call_args[1]
+        # Should not raise an exception
+        dao.create_order(order_data)
         
-        # Check SQL contains WHERE ID IN clause
-        self.assertIn("WHERE", sql)
-        self.assertIn("IN", sql)
-        self.assertEqual(len(params), 1)
-        self.assertEqual(params[0], 1)
+        # Verify that customer was added and order was created
+        self.assertGreaterEqual(self.mock_cursor.execute.call_count, 3)
 
-    def test_lookup_inventory_multiple_ids(self, mock_get_pooled_conn):
-        """Test lookup_inventory_by_id with multiple IDs"""
-        mock_conn = MagicMock()
-        mock_conn.cursor.return_value = self.mock_cursor
-        mock_get_pooled_conn.return_value = mock_conn
+    @patch('database.dao_helper_functions.get_order_price')
+    def test_create_order_existing_customer(self, mock_get_order_price, mock_get_pooled_conn):
+        """Test creating an order for an existing customer"""
+        from order_validation.order_validator import Order
         
-        dao = self.create_dao_with_mock_cursor()
+        # Mock the get_order_price function
+        mock_get_order_price.return_value = (100.0, [
+            {"Product_Id": 1, "Design_Id": 1, "Quantity": 2, "Unit_Price": 40.0, "Total_Price": 80.0}
+        ])
         
-        result = dao.lookup_inventory_by_id(mock_conn, [1, 2, 3])
-        
-        self.mock_cursor.execute.assert_called_once()
-        call_args = self.mock_cursor.execute.call_args[0]
-        params = call_args[1]
-        
-        # Should have 3 parameters
-        self.assertEqual(len(params), 3)
-
-    def test_lookup_inventory_empty_list(self, mock_get_pooled_conn):
-        """Test lookup_inventory_by_id with empty list"""
-        mock_conn = MagicMock()
-        mock_conn.cursor.return_value = self.mock_cursor
-        mock_get_pooled_conn.return_value = mock_conn
-        
-        dao = self.create_dao_with_mock_cursor()
-        
-        result = dao.lookup_inventory_by_id(mock_conn, [])
-        
-        # Should return empty result or handle gracefully
-        self.assertEqual(result, [{}])
-
-
-@patch('database.dao_helper_functions.get_pooled_connection')
-class TestLookupDesignPricesById(unittest.TestCase):
-    """Test cases for _Db2DAO.lookup_design_prices_by_id() method"""
-
-    @classmethod
-    def setUpClass(cls):
-        """Set up once for all tests"""
-        cls.mock_cursor = MagicMock()
-        # Bug in actual code: lookup_design_prices returns ID, PRICE but tries to convert as inventory
-        # Mock with 9 fields to match convert_inventory_data expectations
-        cls.mock_cursor.fetchall.return_value = [
-            (1, "M", "Casual", "Cotton", "Blue", 10, 1.0, 25.0, 15.0),
-            (2, "L", "Formal", "Silk", "Red", 5, 1.2, 35.0, 25.0)
+        # Mock cursor responses
+        self.mock_cursor.fetchall.side_effect = [
+            [(1, 10, 1.0, 25.0, 15.0)],  # validate_and_lookup_item_prices - inventory
+            [(1, 5.0)],  # validate_and_lookup_item_prices - design prices
+            [(999, "Existing Customer", "123 Main St")],  # Customer check (found)
+            [(456,)]  # Order ID
         ]
         
-    def setUp(self):
-        """Reset mocks before each test"""
-        self.mock_cursor.reset_mock()
-        self.mock_cursor.fetchall.return_value = [
-            (1, "M", "Casual", "Cotton", "Blue", 10, 1.0, 25.0, 15.0),
-            (2, "L", "Formal", "Silk", "Red", 5, 1.2, 35.0, 25.0)
-        ]
-        self.mock_cursor.execute.return_value = None
-
-    def create_dao_with_mock_cursor(self):
-        """Helper to create DAO with mocked cursor"""
-        dao = MagicMock(spec=_Db2DAO)
-        dao.cursor = self.mock_cursor
-        dao.creds = {"db_name": "TEST_DB"}
-        dao._conn_str = "mocked_connection_string"
-        dao.lookup_design_prices_by_id = _Db2DAO.lookup_design_prices_by_id.__get__(dao, _Db2DAO)
-        return dao
-
-    def test_lookup_design_prices_single_id(self, mock_get_pooled_conn):
-        """Test lookup_design_prices_by_id with single ID"""
         mock_conn = MagicMock()
         mock_conn.cursor.return_value = self.mock_cursor
         mock_get_pooled_conn.return_value = mock_conn
         
         dao = self.create_dao_with_mock_cursor()
         
-        result = dao.lookup_design_prices_by_id(mock_conn, [1])
+        order_data = Order({
+            "Customer": {"Name": "Existing Customer", "Address": "123 Main St"},
+            "Items": [
+                {"Product_Id": 1, "Design_Id": 1, "Quantity": 2}
+            ]
+        })
         
-        self.mock_cursor.execute.assert_called_once()
-        call_args = self.mock_cursor.execute.call_args[0]
-        sql = call_args[0]
+        # Should not raise an exception
+        dao.create_order(order_data)
         
-        # Check SQL structure
-        self.assertIn("SELECT ID, PRICE", sql)
-        self.assertIn("FROM", sql)
-        self.assertIn("DESIGNS", sql)
-        self.assertIn("WHERE ID IN", sql)
-
-    def test_lookup_design_prices_multiple_ids(self, mock_get_pooled_conn):
-        """Test lookup_design_prices_by_id with multiple IDs"""
-        mock_conn = MagicMock()
-        mock_conn.cursor.return_value = self.mock_cursor
-        mock_get_pooled_conn.return_value = mock_conn
-        
-        dao = self.create_dao_with_mock_cursor()
-        
-        result = dao.lookup_design_prices_by_id(mock_conn, [1, 2, 3])
-        
-        call_args = self.mock_cursor.execute.call_args[0]
-        params = call_args[1]
-        
-        self.assertEqual(len(params), 3)
-
-    def test_lookup_design_prices_empty_list(self, mock_get_pooled_conn):
-        """Test lookup_design_prices_by_id with empty list"""
-        mock_conn = MagicMock()
-        mock_conn.cursor.return_value = self.mock_cursor
-        mock_get_pooled_conn.return_value = mock_conn
-        
-        dao = self.create_dao_with_mock_cursor()
-        
-        result = dao.lookup_design_prices_by_id(mock_conn, [])
-        
-        # Should return empty dict
-        self.assertEqual(result, [{}])
+        # Verify order was created
+        self.assertGreaterEqual(self.mock_cursor.execute.call_count, 2)
 
 
 @patch('database.dao_helper_functions.get_pooled_connection')
@@ -610,22 +672,6 @@ class TestHelperFunctions(unittest.TestCase):
         # Price should be calculated: (Style_Price * Size_Factor) + Material_Price
         # = (25.0 * 1.0) + 15.0 = 40.0
         self.assertEqual(result["Price"], 40.0)
-
-    def test_get_order_price(self):
-        """Test get_order_price returns 0.0 (placeholder)"""
-        from database.dao_helper_functions import get_order_price
-        from order_validation.order_validator import Order
-        
-        order_data = {
-            "Customer": {"Name": "Test Customer", "Address": "Test Address"},
-            "Items": [{"Product_Id": 1, "Design_Id": 1, "Quantity": 2}]
-        }
-        order = Order(order_data)
-        
-        result = get_order_price(order)
-        
-        # Current implementation returns 0.0
-        self.assertEqual(result, 0.0)
 
 
 if __name__ == "__main__":
