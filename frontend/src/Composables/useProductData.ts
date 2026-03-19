@@ -3,7 +3,6 @@ import type { ProductData, ProductApiResponse } from '../Types/product.types'
 import { 
     STYLE_TO_IMAGES, 
     MATERIAL_TO_TEXTURE, 
-    STYLE_TO_OVERLAY,
     DEFAULT_PRODUCT_DATA 
 } from '../Constants/productMappings'
 import { 
@@ -36,11 +35,6 @@ export const useProductData = () => {
     const materialBackgroundImage = computed(() => {
         const texture = MATERIAL_TO_TEXTURE[currentMaterial.value]
         return texture ? `url(${texture})` : 'none'
-    })
-
-    const styleOverlayImage = computed(() => {
-        const overlay = STYLE_TO_OVERLAY[productData.value.style]
-        return overlay ? `url(${overlay})` : 'none'
     })
 
     const renderStars = computed(() => {
@@ -331,7 +325,7 @@ export const useProductData = () => {
         // Computed
         productImages,
         materialBackgroundImage,
-        styleOverlayImage,
+
         renderStars,
         formattedPrice,
         // Methods

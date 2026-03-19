@@ -27,8 +27,6 @@ import materialWool from '../Assets/Textures/material-wool.png'
 import materialBlend from '../Assets/Textures/material-blend.png'
 import materialKevlar from '../Assets/Textures/material-kevlar.png'
 
-// Style overlay images
-import styleOverlay from '../Assets/Designs/1.png'
 
 import type { ProductData } from '../Types/product.types'
 
@@ -56,11 +54,6 @@ export const MATERIAL_TO_TEXTURE: Record<string, string> = {
     'Cotton': materialCotton,
     'Polyester': materialPolyester,
     'Kevlar': materialKevlar
-}
-
-// Map styles to their overlay images
-export const STYLE_TO_OVERLAY: Record<string, string> = {
-    'Vest': styleOverlay
 }
 
 // Default product data structure
