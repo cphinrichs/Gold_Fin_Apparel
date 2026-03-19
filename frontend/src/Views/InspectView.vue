@@ -97,6 +97,16 @@
             <div class="price-section">
                 <span class="price">${{ formattedPrice }}</span>
             </div>
+
+            <!-- Quantity selector -->
+            <div class="quantity-selector">
+                <label class="quantity-label">Quantity</label>
+                <div class="quantity-controls">
+                    <button type="button" class="qty-btn" @click="quantity = Math.max(1, quantity - 1)">−</button>
+                    <span class="qty-display">{{ quantity }}</span>
+                    <button type="button" class="qty-btn" @click="quantity = Math.min(currentStock, quantity + 1)">+</button>
+                </div>
+            </div>
             
             <button type="button" class="add-to-cart" @click="handleAddToCart" :class="{ added: addedFeedback }">
                 {{ addedFeedback ? 'ADDED TO CART ✓' : 'ADD TO CART' }}
@@ -193,22 +203,25 @@ const designBackgroundImage = computed(() => {
 // Cart composable
 const { addToCart } = useCart()
 const addedFeedback = ref(false)
+const quantity = ref(1)
 
 const handleAddToCart = () => {
     const cartItem: CartItem = {
         cartItemId: `${Date.now()}-${Math.random()}`,
         Product_Id: currentProductId.value,
+        Design_Id: parseInt(route.query.designId as string) || 0,
         Style: productData.value.style,
         Color: currentColor.value,
         Material: currentMaterial.value,
         Size: selectedSize.value || productData.value.sizes[0] || '',
         Price: productData.value.price,
         Stock: currentStock.value,
-        quantity: 1
+        quantity: quantity.value
     }
     addToCart(cartItem)
     addedFeedback.value = true
-    setTimeout(() => { addedFeedback.value = false }, 1800)
+    quantity.value = 1
+    setTimeout(() => { addedFeedback.value = false }, 500)
 }
 
 // Helper functions to update refs from composables

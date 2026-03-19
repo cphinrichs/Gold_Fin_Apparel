@@ -35,16 +35,28 @@ export const useCart = () => {
                 c.Size === item.Size
         )
         if (existing) {
-            existing.quantity += 1
+            existing.quantity += item.quantity ?? 1
             cartItems.value = [...cartItems.value]
         } else {
-            cartItems.value = [...cartItems.value, { ...item, quantity: 1 }]
+            cartItems.value = [...cartItems.value, { ...item, quantity: item.quantity ?? 1 }]
         }
         saveToStorage(cartItems.value)
     }
 
     const removeFromCart = (cartItemId: string) => {
         cartItems.value = cartItems.value.filter((c) => c.cartItemId !== cartItemId)
+        saveToStorage(cartItems.value)
+    }
+
+    const removeQuantityFromCart = (cartItemId: string, amount: number) => {
+        const item = cartItems.value.find((c) => c.cartItemId === cartItemId)
+        if (!item) return
+        if (amount >= item.quantity) {
+            cartItems.value = cartItems.value.filter((c) => c.cartItemId !== cartItemId)
+        } else {
+            item.quantity -= amount
+            cartItems.value = [...cartItems.value]
+        }
         saveToStorage(cartItems.value)
     }
 
@@ -58,6 +70,7 @@ export const useCart = () => {
         cartCount,
         addToCart,
         removeFromCart,
+        removeQuantityFromCart,
         clearCart,
     }
 }

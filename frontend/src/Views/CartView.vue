@@ -1,5 +1,10 @@
 <script lang="ts" setup>
+import { onMounted } from 'vue';
 import Cart from '../Components/Cart.vue';
+
+onMounted(() => {
+  window.scrollTo({ top: 0, behavior: 'instant' });
+});
 </script>
 
 <template>

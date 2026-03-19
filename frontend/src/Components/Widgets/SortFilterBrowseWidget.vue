@@ -89,7 +89,7 @@ const emit = defineEmits<{ (e: 'filtersChanged', filters: Filters): void }>();
           :key="option.value"
           class="filter-chip"
           :class="{ selected: filters.sort === option.value }"
-          @click="filters.sort = filters.sort === option.value ? '' : option.value"
+          @click="filters.sort = filters.sort === option.value ? '' : option.value; emit('filtersChanged', filters)"
         >
           {{ option.label }}
         </label>
