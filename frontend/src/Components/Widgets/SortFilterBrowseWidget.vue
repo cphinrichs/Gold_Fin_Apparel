@@ -23,7 +23,13 @@ const filters = reactive<Filters>({
   sort: '',
 });
 
-const colorOptions = ['White', 'Black', 'Red', 'Blue', 'Green'];
+const colorOptions = [
+  { label: 'White', hex: 'ffffff' },
+  { label: 'Black', hex: '1a1a1a' },
+  { label: 'Red',   hex: 'e53935' },
+  { label: 'Blue',  hex: '1e88e5' },
+  { label: 'Green', hex: '43a047' },
+];
 const materialOptions = ['Cotton', 'Polyester', 'Wool', 'Silk', 'Kevlar'];
 const sizeOptions = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL'];
 const styleOptions = ['Tank Top', 'Short Sleeve', 'Long Sleeve', 'Hoodie', 'Vest', 'Kimono'];
@@ -96,13 +102,13 @@ const emit = defineEmits<{ (e: 'filtersChanged', filters: Filters): void }>();
       <div class="filter-options">
         <label
           v-for="color in colorOptions"
-          :key="color"
+          :key="color.hex"
           class="filter-chip"
-          :class="{ selected: isSelected('colors', color) }"
-          @click="toggleFilter('colors', color)"
+          :class="{ selected: isSelected('colors', color.hex) }"
+          @click="toggleFilter('colors', color.hex)"
         >
-          <span class="color-dot" :class="color.toLowerCase()"></span>
-          {{ color }}
+          <span class="color-dot" :style="{ background: '#' + color.hex }"></span>
+          {{ color.label }}
         </label>
       </div>
     </div>
@@ -335,11 +341,7 @@ const emit = defineEmits<{ (e: 'filtersChanged', filters: Filters): void }>();
   border: 1px solid rgba(0,0,0,0.15);
   flex-shrink: 0;
 }
-.color-dot.white  { background: #ffffff; border-color: #ccc; }
-.color-dot.black  { background: #1a1a1a; }
-.color-dot.red    { background: #e53935; }
-.color-dot.blue   { background: #1e88e5; }
-.color-dot.green  { background: #43a047; }
+.color-dot { background: #999; }
 
 /* Apply button */
 .apply-btn {

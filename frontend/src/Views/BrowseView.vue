@@ -82,7 +82,7 @@ const displayedProducts = computed(() => {
   const { colors, materials, sizes, styles, sort } = activeFilters.value
 
   if (colors.length > 0) {
-    list = list.filter(p => colors.some(c => c.toLowerCase() === p.Color.toLowerCase()))
+    list = list.filter(p => colors.some(c => c.toLowerCase() === p.Color.toLowerCase().replace(/^#/, '')))
   }
   if (materials.length > 0) {
     list = list.filter(p => materials.includes(p.Material))
@@ -114,6 +114,7 @@ const handleProductClick = (productId: number) => {
 
 // Initialize component
 onMounted(() => {
+  window.scrollTo({ top: 0, behavior: 'instant' });
   console.log('BrowseView mounted, fetching products...')
   console.log('Current route query:', route.query)
   loadProducts()

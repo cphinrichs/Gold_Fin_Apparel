@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
+
+onMounted(() => {
+  window.scrollTo({ top: 0, behavior: 'instant' });
+});
 
 const state = window.history.state;
 

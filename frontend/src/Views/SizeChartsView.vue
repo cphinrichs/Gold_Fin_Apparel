@@ -20,6 +20,12 @@
       </thead>
       <tbody>
         <tr>
+          <td><strong>Extra Small (XS)</strong></td>
+          <td>30-32</td>
+          <td>15-15.5</td>
+          <td>25</td>
+        </tr>
+        <tr>
           <td><strong>Small (S)</strong></td>
           <td>34-36</td>
           <td>16-16.5</td>
@@ -66,6 +72,12 @@
         </tr>
       </thead>
       <tbody>
+        <tr>
+          <td><strong>Extra Small (XS)</strong></td>
+          <td>30-32</td>
+          <td>15-15.5</td>
+          <td>26</td>
+        </tr>
         <tr>
           <td><strong>Small (S)</strong></td>
           <td>34-36</td>
@@ -114,6 +126,13 @@
         </tr>
       </thead>
       <tbody>
+        <tr>
+          <td><strong>Extra Small (XS)</strong></td>
+          <td>30-32</td>
+          <td>15-15.5</td>
+          <td>31</td>
+          <td>26</td>
+        </tr>
         <tr>
           <td><strong>Small (S)</strong></td>
           <td>34-36</td>
@@ -168,6 +187,13 @@
       </thead>
       <tbody>
         <tr>
+          <td><strong>Extra Small (XS)</strong></td>
+          <td>32-34</td>
+          <td>16-16.5</td>
+          <td>32</td>
+          <td>26</td>
+        </tr>
+        <tr>
           <td><strong>Small (S)</strong></td>
           <td>36-38</td>
           <td>17-17.5</td>
@@ -220,6 +246,12 @@
       </thead>
       <tbody>
         <tr>
+          <td><strong>Extra Small (XS)</strong></td>
+          <td>30-32</td>
+          <td>15-15.5</td>
+          <td>24</td>
+        </tr>
+        <tr>
           <td><strong>Small (S)</strong></td>
           <td>34-36</td>
           <td>16-16.5</td>
@@ -268,6 +300,14 @@
         </tr>
       </thead>
       <tbody>
+        <tr>
+          <td><strong>Extra Small (XS)</strong></td>
+          <td>30-32</td>
+          <td>24-26</td>
+          <td>15-15.5</td>
+          <td>21</td>
+          <td>42</td>
+        </tr>
         <tr>
           <td><strong>Small (S)</strong></td>
           <td>34-36</td>

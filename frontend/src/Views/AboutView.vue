@@ -150,6 +150,7 @@ section {
 
 h1 {
   font-size: clamp(1.8rem, 4vw, 2.5rem);
+  text-align: center;
 }
 
 h2 {
