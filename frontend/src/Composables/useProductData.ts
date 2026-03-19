@@ -3,7 +3,6 @@ import type { ProductData, ProductApiResponse } from '../Types/product.types'
 import { 
     STYLE_TO_IMAGES, 
     MATERIAL_TO_TEXTURE, 
-    STYLE_TO_OVERLAY,
     DEFAULT_PRODUCT_DATA 
 } from '../Constants/productMappings'
 import { 
@@ -38,33 +37,18 @@ export const useProductData = () => {
         return texture ? `url(${texture})` : 'none'
     })
 
-    const styleOverlayImage = computed(() => {
-        const overlay = STYLE_TO_OVERLAY[productData.value.style]
-        return overlay ? `url(${overlay})` : 'none'
-    })
-
     const renderStars = computed(() => {
         const filledStars = '★'.repeat(productData.value.rating)
         const emptyStars = '☆'.repeat(5 - productData.value.rating)
         return filledStars + emptyStars
     })
 
-    /**
-     * Check if a material is available for the current color
-     */
-    const isMaterialAvailable = (material: string): boolean => {
-        if (!currentColor.value) return true
-
-        const colorCode = currentColor.value.replace('#', '')
-        return inventory.value.some(product =>
-            product.Style === productData.value.style &&
-            product.Color === colorCode &&
-            product.Material === material
-        )
-    }
+    const allProductCombinations = computed(() => {
+        return inventory.value.filter(product => product.Style === productData.value.style)
+    })
 
     /**
-     * Check if a color is available for the current material
+     * Check if a color is available for the current material and size
      */
     const isColorAvailable = (color: string): boolean => {
         if (!currentMaterial.value) return true
@@ -73,7 +57,23 @@ export const useProductData = () => {
         return inventory.value.some(product =>
             product.Style === productData.value.style &&
             product.Color === colorCode &&
-            product.Material === currentMaterial.value
+            product.Material === currentMaterial.value &&
+            (!currentSize.value || product.Size.trim() === currentSize.value.trim())
+        )
+    }
+
+    /**
+     * Check if a material is available for the current color and size
+     */
+    const isMaterialAvailable = (material: string): boolean => {
+        if (!currentColor.value) return true
+
+        const colorCode = currentColor.value.replace('#', '')
+        return inventory.value.some(product =>
+            product.Style === productData.value.style &&
+            product.Color === colorCode &&
+            product.Material === material &&
+            (!currentSize.value || product.Size.trim() === currentSize.value.trim())
         )
     }
 
@@ -179,43 +179,50 @@ export const useProductData = () => {
     }
 
     /**
+     * Update current product ID and stock based on selections
+     */
+    const updateCurrentProduct = () => {
+        if (currentColor.value && currentMaterial.value && currentSize.value) {
+            const colorCode = currentColor.value.replace('#', '')
+            const matchingProduct = inventory.value.find(product =>
+                product.Style === productData.value.style &&
+                product.Color === colorCode &&
+                product.Material === currentMaterial.value &&
+                product.Size.trim() === currentSize.value.trim()
+            )
+            
+            if (matchingProduct) {
+                currentProductId.value = matchingProduct.Product_Id
+                currentStock.value = matchingProduct.Stock
+            }
+        }
+    }
+
+    /**
      * Clear selections when size changes
      */
-    const clearIncompatibleForSize = () => {
-        const tempColor = currentColor.value
-        const tempMaterial = currentMaterial.value
+    const clearIncompatibleForSize = (size: string) => {
+        // Find all combinations with this size
+        const validCombinations = allProductCombinations.value.filter(
+            combo => combo.Size.trim() === size.trim()
+        )
 
-        // Check if current color is available for new size+material
-        if (currentColor.value && currentMaterial.value) {
-            const colorCode = currentColor.value.replace('#', '')
-            const colorAvailable = inventory.value.some(product =>
-                product.Style === productData.value.style &&
-                product.Color === colorCode &&
-                product.Material === currentMaterial.value &&
-                product.Size.trim() === currentSize.value.trim()
-            )
+        // Get available colors and materials for this size (with # prefix for colors)
+        const availableColors = [...new Set(validCombinations.map(c => `#${c.Color}`))]
+        const availableMaterials = [...new Set(validCombinations.map(c => c.Material))]
 
-            if (!colorAvailable) {
-                const firstColor = getFirstAvailableColor(currentMaterial.value, currentSize.value)
-                currentColor.value = firstColor
-            }
+        // If current color is not available, select first available
+        if (!availableColors.includes(currentColor.value)) {
+            currentColor.value = availableColors[0] || ''
         }
 
-        // Check if current material is available for new size+color
-        if (currentMaterial.value && currentColor.value) {
-            const colorCode = currentColor.value.replace('#', '')
-            const materialAvailable = inventory.value.some(product =>
-                product.Style === productData.value.style &&
-                product.Color === colorCode &&
-                product.Material === currentMaterial.value &&
-                product.Size.trim() === currentSize.value.trim()
-            )
-
-            if (!materialAvailable) {
-                const firstMaterial = getFirstAvailableMaterial(currentColor.value, currentSize.value)
-                currentMaterial.value = firstMaterial
-            }
+        // If current material is not available, select first available
+        if (!availableMaterials.includes(currentMaterial.value)) {
+            currentMaterial.value = availableMaterials[0] || ''
         }
+
+        // Update the product ID and stock based on the new combination
+        updateCurrentProduct()
     }
 
     const formattedPrice = computed(() => {
@@ -318,7 +325,7 @@ export const useProductData = () => {
         // Computed
         productImages,
         materialBackgroundImage,
-        styleOverlayImage,
+
         renderStars,
         formattedPrice,
         // Methods
