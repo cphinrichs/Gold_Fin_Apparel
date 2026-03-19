@@ -53,7 +53,10 @@
     {"COLOR": "FFD700", "MATERIAL_ID": 3, "STYLE_ID": 6, "SIZE_ID": 4, "STOCK": 60},
     {"COLOR": "A52A2A", "MATERIAL_ID": 2, "STYLE_ID": 4, "SIZE_ID": 1, "STOCK": 50},
     {"COLOR": "4B0082", "MATERIAL_ID": 1, "STYLE_ID": 3, "SIZE_ID": 6, "STOCK": 80},
-    {"COLOR": "FF1493", "MATERIAL_ID": 4, "STYLE_ID": 1, "SIZE_ID": 5, "STOCK": 15}
+    {"COLOR": "FF1493", "MATERIAL_ID": 4, "STYLE_ID": 1, "SIZE_ID": 5, "STOCK": 15},
+    {"COLOR": "FF1493", "MATERIAL_ID": 4, "STYLE_ID": 1, "SIZE_ID": 5, "STOCK": 15},
+    {"COLOR": "FFFFFF", "MATERIAL_ID": 3, "STYLE_ID": 3, "SIZE_ID": 2, "STOCK": 5},
+    {"COLOR": "FFFFFF", "MATERIAL_ID": 3, "STYLE_ID": 3, "SIZE_ID": 5, "STOCK": 25}
   ],
   "CUSTOMERS": [
     {"NAME": "John Smith", "ADDRESS": "123 Main St, New York, NY 10001"},
