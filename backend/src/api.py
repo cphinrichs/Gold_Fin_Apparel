@@ -38,7 +38,7 @@ def getInventory():
 def getDesigns():
     log.log(Level.DEBUG, "Request to get designs received. Processing...")
     query_fields = dict(request.headers)
-    # query_fields = {"Size": "M"}
+
     log.log(Level.DEBUG, "Request processed. Querying database...")
     query_results = db.select_designs(query_fields)
     
@@ -52,27 +52,29 @@ def getDesigns():
             "price": float(row[2]) if row[2] else None
         })
     
+    log.log(Level.DEBUG, "Designs query successful.")
     return jsonify({"designs": designs_list})
 
 @app.post("/order")
 def postOrder():
+    log.log(Level.DEBUG, "Request to post order received. Validating request...")
     query_fields = request.json
-    print(type(query_fields))
-    print(query_fields)
-    # TODO: validate the request and return a 400 status code if it's not valid
     try:
         order_data = Order(query_fields)
         order_data.validate()
     except Exception as e:
         log.log(Level.ERROR, "Aborting order. Validation failed for reason: " + str(e.args))
-        abort(401)
+        abort(400)
 
     # TODO: call the DAO using the request object
-    
+    log.log(Level.DEBUG, "Request validated successfully. Querying database...")
+    try:
+        db.create_order(order_data)
+    except Exception as e:
+        #no logging here, the DAO already logs anything that could cause an error
+        abort(500)
 
-    # TODO: return a 200 status code if successful
-
-    db.create_order(order_data)
+    log.log(Level.DEBUG, "Order successful.")    
     return "<p>Order posted</p>"
 
 if __name__ == '__main__':

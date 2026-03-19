@@ -28,11 +28,7 @@ import ibm_db
 import ibm_db_dbi
 
 class _Db2DAO:
-    def __init__(self):
-        # self.creds = None
-        self.conn = None
-        self.cursor = None
-        
+    def __init__(self):        
         try:
             config_path = Settings.db_config_file()
             with open(config_path, "r") as file:
@@ -52,20 +48,7 @@ class _Db2DAO:
             conn.close()
             
             log.log(Level.INFO, "Successfully connected to Db2.")
-            print("test")
-            # test_dictionary["ascending"] = True
 
-            # test_dictionary = {
-            #     "Customer": "Kara Lynch",
-            #     "Items": [
-            #         {
-            #             "Product_Id": 1,
-            #             "Design_Id": 1,
-            #             "Quantity": 3
-            #         }
-            #     ]
-            # }
-            # self.create_order(Order(test_dictionary))
         except Exception as e:
             log.log(Level.CRITICAL, f"Failed to initialize DB2 connection: {e}")
             raise Exception
@@ -86,7 +69,7 @@ class _Db2DAO:
         product_data, design_data = self.validate_and_lookup_item_prices(conn, order_data)
 
         #step 2: calculate the prices for the order and for each item
-
+        log.log(Level.DEBUG, "Calculating all item prices...")
         order_price, order_items = helper.get_order_price(product_data, design_data, order_items)
 
         
@@ -105,15 +88,18 @@ class _Db2DAO:
         cursor.execute(customer_check_sql, [order_data.get_customer()["Name"]])
         customer_query_results = cursor.fetchall()
 
-        print(customer_query_results)
+        # print(customer_query_results)
 
         if len(customer_query_results) == 0:
+            log.log(Level.DEBUG, "Customer not found. Adding to database...")
             cust_id = self.add_customer_and_return_id(conn, order_data.get_customer())
         else:
+            log.log(Level.DEBUG, "Customer found and ID retrieved.")
             cust_id = customer_query_results[0][0]
         
         #step 4: add the order to the table using the customer's ID and the order data
         #then get the order ID for the next step
+        log.log(Level.DEBUG, "Preparing SQL query to add order...")
         add_order_sql = f"""
         SELECT ID
         FROM FINAL TABLE
@@ -126,22 +112,23 @@ class _Db2DAO:
 
         order_params = [cust_id, order_price, current_time]
 
+        log.log(Level.DEBUG, "Adding order...")
         cursor.execute(add_order_sql, order_params)
         order_id = cursor.fetchall()[0][0]
 
         #step 5: add each of the order items to the table
-
-        
+        log.log(Level.DEBUG, "Order added. Preparing SQL queries to add order items...")        
         order_items_sql = f"""
         INSERT INTO {self.creds["db_name"]}.ORDER_ITEMS (ORDER_ID, PRODUCT_ID, QUANTITY, DESIGN_ID, PRICE)
         VALUES(?, ?, ?, ?, ?)"""
-
+        
+        log.log(Level.DEBUG, "Adding order items...")   
         for item in order_items:
             order_items_params = [order_id, item["Product_Id"], item["Quantity"], item["Design_Id"], item["Unit_Price"]]
             cursor.execute(order_items_sql, order_items_params)
 
         #step 6: for each order item, decrement the inventory table by its quantity
-
+        log.log(Level.DEBUG, "Order items added. Preparing SQL inventory stock counts...")   
         decrement_items_sql = f"""
         UPDATE {self.creds["db_name"]}.INVENTORY
         SET STOCK = STOCK - ?
@@ -223,7 +210,7 @@ class _Db2DAO:
                 design_lookup_sql += ");"
             design_lookup_params.append(id)
 
-        print(design_lookup_sql)
+        # print(design_lookup_sql)
         
         cursor.execute(design_lookup_sql, design_lookup_params)
         design_results = cursor.fetchall()
@@ -231,7 +218,7 @@ class _Db2DAO:
         design_dict = {}
 
         for row in design_results:
-            print(row)
+            # print(row)
             design_dict[row[0]] = row[1]
 
         return inventory_dict, design_dict
@@ -263,24 +250,31 @@ class _Db2DAO:
             log.log(Level.DEBUG, "Preparing SQL query to display inventory...")
             sql = f"""
             SELECT 
-                {self.creds["db_name"]}.INVENTORY.PRODUCT_ID,
-                {self.creds["db_name"]}.SIZES.NAME AS SIZE,
-                {self.creds["db_name"]}.STYLES.NAME AS STYLE,
-                {self.creds["db_name"]}.MATERIALS.NAME AS MATERIAL,
-                {self.creds["db_name"]}.INVENTORY.COLOR,
-                {self.creds["db_name"]}.INVENTORY.STOCK,
-                {self.creds["db_name"]}.SIZES.PRICE_FACTOR AS SIZE_FACTOR,
-                {self.creds["db_name"]}.STYLES.PRICE AS STYLE_PRICE,
-                {self.creds["db_name"]}.MATERIALS.PRICE AS MATERIAL_PRICE
-            FROM {self.creds["db_name"]}.INVENTORY
-            LEFT JOIN {self.creds["db_name"]}.SIZES
-                ON {self.creds["db_name"]}.INVENTORY.SIZE_ID = {self.creds["db_name"]}.SIZES.ID
-            LEFT JOIN {self.creds["db_name"]}.STYLES
-                ON {self.creds["db_name"]}.INVENTORY.STYLE_ID = {self.creds["db_name"]}.STYLES.ID
-            LEFT JOIN {self.creds["db_name"]}.MATERIALS
-                ON {self.creds["db_name"]}.INVENTORY.MATERIAL_ID = {self.creds["db_name"]}.MATERIALS.ID
+            INV.PRODUCT_ID,
+            SZ.NAME AS SIZE,
+            ST.NAME AS STYLE,
+            MAT.NAME AS MATERIAL,
+            INV.COLOR AS COLOR,
+            INV.STOCK,
+            SZ.PRICE_FACTOR AS SIZE_FACTOR,
+            ST.PRICE AS STYLE_PRICE,
+            MAT.PRICE AS MATERIAL_PRICE
+            FROM {self.creds["db_name"]}.INVENTORY AS INV
+            LEFT JOIN {self.creds["db_name"]}.SIZES AS SZ
+                ON INV.SIZE_ID = SZ.ID
+            LEFT JOIN {self.creds["db_name"]}.STYLES AS ST
+                ON INV.STYLE_ID = ST.ID
+            LEFT JOIN {self.creds["db_name"]}.MATERIALS AS MAT
+                ON INV.MATERIAL_ID = MAT.ID
             """
             params = []
+
+            field_dict = {
+                "Size": "SZ.NAME",
+                "Style": "ST.NAME",
+                "Material": "MAT.NAME",
+                "Color": "INV.COLOR"
+            }
 
             for field in ["Size", "Style", "Material", "Color"]:
                 if field in search_fields:
@@ -289,20 +283,16 @@ class _Db2DAO:
                     else:
                         sql += f" AND "
 
-                    if field == "Color":
-                        sql += "INVENTORY.COLOR = ?"
-                    else:
-                        sql += f"{field}S.NAME = ?"
-                    
+                    sql += f"{field_dict[field]} = ?"
                     params.append(search_fields[field])
 
-            sql += f" ORDER BY {self.creds["db_name"]}.INVENTORY.STOCK "
+            sql += f"\nORDER BY {self.creds["db_name"]}.INVENTORY.STOCK "
             if "Ascending" in search_fields and search_fields["Ascending"].lower() == "true":
                 sql += "ASC;"
             else:
                 sql += "DESC;"
 
-            print(sql)
+            # print(sql)
 
             conn = helper.get_pooled_connection(self._conn_str)
             cursor = conn.cursor()
@@ -361,6 +351,7 @@ class _Db2DAO:
                 sql += "DESC;"
 
             
+            log.log(Level.DEBUG, "SQL assembled. Connecting to database...")
             
             conn = helper.get_pooled_connection(self._conn_str)
             cursor = conn.cursor()
@@ -373,6 +364,7 @@ class _Db2DAO:
             
 
 
+            log.log(Level.DEBUG, "Query successful. Returning results...")
             return query_results
         except Exception as e:
             log.log(Level.ERROR, "Error occured during designs query: " + str(e.args))

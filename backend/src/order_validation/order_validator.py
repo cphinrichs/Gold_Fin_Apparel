@@ -13,15 +13,13 @@ class Order:
         log.log(Level.DEBUG, "No invalid fields found.")
 
         field = ""
-        print(type(order_data["Items"]))
-        print(type(order_data["Items"][0]))
+        # print(type(order_data["Items"]))
+        # print(type(order_data["Items"][0]))
         try:
             field = "Customer"
             assert type(order_data["Customer"]) == dict
             field = "Items"
-            assert type(order_data["Items"]) == list
-            print("test 3")
-            
+            assert type(order_data["Items"]) == list            
         except KeyError as e:
             log.log(Level.ERROR, "Aborting order. The following data was not found in request: " + str(e.args))
             raise Exception
@@ -29,7 +27,6 @@ class Order:
             log.log(Level.ERROR, "Aborting order. The following data is formatted improperly: " + field)
             raise Exception
         except Exception as e:
-            print("test 4")
             log.log(Level.ERROR, "Aborting order. The following error occurred: " + str(e.args))
             raise Exception
         
