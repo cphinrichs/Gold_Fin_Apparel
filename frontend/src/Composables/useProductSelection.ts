@@ -6,6 +6,7 @@ import { toggleActiveButton } from '../Utils/productHelpers'
  */
 export const useProductSelection = () => {
     const currentImageIndex = ref(0)
+    const selectedSize = ref('')
 
     const handleColorSelection = (
         event: Event, 
@@ -29,6 +30,7 @@ export const useProductSelection = () => {
         toggleActiveButton('.size-btn', target)
         updateSize(size)
         clearIncompatible()
+        selectedSize.value = size
     }
 
     const handleMaterialSelection = (
@@ -45,6 +47,7 @@ export const useProductSelection = () => {
 
     return {
         currentImageIndex,
+        selectedSize,
         handleColorSelection,
         handleSizeSelection,
         handleMaterialSelection

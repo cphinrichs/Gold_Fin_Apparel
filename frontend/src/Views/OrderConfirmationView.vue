@@ -7,6 +7,39 @@ const maskedCard = computed(() => {
   const num = state?.cardNumber?.replace(/\s/g, '') ?? '';
   return num.length >= 4 ? 'XXXX XXXX XXXX ' + num.slice(-4) : 'XXXX XXXX XXXX XXXX';
 });
+
+// Deduplicate items: merge any entries with identical Style+Color+Material+Size
+const rawItems: any[] = state?.orderedItems ?? [];
+const orderedItems = rawItems.reduce((acc: any[], item: any) => {
+  const existing = acc.find(
+    (i) => i.Style === item.Style && i.Color === item.Color &&
+           i.Material === item.Material && i.Size === item.Size
+  );
+  if (existing) {
+    existing.quantity = (existing.quantity ?? 1) + (item.quantity ?? 1);
+  } else {
+    acc.push({ ...item, quantity: item.quantity ?? 1 });
+  }
+  return acc;
+}, []);
+
+// Parse shipping cost string ("Free" -> 0, "$9.99" -> 9.99)
+const shippingCostNum = computed(() => {
+  const raw: string = state?.shippingCost ?? 'Free';
+  if (raw === 'Free' || state?.deliveryOption === 'pickup') return 0;
+  const parsed = parseFloat(raw.replace(/[^\d.]/g, ''));
+  return isNaN(parsed) ? 0 : parsed;
+});
+
+// Items subtotal
+const itemsSubtotal = computed(() =>
+  orderedItems.reduce((sum: number, item: any) => sum + item.Price * (item.quantity ?? 1), 0)
+);
+
+// Grand total = items + shipping
+const grandTotal = computed(() =>
+  (itemsSubtotal.value + shippingCostNum.value).toFixed(2)
+);
 </script>
 
 <template>
@@ -92,6 +125,42 @@ const maskedCard = computed(() => {
         </div>
       </div>
 
+    </div>
+
+    <!-- Ordered Items -->
+    <div class="ordered-items-section" v-if="orderedItems.length > 0">
+      <h2 class="ordered-items-title">Items Ordered</h2>
+      <div class="ordered-items-grid">
+        <div
+          v-for="item in orderedItems"
+          :key="item.cartItemId"
+          class="ordered-item"
+          :style="{ backgroundColor: item.Color }">
+          <div class="ordered-item-info">
+            <h3>{{ item.Style }}</h3>
+            <p>{{ item.Material }}</p>
+            <p>Size: {{ item.Size }}</p>
+            <p v-if="item.quantity > 1">Qty: {{ item.quantity }}</p>
+            <p class="ordered-item-price">${{ (item.Price * item.quantity).toFixed(2) }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="ordered-total">
+        <div class="ordered-total-rows">
+          <div class="ordered-total-row" v-if="shippingCostNum > 0">
+            <span class="ordered-total-label">Subtotal</span>
+            <span class="ordered-total-value">${{ itemsSubtotal.toFixed(2) }}</span>
+          </div>
+          <div class="ordered-total-row" v-if="shippingCostNum > 0">
+            <span class="ordered-total-label">Shipping</span>
+            <span class="ordered-total-value">${{ shippingCostNum.toFixed(2) }}</span>
+          </div>
+          <div class="ordered-total-row grand">
+            <span class="ordered-total-label">Order Total</span>
+            <span class="ordered-total-value">${{ grandTotal }}</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="confirmation-footer">
@@ -223,5 +292,106 @@ const maskedCard = computed(() => {
   color: #333;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transform: translateY(-2px);
+}
+
+/* Ordered items */
+.ordered-items-section {
+  margin-top: 3rem;
+}
+
+.ordered-items-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #333;
+  border-bottom: 3px solid #FFD700;
+  padding-bottom: 0.6rem;
+  margin-bottom: 1.5rem;
+}
+
+.ordered-items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.ordered-item {
+  border: 1px solid #ddd;
+  padding: 15px;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ordered-item-info {
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  text-align: center;
+}
+
+.ordered-item-info h3 {
+  margin: 0 0 6px 0;
+  font-size: 1.1rem;
+}
+
+.ordered-item-info p {
+  margin: 3px 0;
+  font-size: 0.85rem;
+}
+
+.ordered-item-price {
+  font-weight: 700;
+  font-size: 0.95rem !important;
+  margin-top: 5px !important;
+}
+
+.ordered-total {
+  margin-top: 20px;
+  max-width: 400px;
+  margin-left: auto;
+  border: 2px solid #333;
+  background: #f5f5f5;
+}
+
+.ordered-total-rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.ordered-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 10px 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.ordered-total-row:last-child {
+  border-bottom: none;
+}
+
+.ordered-total-row.grand {
+  padding: 14px 20px;
+  background: #efefef;
+}
+
+.ordered-total-label {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #333;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ordered-total-row.grand .ordered-total-label,
+.ordered-total-row.grand .ordered-total-value {
+  font-size: 1.1rem;
+}
+
+.ordered-total-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #333;
 }
 </style>

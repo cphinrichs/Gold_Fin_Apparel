@@ -23,6 +23,8 @@ export const useProductData = () => {
     const currentMaterial = ref('')
     const currentSize = ref('')
     const inventory = ref<ProductApiResponse[]>([])
+    const currentProductId = ref(0)
+    const currentStock = ref(0)
     const isLoading = ref(false)
     const error = ref<string | null>(null)
 
@@ -290,6 +292,8 @@ export const useProductData = () => {
             currentColor.value = `#${currentProduct.Color}`
             currentMaterial.value = currentProduct.Material
             currentSize.value = currentProduct.Size.trim()
+            currentProductId.value = currentProduct.Product_Id
+            currentStock.value = currentProduct.Stock
             
         } catch (err) {
             console.error('Error fetching product:', err)
@@ -307,6 +311,8 @@ export const useProductData = () => {
         currentColor,
         currentMaterial,
         currentSize,
+        currentProductId,
+        currentStock,
         isLoading,
         error,
         // Computed

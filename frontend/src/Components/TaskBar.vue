@@ -11,7 +11,7 @@ providing navigation links and quick access to key features.
         <router-link to="/browse">Browse</router-link>
         <ul class="dropdown">
           <li><router-link to="/browse?style=Tank Top">Tank Tops</router-link></li>
-          <li><router-link to="/browse?style=Short Sleeve">T-Shirts</router-link></li>
+          <li><router-link to="/browse?style=Short Sleeve">Short Sleeves</router-link></li>
           <li><router-link to="/browse?style=Long Sleeve">Long Sleeves</router-link></li>
           <li><router-link to="/browse?style=Hoodie">Hoodies</router-link></li>
           <li><router-link to="/browse?style=Vest">Vests</router-link></li>
@@ -30,17 +30,22 @@ providing navigation links and quick access to key features.
       </li>
     </ul>
     <router-link to="/cart" class="cart-button">
-      <svg class="cart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <circle cx="9" cy="21" r="1"></circle>
-        <circle cx="20" cy="21" r="1"></circle>
-        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-      </svg>
+      <div class="cart-icon-wrapper">
+        <svg class="cart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+        <span v-if="cartCount > 0" class="cart-badge">{{ cartCount }}</span>
+      </div>
     </router-link>
   </nav>
 </template>
 
 <script lang="ts" setup>
+import { useCart } from '../Composables/useCart'
 
+const { cartCount } = useCart()
 </script>
 
 <style scoped>
@@ -150,11 +155,37 @@ providing navigation links and quick access to key features.
   justify-content: center;
 }
 
+.cart-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .cart-icon {
   width: 24px;
   height: 24px;
   color: white;
   margin-right: 1.0rem;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -8px;
+  right: 4px;
+  background-color: #FFD700;
+  color: #222;
+  font-size: 0.6rem;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  line-height: 1;
+  pointer-events: none;
 }
 
 .cart-button:hover {

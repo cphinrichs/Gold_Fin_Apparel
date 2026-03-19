@@ -10,6 +10,18 @@ export interface ProductApiResponse {
     Price: number
 }
 
+export interface CartItem {
+    cartItemId: string      // unique ID for this cart entry
+    Product_Id: number
+    Style: string
+    Color: string           // hex with #
+    Material: string
+    Size: string
+    Price: number
+    Stock: number
+    quantity: number
+}
+
 export interface ProductData {
     name: string
     style: string

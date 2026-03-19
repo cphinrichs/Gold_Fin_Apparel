@@ -10,6 +10,7 @@ type Filters = {
   materials: string[];
   sizes: string[];
   styles: string[];
+  sort: string;
 };
 
 const isOpen = ref(false);
@@ -19,15 +20,20 @@ const filters = reactive<Filters>({
   materials: [],
   sizes: [],
   styles: [],
+  sort: '',
 });
 
 const colorOptions = ['White', 'Black', 'Red', 'Blue', 'Green'];
 const materialOptions = ['Cotton', 'Polyester', 'Wool', 'Silk', 'Kevlar'];
 const sizeOptions = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL'];
 const styleOptions = ['Tank Top', 'Short Sleeve', 'Long Sleeve', 'Hoodie', 'Vest', 'Kimono'];
+const sortOptions = [
+  { label: 'Price: Low to High', value: 'price_asc' },
+  { label: 'Price: High to Low', value: 'price_desc' },
+];
 
 const activeFilterCount = computed(() =>
-  filters.colors.length + filters.materials.length + filters.sizes.length + filters.styles.length
+  filters.colors.length + filters.materials.length + filters.sizes.length + filters.styles.length + (filters.sort ? 1 : 0)
 );
 
 const toggleFilter = (category: keyof typeof filters, value: string) => {
@@ -45,6 +51,7 @@ const clearAll = () => {
   filters.materials = [];
   filters.sizes = [];
   filters.styles = [];
+  filters.sort = '';
 };
 
 const emit = defineEmits<{ (e: 'filtersChanged', filters: Filters): void }>();
@@ -65,6 +72,22 @@ const emit = defineEmits<{ (e: 'filtersChanged', filters: Filters): void }>();
       <button class="clear-btn" @click="clearAll" v-if="activeFilterCount > 0">
         Clear All ({{ activeFilterCount }})
       </button>
+    </div>
+
+    <!-- Sort -->
+    <div class="filter-group">
+      <h3>Sort By</h3>
+      <div class="filter-options">
+        <label
+          v-for="option in sortOptions"
+          :key="option.value"
+          class="filter-chip"
+          :class="{ selected: filters.sort === option.value }"
+          @click="filters.sort = filters.sort === option.value ? '' : option.value"
+        >
+          {{ option.label }}
+        </label>
+      </div>
     </div>
 
     <!-- Color -->
@@ -133,7 +156,7 @@ const emit = defineEmits<{ (e: 'filtersChanged', filters: Filters): void }>();
     </div>
 
     <button class="apply-btn" @click="emit('filtersChanged', filters); isOpen = false">
-      Apply Filters
+      Apply 
     </button>
     </div>
   </div>

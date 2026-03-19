@@ -366,10 +366,16 @@
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
+    transition: background 0.2s ease;
 }
 
 .add-to-cart:hover {
     background: #000;
+}
+
+.add-to-cart.added {
+    background: #2e7d32;
+    cursor: default;
 }
 
 .shipping-returns summary {
