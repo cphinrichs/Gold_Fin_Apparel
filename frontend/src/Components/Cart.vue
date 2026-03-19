@@ -8,14 +8,30 @@ import BrowseButton from './Buttons/BrowseButton.vue';
 import { ref, computed } from 'vue';
 import { useCart } from '../Composables/useCart';
 
-const { cartItems, removeFromCart } = useCart();
+const { cartItems, removeFromCart, clearCart } = useCart();
 
 const cartTotal = computed(() =>
   cartItems.value.reduce((sum, item) => sum + item.Price * (item.quantity ?? 1), 0).toFixed(2)
 );
 
-// Confirmation dialog state
+// Single-item remove dialog
 const pendingRemoveId = ref<string | null>(null);
+
+// Clear all dialog
+const showClearConfirm = ref(false);
+
+const promptClearAll = () => {
+  showClearConfirm.value = true;
+};
+
+const confirmClearAll = () => {
+  clearCart();
+  showClearConfirm.value = false;
+};
+
+const cancelClearAll = () => {
+  showClearConfirm.value = false;
+};
 
 const promptRemove = (cartItemId: string) => {
   pendingRemoveId.value = cartItemId;
@@ -65,10 +81,13 @@ const cancelRemove = () => {
                     </div>
                 </div>
 
-                <!-- Cart total -->
-                <div class="cart-total">
-                    <span class="cart-total-label">Order Total</span>
-                    <span class="cart-total-value">${{ cartTotal }}</span>
+                <!-- Cart total + Clear All row -->
+                <div class="cart-total-row">
+                    <button class="clear-all-btn" @click="promptClearAll">Clear All</button>
+                    <div class="cart-total">
+                        <span class="cart-total-label">Order Total</span>
+                        <span class="cart-total-value">${{ cartTotal }}</span>
+                    </div>
                 </div>
             </div>
 
@@ -82,7 +101,20 @@ const cancelRemove = () => {
         </div>
     </section>
 
-    <!-- Confirmation dialog -->
+    <!-- Clear All confirmation dialog -->
+    <Teleport to="body">
+        <div class="confirm-overlay" v-if="showClearConfirm" @click.self="cancelClearAll">
+            <div class="confirm-dialog">
+                <p>Are you sure you want to remove <strong>all items</strong> from your cart? This cannot be undone.</p>
+                <div class="confirm-actions">
+                    <button class="confirm-no" @click="cancelClearAll">No</button>
+                    <button class="confirm-yes" @click="confirmClearAll">Yes, Clear All</button>
+                </div>
+            </div>
+        </div>
+    </Teleport>
+
+    <!-- Remove single item confirmation dialog -->
     <Teleport to="body">
         <div class="confirm-overlay" v-if="pendingRemoveId !== null" @click.self="cancelRemove">
             <div class="confirm-dialog">
@@ -199,12 +231,37 @@ const cancelRemove = () => {
 }
 
 /* Cart total row */
+.cart-total-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24px;
+}
+
+.clear-all-btn {
+  padding: 0.55rem 1.4rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 2px solid #c0392b;
+  border-radius: 4px;
+  background: transparent;
+  color: #c0392b;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.clear-all-btn:hover {
+  background: #c0392b;
+  color: #fff;
+}
+
 .cart-total {
   display: flex;
   justify-content: flex-end;
   align-items: center;
   gap: 1rem;
-  margin-top: 24px;
   padding: 16px 20px;
   border: 2px solid #333;
   max-width: 400px;
