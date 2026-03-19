@@ -24,11 +24,23 @@ const filters = reactive<Filters>({
 });
 
 const colorOptions = [
-  { label: 'White', hex: 'ffffff' },
-  { label: 'Black', hex: '1a1a1a' },
-  { label: 'Red',   hex: 'e53935' },
-  { label: 'Blue',  hex: '1e88e5' },
-  { label: 'Green', hex: '43a047' },
+  { label: 'White',     hex: 'FFFFFF' },
+  { label: 'Black',     hex: '000000' },
+  { label: 'Gray',      hex: '808080' },
+  { label: 'Red',       hex: 'FF0000' },
+  { label: 'Deep Pink', hex: 'FF1493' },
+  { label: 'Pink',      hex: 'FFC0CB' },
+  { label: 'Orange',    hex: 'FFA500' },
+  { label: 'Yellow',    hex: 'FFFF00' },
+  { label: 'Gold',      hex: 'FFD700' },
+  { label: 'Lime',      hex: '00FF00' },
+  { label: 'Teal',      hex: '008080' },
+  { label: 'Blue',      hex: '0000FF' },
+  { label: 'Navy',      hex: '000080' },
+  { label: 'Indigo',    hex: '4B0082' },
+  { label: 'Purple',    hex: '800080' },
+  { label: 'Maroon',    hex: '800000' },
+  { label: 'Brown',     hex: 'A52A2A' },
 ];
 const materialOptions = ['Cotton', 'Polyester', 'Wool', 'Silk', 'Kevlar'];
 const sizeOptions = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL'];
