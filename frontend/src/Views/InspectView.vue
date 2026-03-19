@@ -70,7 +70,7 @@
                             class="size-btn" 
                             v-for="(size, index) in productData.sizes" 
                             :key="index" 
-                            @click="handleSizeSelection">
+                            @click="handleSizeSelection($event, size)">
                             {{ size }}
                         </button>
                     </div>
@@ -84,7 +84,9 @@
                 <span class="price">${{ formattedPrice }}</span>
             </div>
             
-            <button class="add-to-cart">ADD TO CART</button>
+            <button type="button" class="add-to-cart" @click="handleAddToCart" :class="{ added: addedFeedback }">
+                {{ addedFeedback ? 'ADDED TO CART ✓' : 'ADD TO CART' }}
+            </button>
             
             <div class="shipping-returns">
                 <details>
@@ -101,10 +103,12 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useProductData } from '../Composables/useProductData'
 import { useProductSelection } from '../Composables/useProductSelection'
+import { useCart } from '../Composables/useCart'
+import type { CartItem } from '../Types/product.types'
 
 const route = useRoute()
 
@@ -113,6 +117,8 @@ const {
     productData,
     currentColor,
     currentMaterial,
+    currentProductId,
+    currentStock,
     productImages,
     materialBackgroundImage,
     styleOverlayImage,
@@ -124,10 +130,32 @@ const {
 // Selection composable
 const {
     currentImageIndex,
+    selectedSize,
     handleColorSelection,
     handleSizeSelection,
     handleMaterialSelection
 } = useProductSelection()
+
+// Cart composable
+const { addToCart } = useCart()
+const addedFeedback = ref(false)
+
+const handleAddToCart = () => {
+    const cartItem: CartItem = {
+        cartItemId: `${Date.now()}-${Math.random()}`,
+        Product_Id: currentProductId.value,
+        Style: productData.value.style,
+        Color: currentColor.value,
+        Material: currentMaterial.value,
+        Size: selectedSize.value || productData.value.sizes[0] || '',
+        Price: productData.value.price,
+        Stock: currentStock.value,
+        quantity: 1
+    }
+    addToCart(cartItem)
+    addedFeedback.value = true
+    setTimeout(() => { addedFeedback.value = false }, 1800)
+}
 
 // Helper functions to update refs from composables
 const updateColor = (color: string) => {

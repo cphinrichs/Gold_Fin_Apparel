@@ -62,6 +62,11 @@ const router = createRouter({
       path: '/inspect/:id',
       name: 'Inspect',
       component: InspectView
+    },
+    {
+      path: '/order-confirmation',
+      name: 'OrderConfirmation',
+      component: () => import('../Views/OrderConfirmationView.vue')
     }
   ],
 })

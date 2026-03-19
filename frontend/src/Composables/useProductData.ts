@@ -21,6 +21,8 @@ export const useProductData = () => {
     const productData = ref<ProductData>({ ...DEFAULT_PRODUCT_DATA })
     const currentColor = ref('')
     const currentMaterial = ref('')
+    const currentProductId = ref(0)
+    const currentStock = ref(0)
     const isLoading = ref(false)
     const error = ref<string | null>(null)
 
@@ -104,6 +106,8 @@ export const useProductData = () => {
             
             currentColor.value = `#${currentProduct.Color}`
             currentMaterial.value = currentProduct.Material
+            currentProductId.value = currentProduct.Product_Id
+            currentStock.value = currentProduct.Stock
             
         } catch (err) {
             console.error('Error fetching product:', err)
@@ -120,6 +124,8 @@ export const useProductData = () => {
         productData,
         currentColor,
         currentMaterial,
+        currentProductId,
+        currentStock,
         isLoading,
         error,
         // Computed

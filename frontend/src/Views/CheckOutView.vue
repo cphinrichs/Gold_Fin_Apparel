@@ -3,8 +3,10 @@ import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import CancelButton from '../Components/Buttons/CancelButton.vue';
 import CompleteOrderButton from '../Components/Buttons/CompleteOrderButton.vue';
+import { useCart } from '../Composables/useCart';
 
 const router = useRouter();
+const { cartItems, clearCart } = useCart();
 
 const activeSection = ref(0); // 0: Delivery, 1: Personal, 2: Shipping, 3: Payment
 const deliveryOption = ref('');
@@ -166,6 +168,12 @@ const completeOrder = () => {
     shippingCost = '$14.99';
     estimatedDelivery = 'Next business day';
   }
+
+  const orderedItems = JSON.parse(JSON.stringify(cartItems.value));
+  const orderTotal = cartItems.value.reduce((sum, item) => sum + item.Price * item.quantity, 0).toFixed(2);
+
+  clearCart();
+
   router.push({
     name: 'OrderConfirmation',
     state: {
@@ -185,6 +193,8 @@ const completeOrder = () => {
       cardNumber: formData.value.cardNumber,
       expirationDate: formData.value.expirationDate,
       cvv: formData.value.cvv,
+      orderedItems,
+      orderTotal,
     }
   });
 };
