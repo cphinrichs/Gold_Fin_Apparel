@@ -7,8 +7,9 @@ import CheckOutButton from './Buttons/CheckOutButton.vue';
 import BrowseButton from './Buttons/BrowseButton.vue';
 import { ref, computed } from 'vue';
 import { useCart } from '../Composables/useCart';
+import { getStyleImageUrl, getMaterialTextureUrl, getDesignImageUrl } from '../Utils/browseImageHelpers';
 
-const { cartItems, removeFromCart, clearCart } = useCart();
+const { cartItems, removeFromCart, removeQuantityFromCart, clearCart } = useCart();
 
 const cartTotal = computed(() =>
   cartItems.value.reduce((sum, item) => sum + item.Price * (item.quantity ?? 1), 0).toFixed(2)
@@ -16,6 +17,8 @@ const cartTotal = computed(() =>
 
 // Single-item remove dialog
 const pendingRemoveId = ref<string | null>(null);
+const pendingRemoveQty = ref(1);
+const pendingItemMaxQty = ref(1);
 
 // Clear all dialog
 const showClearConfirm = ref(false);
@@ -34,12 +37,15 @@ const cancelClearAll = () => {
 };
 
 const promptRemove = (cartItemId: string) => {
+  const item = cartItems.value.find(i => i.cartItemId === cartItemId);
+  pendingItemMaxQty.value = item?.quantity ?? 1;
+  pendingRemoveQty.value = 1;
   pendingRemoveId.value = cartItemId;
 };
 
 const confirmRemove = () => {
   if (pendingRemoveId.value) {
-    removeFromCart(pendingRemoveId.value);
+    removeQuantityFromCart(pendingRemoveId.value, pendingRemoveQty.value);
     pendingRemoveId.value = null;
   }
 };
@@ -64,8 +70,19 @@ const cancelRemove = () => {
                     <div
                         v-for="item in cartItems"
                         :key="item.cartItemId"
-                        class="cart-item"
-                        :style="{ backgroundColor: item.Color }">
+                        class="cart-item">
+                        <!-- Layered product image -->
+                        <div class="cart-item-image" :style="{ backgroundColor: item.Color }">
+                            <div class="cart-layer material-layer" :style="{ backgroundImage: `url(${getMaterialTextureUrl(item.Material)})` }"></div>
+                            <div class="cart-layer design-layer" :style="{ backgroundImage: `url(${getDesignImageUrl(item.Design_Id)})` }"></div>
+                            <img
+                                v-if="getStyleImageUrl(item.Style)"
+                                :src="getStyleImageUrl(item.Style)"
+                                :alt="item.Style"
+                                class="cart-style-image"
+                            />
+                        </div>
+                        <!-- Info below image -->
                         <div class="cart-item-info">
                             <h3>{{ item.Style }}</h3>
                             <p>{{ item.Material }}</p>
@@ -118,10 +135,19 @@ const cancelRemove = () => {
     <Teleport to="body">
         <div class="confirm-overlay" v-if="pendingRemoveId !== null" @click.self="cancelRemove">
             <div class="confirm-dialog">
-                <p>Are you sure you want to remove this item from your cart?</p>
+                <p v-if="pendingItemMaxQty === 1">Are you sure you want to remove this item from your cart?</p>
+                <template v-else>
+                  <p>How many would you like to remove?</p>
+                  <div class="qty-selector">
+                    <button class="qty-btn" @click="pendingRemoveQty = Math.max(1, pendingRemoveQty - 1)">−</button>
+                    <span class="qty-display">{{ pendingRemoveQty }}</span>
+                    <button class="qty-btn" @click="pendingRemoveQty = Math.min(pendingItemMaxQty, pendingRemoveQty + 1)">+</button>
+                  </div>
+                  <p class="qty-hint">{{ pendingRemoveQty === pendingItemMaxQty ? 'This will remove the item entirely.' : `${pendingItemMaxQty - pendingRemoveQty} will remain in your cart.` }}</p>
+                </template>
                 <div class="confirm-actions">
-                    <button class="confirm-no" @click="cancelRemove">No</button>
-                    <button class="confirm-yes" @click="confirmRemove">Yes</button>
+                    <button class="confirm-no" @click="cancelRemove">Cancel</button>
+                    <button class="confirm-yes" @click="confirmRemove">Remove</button>
                 </div>
             </div>
         </div>
@@ -158,35 +184,69 @@ const cancelRemove = () => {
 .cart-item {
   border: 1px solid #ddd;
   cursor: default;
-  padding: 15px;
-  aspect-ratio: 1 / 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
   transition: box-shadow 0.2s;
   position: relative;
+  overflow: hidden;
 }
 
 .cart-item:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+/* Layered image area */
+.cart-item-image {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.cart-layer {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.material-layer {
+  opacity: 0.35;
+  mix-blend-mode: multiply;
+}
+
+.design-layer {
+  opacity: 0.7;
+  mix-blend-mode: overlay;
+  background-size: 60%;
+  background-position: center;
+}
+
+.cart-style-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 .cart-item-info {
-  color: white;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  padding: 10px 12px;
+  background: #fff;
   text-align: center;
 }
 
 .cart-item-info h3 {
-  margin: 0 0 8px 0;
-  font-size: 1.2rem;
+  margin: 0 0 4px 0;
+  font-size: 1rem;
 }
 
 .cart-item-info p {
-  margin: 4px 0;
-  font-size: 0.9rem;
+  margin: 3px 0;
+  font-size: 0.85rem;
+  color: #555;
 }
 
 .cart-item-price {
@@ -345,6 +405,50 @@ const cancelRemove = () => {
 .confirm-no {
   background: #fff;
   color: #333;
+}
+
+/* Quantity selector in remove dialog */
+.qty-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin: 0.75rem 0;
+}
+
+.qty-btn {
+  width: 36px;
+  height: 36px;
+  border: 2px solid #333;
+  border-radius: 4px;
+  background: #fff;
+  color: #333;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s;
+}
+
+.qty-btn:hover {
+  background: #333;
+  color: #FFD700;
+}
+
+.qty-display {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #333;
+  min-width: 2rem;
+  text-align: center;
+}
+
+.qty-hint {
+  font-size: 0.85rem !important;
+  color: #888 !important;
+  margin: 0 0 0.5rem 0 !important;
 }
 
 </style>

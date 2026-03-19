@@ -13,6 +13,7 @@ export interface ProductApiResponse {
 export interface CartItem {
     cartItemId: string      // unique ID for this cart entry
     Product_Id: number
+    Design_Id: number
     Style: string
     Color: string           // hex with #
     Material: string

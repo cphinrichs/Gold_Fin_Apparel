@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue';
+import { getStyleImageUrl, getMaterialTextureUrl, getDesignImageUrl } from '../Utils/browseImageHelpers';
 
 onMounted(() => {
   window.scrollTo({ top: 0, behavior: 'instant' });
@@ -138,13 +139,24 @@ const grandTotal = computed(() =>
         <div
           v-for="item in orderedItems"
           :key="item.cartItemId"
-          class="ordered-item"
-          :style="{ backgroundColor: item.Color }">
+          class="ordered-item">
+          <!-- Layered product image -->
+          <div class="ordered-item-image" :style="{ backgroundColor: item.Color }">
+            <div class="ord-layer material-layer" :style="{ backgroundImage: `url(${getMaterialTextureUrl(item.Material)})` }"></div>
+            <div class="ord-layer design-layer" :style="{ backgroundImage: `url(${getDesignImageUrl(item.Design_Id)})` }"></div>
+            <img
+              v-if="getStyleImageUrl(item.Style)"
+              :src="getStyleImageUrl(item.Style)"
+              :alt="item.Style"
+              class="ordered-style-image"
+            />
+            <!-- Quantity badge -->
+            <span class="ord-qty-badge" v-if="item.quantity > 1">× {{ item.quantity }}</span>
+          </div>
+          <!-- Info below image -->
           <div class="ordered-item-info">
             <h3>{{ item.Style }}</h3>
-            <p>{{ item.Material }}</p>
-            <p>Size: {{ item.Size }}</p>
-            <p v-if="item.quantity > 1">Qty: {{ item.quantity }}</p>
+            <p>{{ item.Material }} | {{ item.Size }}</p>
             <p class="ordered-item-price">${{ (item.Price * item.quantity).toFixed(2) }}</p>
           </div>
         </div>
@@ -320,27 +332,76 @@ const grandTotal = computed(() =>
 
 .ordered-item {
   border: 1px solid #ddd;
-  padding: 15px;
-  aspect-ratio: 1 / 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Layered image area */
+.ordered-item-image {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.ord-layer {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.ord-layer.material-layer {
+  opacity: 0.35;
+  mix-blend-mode: multiply;
+}
+
+.ord-layer.design-layer {
+  opacity: 0.7;
+  mix-blend-mode: overlay;
+  background-size: 60%;
+  background-position: center;
+}
+
+.ordered-style-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.ord-qty-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #333;
+  color: #FFD700;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
 }
 
 .ordered-item-info {
-  color: white;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  padding: 8px 10px;
+  background: #fff;
   text-align: center;
 }
 
 .ordered-item-info h3 {
-  margin: 0 0 6px 0;
-  font-size: 1.1rem;
+  margin: 0 0 4px 0;
+  font-size: 0.95rem;
+  color: #333;
 }
 
 .ordered-item-info p {
-  margin: 3px 0;
-  font-size: 0.85rem;
+  margin: 2px 0;
+  font-size: 0.8rem;
+  color: #555;
 }
 
 .ordered-item-price {
