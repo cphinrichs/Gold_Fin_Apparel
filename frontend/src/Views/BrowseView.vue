@@ -103,7 +103,7 @@ const displayedProducts = computed(() => {
   const { colors, materials, sizes, styles, sort } = activeFilters.value
 
   if (colors.length > 0) {
-    list = list.filter(p => colors.some(c => c.toLowerCase() === p.Color.toLowerCase().replace(/^#/, '')))
+    list = list.filter(p => colors.some(c => c.toLowerCase() === p.inventory.Color.toLowerCase().replace(/^#/, '')))
   }
   if (materials.length > 0) {
     list = list.filter(p => materials.includes(p.inventory.Material))
@@ -191,7 +191,7 @@ const handleImageError = (event: Event) => {
 }
 
 // Initialize component
-onMounted(() => {
+onMounted(async () => {
   window.scrollTo({ top: 0, behavior: 'instant' });
   console.log('BrowseView mounted, fetching products...')
   console.log('Current route query:', route.query)
