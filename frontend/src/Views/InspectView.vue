@@ -78,7 +78,7 @@
                     <div class="size-options">
                         <button 
                             class="size-btn" 
-                            v-for="(size, index) in productData.sizes" 
+                            v-for="(size, index) in sortedSizes" 
                             :key="index"
                             :class="{ 
                                 active: currentSize === size,
@@ -117,7 +117,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useProductData } from '../Composables/useProductData'
 import { useProductSelection } from '../Composables/useProductSelection'
@@ -156,6 +156,25 @@ const {
     handleSizeSelection,
     handleMaterialSelection
 } = useProductSelection()
+
+// Sort sizes from smallest to largest
+const sortedSizes = computed(() => {
+    const sizeOrder = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL']
+    return [...productData.value.sizes].sort((a, b) => {
+        const indexA = sizeOrder.indexOf(a)
+        const indexB = sizeOrder.indexOf(b)
+        
+        // If both sizes are in the order array, sort by position
+        if (indexA !== -1 && indexB !== -1) {
+            return indexA - indexB
+        }
+        // If only one is in the array, prioritize it
+        if (indexA !== -1) return -1
+        if (indexB !== -1) return 1
+        // If neither is in the array, sort alphabetically
+        return a.localeCompare(b)
+    })
+})
 
 // Get design image from query parameter
 const designBackgroundImage = computed(() => {

@@ -95,10 +95,9 @@
   background-repeat: no-repeat;
   pointer-events: none;
   z-index: 2;
-  mix-blend-mode: normal;
 }
 
-/* Layer 3: Style image with transparent cutout - MUST fill entire container */
+/* Layer 3: Style image with transparent cutout - FILLS entire container like InspectView */
 .product-style-image {
   position: absolute;
   top: 0;
@@ -109,6 +108,7 @@
   object-position: center;
   pointer-events: none;
   z-index: 3;
+  display: block;
 }
 
 /* Product info overlay */

@@ -19,7 +19,7 @@
         
         <div v-else class="product-list">
           <button
-            v-for="combination in productCombinations"
+            v-for="combination in displayedProducts"
             :key="`${combination.inventory.Product_Id}-${combination.design.id}`"
             class="product-item"
             @click="handleProductClick(combination)">
@@ -64,7 +64,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useInventory } from '../Composables/useInventory'
 import { useDesigns } from '../Composables/useDesigns'
@@ -77,11 +77,8 @@ import SortFilterBrowseWidget from '../Components/Widgets/SortFilterBrowseWidget
 const router = useRouter()
 const route = useRoute()
 
-// Inventory management
-const { products, loading, error, loadProducts } = useInventory()
-
 // Product filtering (route-query based)
-const { filteredProducts, watchRouteChanges } = useProductFiltering(products, route)
+// const { filteredProducts, watchRouteChanges } = useProductFiltering(products, route)
 
 // Widget filter state
 type WidgetFilters = {
@@ -101,27 +98,36 @@ const activeFilters = ref<WidgetFilters>({
 
 // Final displayed products — apply widget filters + sort on top of route-filtered list
 const displayedProducts = computed(() => {
-  let list = filteredProducts.value
+  let list = productCombinations.value
 
   const { colors, materials, sizes, styles, sort } = activeFilters.value
 
   if (colors.length > 0) {
-    list = list.filter(p => colors.some(c => c.toLowerCase() === p.Color.toLowerCase()))
+    list = list.filter(p => colors.some(c => c.toLowerCase() === p.inventory.Color.toLowerCase()))
   }
   if (materials.length > 0) {
-    list = list.filter(p => materials.includes(p.Material))
+    list = list.filter(p => materials.includes(p.inventory.Material))
   }
   if (sizes.length > 0) {
-    list = list.filter(p => sizes.includes(p.Size.trim()))
+    list = list.filter(p => sizes.includes(p.inventory.Size.trim()))
   }
+  // Only apply widget style filter if it exists
   if (styles.length > 0) {
-    list = list.filter(p => styles.includes(p.Style))
+    list = list.filter(p => styles.includes(p.inventory.Style))
   }
 
   if (sort === 'price_asc') {
-    list = [...list].sort((a, b) => a.Price - b.Price)
+    list = [...list].sort((a, b) => {
+      const priceA = a.inventory.Price + a.design.price
+      const priceB = b.inventory.Price + b.design.price
+      return priceA - priceB
+    })
   } else if (sort === 'price_desc') {
-    list = [...list].sort((a, b) => b.Price - a.Price)
+    list = [...list].sort((a, b) => {
+      const priceA = a.inventory.Price + a.design.price
+      const priceB = b.inventory.Price + b.design.price
+      return priceB - priceA
+    })
   }
 
   return list
@@ -194,6 +200,13 @@ onMounted(async () => {
   
   // Create combinations after both are loaded
   loadCombinations()
+})
+
+// Watch for route changes to reload combinations when style filter changes
+watch(() => route.query.style, () => {
+  if (inventory.value.length > 0 && designs.value.length > 0) {
+    loadCombinations()
+  }
 })
 </script>
 
