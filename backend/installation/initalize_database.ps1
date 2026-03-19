@@ -1,0 +1,1 @@
+python backend/installation/initalize_database.py

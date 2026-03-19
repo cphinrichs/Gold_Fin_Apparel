@@ -1,0 +1,1 @@
+python -m unittest discover -s ./backend/tests/jcl -p "test_*.py" -v
