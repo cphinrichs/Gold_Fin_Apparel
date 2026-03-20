@@ -99,7 +99,7 @@ class TestSelectInventory(unittest.TestCase):
         sql = call_args[0]
         params = call_args[1]
         
-        self.assertIn("WHERE SizeS.NAME = ?", sql)
+        self.assertIn("WHERE SZ.NAME = ?", sql)
         self.assertEqual(params[0], "M")
         self.assertEqual(len(result), 1)
 
