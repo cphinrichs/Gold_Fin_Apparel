@@ -6,26 +6,32 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
+        <meta name="description" content="Installing and deploying Gold Fin Apparel, including frontend, backend, and database configuration.">
+      
       
         <meta name="author" content="Team GoldenFinger">
       
       
+        <link rel="canonical" href="https://GoldFinApparel.com/topics/installation-deployment.html">
+      
+      
+        <link rel="prev" href="reports-manager-guide.html">
       
       
       
         
       
       
-      <link rel="icon" href="/assets/images/favicon.png">
+      <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
     
     
       
-        <title>Gold Fin Apparel</title>
+        <title>Installation & Deployment - Gold Fin Apparel</title>
       
     
     
-      <link rel="stylesheet" href="/assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
       
       
   
@@ -111,7 +117,7 @@
       
     
     
-    <script>__md_scope=new URL("/",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -128,6 +134,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#installation-and-deployment-guide" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -140,7 +151,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="/index.html" title="Gold Fin Apparel" class="md-header__button md-logo" aria-label="Gold Fin Apparel" data-md-component="logo">
+    <a href="../index.html" title="Gold Fin Apparel" class="md-header__button md-logo" aria-label="Gold Fin Apparel" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -160,7 +171,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              
+              Installation & Deployment
             
           </span>
         </div>
@@ -238,7 +249,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="/index.html" title="Gold Fin Apparel" class="md-nav__button md-logo" aria-label="Gold Fin Apparel" data-md-component="logo">
+    <a href="../index.html" title="Gold Fin Apparel" class="md-nav__button md-logo" aria-label="Gold Fin Apparel" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -256,7 +267,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/index.html" class="md-nav__link">
+      <a href="../index.html" class="md-nav__link">
         
   
   
@@ -336,7 +347,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/topics/release-notes.html" class="md-nav__link">
+      <a href="release-notes.html" class="md-nav__link">
         
   
   
@@ -364,7 +375,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/topics/end-user-guide.html" class="md-nav__link">
+      <a href="end-user-guide.html" class="md-nav__link">
         
   
   
@@ -396,8 +407,10 @@
       
   
   
+    
   
   
+  
     
     
       
@@ -409,11 +422,11 @@
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
           <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
@@ -434,7 +447,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -452,7 +465,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/topics/reports-manager-guide.html" class="md-nav__link">
+      <a href="reports-manager-guide.html" class="md-nav__link">
         
   
   
@@ -477,10 +490,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="/topics/installation-deployment.html" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation & Deployment
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="installation-deployment.html" class="md-nav__link md-nav__link--active">
         
   
   
@@ -496,6 +536,48 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#frontend-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Frontend Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#backend-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Backend Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -525,6 +607,38 @@
   
   
   
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#frontend-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Frontend Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#backend-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Backend Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -537,8 +651,135 @@
               
               <article class="md-content__inner md-typeset">
                 
-  <h1>404 - Not found</h1>
+                  
 
+
+
+<h1 id="installation-and-deployment-guide">Installation and Deployment Guide</h1>
+<p>Installing and deploying Gold Fin Apparel, including frontend, backend, and database configuration.</p>
+<div class="admonition note">
+<p class="admonition-title">Prerequisites</p>
+<p>Ensure you have the following installed on your system:</p>
+<ul>
+<li>Node.js and npm (for frontend development)</li>
+<li>Python 3.9+ and pip (for backend development)</li>
+<li>Access to an IBM Db2 for z/OS instance</li>
+</ul>
+</div>
+<h2 id="frontend-setup">Frontend Setup</h2>
+<p>The frontend is a Vue.js-based single-page application built with Vite.</p>
+<ol>
+<li>
+<p>Navigate to the frontend directory.</p>
+<p><code>cd frontend</code></p>
+</li>
+<li>
+<p>Install all required npm packages.</p>
+<p><code>npm install</code></p>
+<p>This command reads <code>package.json</code> and installs all dependencies including:</p>
+<ul>
+<li>Vue.js 4.6.4</li>
+<li>Vue Router 4.6.4</li>
+<li>Vite 5.0.0</li>
+<li>TypeScript 5.0.0</li>
+</ul>
+</li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Optional</p>
+<p>Run the development server with hot-reload.</p>
+<p><code>npm run dev</code></p>
+<p>The development server typically runs on <code>http://localhost:5173</code>. You can access the application in your browser and see changes update in real-time.</p>
+</div>
+<ol>
+<li>
+<p>Create an optimized production build.</p>
+<p><code>npm run build</code></p>
+</li>
+</ol>
+<h2 id="backend-setup">Backend Setup</h2>
+<p>The backend is a Flask REST API application that connects to IBM Db2 for z/OS.</p>
+<ol>
+<li>
+<p>Navigate to the backend directory.</p>
+<p><code>cd backend</code></p>
+</li>
+<li>
+<p>Create an isolated Python virtual environment for the project.</p>
+<p><strong>Windows:</strong></p>
+<p><code>python -m venv .venv</code>
+<code>.venv\Scripts\activate</code></p>
+<p>After activation, your terminal prompt will show <code>(.venv)</code> at the beginning.</p>
+</li>
+<li>
+<p>Install all required Python packages.</p>
+<p><code>pip install -r requirements.txt</code></p>
+<p>This installs:</p>
+<ul>
+<li>Flask 3.1.3 — Web framework</li>
+<li>ibm_db 3.2.8 — IBM Db2 Python driver</li>
+<li>requests 2.32.5 — HTTP library</li>
+<li>Additional supporting packages</li>
+</ul>
+</li>
+<li>
+<p>Configure database credentials by creating or updating <code>backend/src/config/db_credentials.json</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;host&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;your_db2_hostname&gt;&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;port&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;50000&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;db_instance&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;GOLDDB&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;protocol&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;TCPIP&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;your_user&gt;&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;your_pass&gt;&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+</code></pre></div>
+</li>
+</ol>
+<div class="admonition warning">
+<p class="admonition-title">Security</p>
+<p>Never commit <code>db_credentials.json</code> to version control. Add it to <code>.gitignore</code> and manage credentials securely in your deployment environment.</p>
+</div>
+<ol>
+<li>
+<p>Configure backend settings by ensuring <code>backend/src/config/backend_settings.json</code> exists with appropriate application configuration.</p>
+<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;debug&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;host&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.0.0.0&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;port&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5000</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;log_level&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;INFO&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+</code></pre></div>
+<p>Adjust these settings based on your deployment environment.</p>
+</li>
+<li>
+<p>Start the Flask API server.</p>
+<p><code>python -m src.api</code></p>
+<p>The API server typically starts on <code>http://localhost:5000</code>. You should see output indicating the server is running.</p>
+<div class="admonition note">
+<p class="admonition-title">Running in Production</p>
+<p>For production deployment, use a production WSGI server such as Gunicorn or uWSGI instead of Flask's development server:</p>
+<div class="highlight"><pre><span></span><code><span class="w">    </span>pip<span class="w"> </span>install<span class="w"> </span>gunicorn
+<span class="w">    </span>gunicorn<span class="w"> </span>-w<span class="w"> </span><span class="m">4</span><span class="w"> </span>-b<span class="w"> </span><span class="m">0</span>.0.0.0:5000<span class="w"> </span>src.api:app
+</code></pre></div>
+</div>
+</li>
+</ol>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
               </article>
             </div>
           
@@ -575,10 +816,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "/", "features": ["navigation.instant", "navigation.indexes"], "search": "/assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.indexes"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="/assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>
