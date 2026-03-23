@@ -66,7 +66,7 @@ class TestJCLJobOutput(unittest.TestCase):
                 raise Exception(f"Unexpected resultes from {job_name}, got {results}")
 
 
-            single_result = request.json()[0]
+            single_result = request.json()[-1]
 
             files = zosmf_authed_session.get(single_result["files-url"]).json()
 
@@ -82,6 +82,7 @@ class TestJCLJobOutput(unittest.TestCase):
                 raise Exception(f"SYSPRINT file not found in job")
             
             # Strip all lines for easier processing
+            print(sysprint_file)
             return sysprint_file.splitlines() 
         # Tables are formatted like the following:
         #      +---------------------------------------------------------------+
@@ -161,6 +162,6 @@ class TestJCLJobOutput(unittest.TestCase):
         if (expected_tables == job_tables):
             print("Job tables are equal to expected tables, test passed")
         else:
-            raise Exception("Job tables are equal to expected tables, test failed")
+            raise Exception("Job tables are not equal to expected tables, test failed")
 
 
