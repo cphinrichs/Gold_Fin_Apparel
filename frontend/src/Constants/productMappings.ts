@@ -34,9 +34,9 @@ import type { ProductData } from '../Types/product.types'
 export const STYLE_TO_IMAGES: Record<string, string[]> = {
     'Kimono': [productKimFront, productKimLeft, productKimBack, productKimRight, productKimDetail],
     'Vest': [productVestFront, productVestLeft, productVestBack, productVestRight, productVestDetail],
-    'T-Shirt': [prodcutShirtFront, prodcutShirtLeft, prodcutShirtBack, prodcutShirtRight, prodcutShirtDetail],
-    'Short Sleeve': [prodcutShirtFront, prodcutShirtLeft, prodcutShirtBack, prodcutShirtRight, prodcutShirtDetail],
     'Tank Top': [prodcutShirtFront, prodcutShirtLeft, prodcutShirtBack, prodcutShirtRight, prodcutShirtDetail],
+    'Short Sleeve': [prodcutShirtFront, prodcutShirtLeft, prodcutShirtBack, prodcutShirtRight, prodcutShirtDetail],
+    'Long Sleeve': [prodcutShirtFront, prodcutShirtLeft, prodcutShirtBack, prodcutShirtRight, prodcutShirtDetail],
     'Hoodie': [productKimFront, productKimLeft, productKimBack, productKimRight, productKimDetail]
 }
 

@@ -42,7 +42,7 @@ const colorOptions = [
   { label: 'Maroon',    hex: '800000' },
   { label: 'Brown',     hex: 'A52A2A' },
 ];
-const materialOptions = ['Cotton', 'Polyester', 'Wool', 'Silk', 'Kevlar'];
+const materialOptions = ['Blend', 'Cotton', 'Kevlar', 'Leather', 'Polyester', 'Wool'];
 const sizeOptions = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL'];
 const styleOptions = ['Tank Top', 'Short Sleeve', 'Long Sleeve', 'Hoodie', 'Vest', 'Kimono'];
 const sortOptions = [

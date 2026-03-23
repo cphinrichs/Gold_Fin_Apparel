@@ -10,14 +10,12 @@
                     @click="currentImageIndex = index">
                     <div class="thumbnail-overlay" :style="{ backgroundImage: materialBackgroundImage }"></div>
                     <div class="thumbnail-design" :style="{ backgroundImage: designBackgroundImage }"></div>
-                    <div class="thumbnail-overlay" :style="{ backgroundImage: designBackgroundImage }"></div>
                     <img :src="image" :alt="`Product thumbnail ${index + 1}`">
                 </button>
             </div>
             <div class="main-image" :style="{ backgroundColor: currentColor }">
                 <div class="material-layer" :style="{ backgroundImage: materialBackgroundImage }"></div>
                 <div class="design-layer" :style="{ backgroundImage: designBackgroundImage }"></div>
-                <div class="style-overlay" :style="{ backgroundImage: designBackgroundImage }"></div>
                 <img :src="productImages[currentImageIndex]" :alt="`${productData.name} - Main view`">
             </div>
         </section>
