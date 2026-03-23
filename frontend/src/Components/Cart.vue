@@ -11,10 +11,34 @@ import { getStyleImageUrl, getMaterialTextureUrl, getDesignImageUrl } from '../U
 
 const { cartItems, removeFromCart, removeQuantityFromCart, clearCart } = useCart();
 
+const COLOR_NAMES: Record<string, string> = {
+  'FFFFFF': 'White',
+  '000000': 'Black',
+  '808080': 'Gray',
+  'FF0000': 'Red',
+  'FF1493': 'Deep Pink',
+  'FFC0CB': 'Pink',
+  'FFA500': 'Orange',
+  'FFFF00': 'Yellow',
+  'FFD700': 'Gold',
+  '00FF00': 'Lime',
+  '008080': 'Teal',
+  '0000FF': 'Blue',
+  '000080': 'Navy',
+  '4B0082': 'Indigo',
+  '800080': 'Purple',
+  '800000': 'Maroon',
+  'A52A2A': 'Brown',
+};
+
+const getColorName = (color: string): string => {
+  const hex = color.replace(/^#/, '').toUpperCase();
+  return COLOR_NAMES[hex] ?? hex;
+};
+
 const cartTotal = computed(() =>
   cartItems.value.reduce((sum, item) => sum + item.Price * (item.quantity ?? 1), 0).toFixed(2)
 );
-
 // Single-item remove dialog
 const pendingRemoveId = ref<string | null>(null);
 const pendingRemoveQty = ref(1);
@@ -71,23 +95,29 @@ const cancelRemove = () => {
                         v-for="item in cartItems"
                         :key="item.cartItemId"
                         class="cart-item">
-                        <!-- Layered product image -->
+                        <!-- Layered product image with info overlay inside -->
                         <div class="cart-item-image" :style="{ backgroundColor: item.Color }">
-                            <div class="cart-layer material-layer" :style="{ backgroundImage: `url(${getMaterialTextureUrl(item.Material)})` }"></div>
-                            <div class="cart-layer design-layer" :style="{ backgroundImage: `url(${getDesignImageUrl(item.Design_Id)})` }"></div>
+                            <!-- Layer 1: Material texture -->
+                            <div class="material-layer" :style="{ backgroundImage: `url(${getMaterialTextureUrl(item.Material)})` }"></div>
+                            <!-- Layer 2: Design -->
+                            <div class="design-layer" :style="{ backgroundImage: `url(${getDesignImageUrl(item.Design_Id)})` }"></div>
+                            <!-- Layer 3: Style silhouette -->
                             <img
                                 v-if="getStyleImageUrl(item.Style)"
                                 :src="getStyleImageUrl(item.Style)"
                                 :alt="item.Style"
                                 class="cart-style-image"
                             />
-                        </div>
-                        <!-- Info below image -->
-                        <div class="cart-item-info">
-                            <h3>{{ item.Style }}</h3>
-                            <p>{{ item.Material }}</p>
-                            <p>Size: {{ item.Size }}</p>
-                            <p class="cart-item-price">${{ item.Price.toFixed(2) }}</p>
+                            <!-- Info overlay -->
+                            <div class="cart-item-info">
+                                <h3>{{ item.Style }}</h3>
+                                <p class="cart-item-details">{{ item.Material }} | {{ item.Size }}</p>
+                                <p class="cart-item-color">
+                                    <span class="color-swatch" :style="{ backgroundColor: item.Color }"></span>
+                                    {{ getColorName(item.Color) }}
+                                </p>
+                                <p class="cart-item-price">${{ (item.Price * (item.quantity ?? 1)).toFixed(2) }}</p>
+                            </div>
                         </div>
                         <!-- Quantity badge top-right -->
                         <span class="quantity-badge" v-if="item.quantity > 1">× {{ item.quantity }}</span>
@@ -100,21 +130,20 @@ const cancelRemove = () => {
 
                 <!-- Cart total + Clear All row -->
                 <div class="cart-total-row">
-                    <button class="clear-all-btn" @click="promptClearAll">Clear All</button>
-                    <div class="cart-total">
-                        <span class="cart-total-label">Order Total</span>
-                        <span class="cart-total-value">${{ cartTotal }}</span>
+                    <div class="cart-actions-left">
+                        <BrowseButton />
+                        <button class="clear-all-btn" @click="promptClearAll">Clear All</button>
+                    </div>
+                    <div class="cart-total-section">
+                        <div class="cart-total">
+                            <span class="cart-total-label">Order Total</span>
+                            <span class="cart-total-value">${{ cartTotal }}</span>
+                        </div>
+                        <CheckOutButton class="cart-checkout-btn" />
                     </div>
                 </div>
             </div>
 
-        </div>
-
-        <div class="browse-footer">
-            <BrowseButton />
-        </div>
-        <div class="checkout-browse-footer" v-if="cartItems.length > 0">
-            <CheckOutButton />
         </div>
     </section>
 
@@ -137,13 +166,12 @@ const cancelRemove = () => {
             <div class="confirm-dialog">
                 <p v-if="pendingItemMaxQty === 1">Are you sure you want to remove this item from your cart?</p>
                 <template v-else>
-                  <p>How many would you like to remove?</p>
-                  <div class="qty-selector">
-                    <button class="qty-btn" @click="pendingRemoveQty = Math.max(1, pendingRemoveQty - 1)">−</button>
-                    <span class="qty-display">{{ pendingRemoveQty }}</span>
-                    <button class="qty-btn" @click="pendingRemoveQty = Math.min(pendingItemMaxQty, pendingRemoveQty + 1)">+</button>
-                  </div>
-                  <p class="qty-hint">{{ pendingRemoveQty === pendingItemMaxQty ? 'This will remove the item entirely.' : `${pendingItemMaxQty - pendingRemoveQty} will remain in your cart.` }}</p>
+                    <p>How many would you like to remove?</p>
+                    <div class="qty-remove-controls">
+                        <button class="qty-btn" @click="pendingRemoveQty = Math.max(1, pendingRemoveQty - 1)">−</button>
+                        <span class="qty-display">{{ pendingRemoveQty }} / {{ pendingItemMaxQty }}</span>
+                        <button class="qty-btn" @click="pendingRemoveQty = Math.min(pendingItemMaxQty, pendingRemoveQty + 1)">+</button>
+                    </div>
                 </template>
                 <div class="confirm-actions">
                     <button class="confirm-no" @click="cancelRemove">Cancel</button>
@@ -177,85 +205,134 @@ const cancelRemove = () => {
 .cart-items-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
+  gap: 1.5rem;
+  margin-top: 2rem;
 }
 
 .cart-item {
-  border: 1px solid #ddd;
-  cursor: default;
+  position: relative;
   display: flex;
   flex-direction: column;
-  transition: box-shadow 0.2s;
-  position: relative;
+  border: 2px solid transparent;
+  border-radius: 8px;
   overflow: hidden;
+  cursor: default;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: transparent;
 }
 
 .cart-item:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Layered image area */
+/* Image container — matches product-image-container */
 .cart-item-image {
   position: relative;
   width: 100%;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 3/4;
   overflow: hidden;
-  flex-shrink: 0;
 }
 
-.cart-layer {
+/* Layer 1: Material texture */
+.material-layer {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-}
-
-.material-layer {
-  opacity: 0.35;
+  pointer-events: none;
+  z-index: 1;
   mix-blend-mode: multiply;
+  opacity: 0.4;
 }
 
+/* Layer 2: Design graphic */
 .design-layer {
-  opacity: 0.7;
-  mix-blend-mode: overlay;
-  background-size: 60%;
-  background-position: center;
-}
-
-.cart-style-image {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 2;
 }
 
+/* Layer 3: Style silhouette */
+.cart-style-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+  z-index: 3;
+  display: block;
+}
+
+/* Info overlay — matches product-info */
 .cart-item-info {
-  padding: 10px 12px;
-  background: #fff;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.75) 40%, transparent 70%);
+  color: white;
+  padding: 1.5rem 1rem;
+  z-index: 4;
   text-align: center;
 }
 
 .cart-item-info h3 {
-  margin: 0 0 4px 0;
   font-size: 1rem;
+  margin: 0 0 0.25rem 0;
+  font-weight: 600;
+  line-height: 1.3;
 }
 
-.cart-item-info p {
-  margin: 3px 0;
-  font-size: 0.85rem;
-  color: #555;
+.cart-item-details {
+  font-size: 0.75rem;
+  margin: 0 0 0.25rem 0;
+  opacity: 0.8;
 }
 
 .cart-item-price {
-  font-weight: 700;
-  font-size: 1rem !important;
-  margin-top: 6px !important;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 0.25rem 0 0 0;
+  color: #ffd700;
 }
 
-/* X button — bottom-left corner of card */
+.cart-item-color {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 3px 0;
+  font-size: 0.8rem;
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.color-swatch {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  flex-shrink: 0;
+}
+
+/* X button — bottom-left, above overlay */
 .remove-btn {
   position: absolute;
   bottom: 10px;
@@ -274,9 +351,10 @@ const cancelRemove = () => {
   cursor: pointer;
   transition: background 0.2s, border-color 0.2s;
   padding: 0;
+  z-index: 5;
 }
 
-/* Quantity badge top-right */
+/* Quantity badge top-right, above overlay */
 .quantity-badge {
   position: absolute;
   top: 10px;
@@ -288,6 +366,7 @@ const cancelRemove = () => {
   padding: 3px 9px;
   border-radius: 12px;
   letter-spacing: 0.3px;
+  z-index: 5;
 }
 
 /* Cart total row */
@@ -296,20 +375,31 @@ const cancelRemove = () => {
   align-items: center;
   justify-content: space-between;
   margin-top: 24px;
+  gap: 1rem;
+}
+
+.cart-actions-left {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 280px;
+  gap: 0.75rem;
 }
 
 .clear-all-btn {
-  padding: 0.55rem 1.4rem;
+  padding: 0;
+  height: 100%;
+  min-height: 44px;
   font-size: 0.85rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   border: 2px solid #c0392b;
-  border-radius: 4px;
   background: transparent;
   color: #c0392b;
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
+  width: 100%;
 }
 
 .clear-all-btn:hover {
@@ -317,15 +407,26 @@ const cancelRemove = () => {
   color: #fff;
 }
 
+.cart-total-section {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 280px;
+  flex-shrink: 0;
+  gap: 0.75rem;
+}
+
+.cart-checkout-btn {
+  width: 100%;
+}
+
 .cart-total {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   gap: 1rem;
   padding: 16px 20px;
   border: 2px solid #333;
-  max-width: 400px;
-  margin-left: auto;
 }
 
 .cart-total-label {
@@ -342,12 +443,6 @@ const cancelRemove = () => {
   color: #333;
 }
 
-.checkout-browse-footer {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 999;
-}
 
 /* Confirmation dialog */
 .confirm-overlay {
@@ -378,6 +473,42 @@ const cancelRemove = () => {
   line-height: 1.5;
 }
 
+.qty-remove-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin: 0 0 1.5rem 0;
+}
+
+.qty-btn {
+  width: 34px;
+  height: 34px;
+  border: 2px solid #333;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s;
+}
+
+.qty-btn:hover {
+  background: #333;
+  color: #fff;
+}
+
+.qty-display {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  min-width: 60px;
+  text-align: center;
+}
+
 .confirm-actions {
   display: flex;
   justify-content: center;
@@ -405,50 +536,6 @@ const cancelRemove = () => {
 .confirm-no {
   background: #fff;
   color: #333;
-}
-
-/* Quantity selector in remove dialog */
-.qty-selector {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  margin: 0.75rem 0;
-}
-
-.qty-btn {
-  width: 36px;
-  height: 36px;
-  border: 2px solid #333;
-  border-radius: 4px;
-  background: #fff;
-  color: #333;
-  font-size: 1.2rem;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s, color 0.2s;
-}
-
-.qty-btn:hover {
-  background: #333;
-  color: #FFD700;
-}
-
-.qty-display {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #333;
-  min-width: 2rem;
-  text-align: center;
-}
-
-.qty-hint {
-  font-size: 0.85rem !important;
-  color: #888 !important;
-  margin: 0 0 0.5rem 0 !important;
 }
 
 </style>

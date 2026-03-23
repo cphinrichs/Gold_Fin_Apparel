@@ -12,8 +12,6 @@ providing navigation links and quick access to key features.
         <ul class="dropdown">
           <li><router-link to="/browse?style=Tank Top">Tank Tops</router-link></li>
           <li><router-link to="/browse?style=Short Sleeve">Short Sleeves</router-link></li>
-          <li><router-link to="/browse?style=Long Sleeve">Long Sleeves</router-link></li>
-          <li><router-link to="/browse?style=Hoodie">Hoodies</router-link></li>
           <li><router-link to="/browse?style=Vest">Vests</router-link></li>
           <li><router-link to="/browse?style=Kimono">Kimonos</router-link></li>
         </ul>

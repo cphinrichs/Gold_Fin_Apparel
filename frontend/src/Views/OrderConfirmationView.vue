@@ -140,24 +140,27 @@ const grandTotal = computed(() =>
           v-for="item in orderedItems"
           :key="item.cartItemId"
           class="ordered-item">
-          <!-- Layered product image -->
+          <!-- Layered product image with info overlay inside -->
           <div class="ordered-item-image" :style="{ backgroundColor: item.Color }">
-            <div class="ord-layer material-layer" :style="{ backgroundImage: `url(${getMaterialTextureUrl(item.Material)})` }"></div>
-            <div class="ord-layer design-layer" :style="{ backgroundImage: `url(${getDesignImageUrl(item.Design_Id)})` }"></div>
+            <!-- Layer 1: Material texture -->
+            <div class="ord-material-layer" :style="{ backgroundImage: `url(${getMaterialTextureUrl(item.Material)})` }"></div>
+            <!-- Layer 2: Design -->
+            <div class="ord-design-layer" :style="{ backgroundImage: `url(${getDesignImageUrl(item.Design_Id)})` }"></div>
+            <!-- Layer 3: Style silhouette -->
             <img
               v-if="getStyleImageUrl(item.Style)"
               :src="getStyleImageUrl(item.Style)"
               :alt="item.Style"
               class="ordered-style-image"
             />
+            <!-- Info overlay -->
+            <div class="ordered-item-info">
+              <h3>{{ item.Style }}</h3>
+              <p class="ordered-item-details">{{ item.Material }} | {{ item.Size }}</p>
+              <p class="ordered-item-price">${{ (item.Price * item.quantity).toFixed(2) }}</p>
+            </div>
             <!-- Quantity badge -->
             <span class="ord-qty-badge" v-if="item.quantity > 1">× {{ item.quantity }}</span>
-          </div>
-          <!-- Info below image -->
-          <div class="ordered-item-info">
-            <h3>{{ item.Style }}</h3>
-            <p>{{ item.Material }} | {{ item.Size }}</p>
-            <p class="ordered-item-price">${{ (item.Price * item.quantity).toFixed(2) }}</p>
           </div>
         </div>
       </div>
@@ -285,7 +288,7 @@ const grandTotal = computed(() =>
 }
 
 .confirmation-footer {
-  margin-top: 3rem;
+  margin-top: 1rem;
   text-align: center;
 }
 
@@ -326,94 +329,125 @@ const grandTotal = computed(() =>
 
 .ordered-items-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
 }
 
 .ordered-item {
-  border: 1px solid #ddd;
+  position: relative;
   display: flex;
   flex-direction: column;
+  border: 2px solid transparent;
+  border-radius: 8px;
   overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: transparent;
 }
 
-/* Layered image area */
+/* Image container */
 .ordered-item-image {
   position: relative;
   width: 100%;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 3/4;
   overflow: hidden;
-  flex-shrink: 0;
 }
 
-.ord-layer {
+/* Layer 1: Material texture */
+.ord-material-layer {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-}
-
-.ord-layer.material-layer {
-  opacity: 0.35;
+  pointer-events: none;
+  z-index: 1;
   mix-blend-mode: multiply;
+  opacity: 0.4;
 }
 
-.ord-layer.design-layer {
-  opacity: 0.7;
-  mix-blend-mode: overlay;
-  background-size: 60%;
-  background-position: center;
-}
-
-.ordered-style-image {
+/* Layer 2: Design graphic */
+.ord-design-layer {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 2;
 }
 
-.ord-qty-badge {
+/* Layer 3: Style silhouette */
+.ordered-style-image {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  background: #333;
-  color: #FFD700;
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 12px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+  z-index: 3;
+  display: block;
 }
 
+/* Info overlay */
 .ordered-item-info {
-  padding: 8px 10px;
-  background: #fff;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.75) 40%, transparent 70%);
+  color: white;
+  padding: 1.5rem 1rem;
+  z-index: 4;
   text-align: center;
 }
 
 .ordered-item-info h3 {
-  margin: 0 0 4px 0;
-  font-size: 0.95rem;
-  color: #333;
+  font-size: 1rem;
+  margin: 0 0 0.25rem 0;
+  font-weight: 600;
+  line-height: 1.3;
 }
 
-.ordered-item-info p {
-  margin: 2px 0;
-  font-size: 0.8rem;
-  color: #555;
+.ordered-item-details {
+  font-size: 0.75rem;
+  margin: 0 0 0.25rem 0;
+  opacity: 0.8;
 }
 
 .ordered-item-price {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 0.25rem 0 0 0;
+  color: #ffd700;
+}
+
+.ord-qty-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #333;
+  color: #FFD700;
+  font-size: 0.85rem;
   font-weight: 700;
-  font-size: 0.95rem !important;
-  margin-top: 5px !important;
+  padding: 3px 9px;
+  border-radius: 12px;
+  letter-spacing: 0.3px;
+  z-index: 5;
 }
 
 .ordered-total {
   margin-top: 20px;
   max-width: 400px;
   margin-left: auto;
+  margin-right: auto;
   border: 2px solid #333;
   background: #f5f5f5;
 }

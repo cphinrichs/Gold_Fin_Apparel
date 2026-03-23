@@ -10,7 +10,7 @@ onMounted(() => {
 <template>
  <section>
   <div>
-    <h1>Cart Page</h1>
+    <h1>Cart</h1>
     <p>Here, users will be able to review their selected items, once reviewed and edited can advance to checkout page.</p>
   </div>
   <Cart />
@@ -18,13 +18,11 @@ onMounted(() => {
 </template>
 
 <style scoped>
-section{
-  padding: 0px 20px;
+section {
+  padding: 80px 20px 20px 20px;
   max-width: 1200px;
-  margin: 0 auto 0 0px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
 }
-
-
-
-
 </style>
