@@ -13,10 +13,14 @@
                     <img :src="image" :alt="`Product thumbnail ${index + 1}`">
                 </button>
             </div>
-            <div class="main-image" :style="{ backgroundColor: currentColor }">
-                <div class="material-layer" :style="{ backgroundImage: materialBackgroundImage }"></div>
-                <div class="design-layer" :style="{ backgroundImage: designBackgroundImage }"></div>
-                <img :src="productImages[currentImageIndex]" :alt="`${productData.name} - Main view`">
+            <div class="main-image">
+                <div class="frame-layer"></div>
+                <div class="frame-content">
+                    <div class="color-background" :style="{ backgroundColor: currentColor }"></div>
+                    <div class="material-layer" :style="{ backgroundImage: materialBackgroundImage }"></div>
+                    <div class="design-layer" :style="{ backgroundImage: designBackgroundImage}"></div>
+                    <img :src="productImages[currentImageIndex]" :alt="`${productData.name} - Main view`">
+                </div>
             </div>
         </section>
         

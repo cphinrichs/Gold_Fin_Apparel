@@ -11,7 +11,7 @@ import { mockDesigns, simulateApiDelay } from './mockData'
  * 2. Ensure your backend API is running
  * 3. Delete mockData.ts if no longer needed
  */
-const USE_MOCK_DATA = true
+const USE_MOCK_DATA = false
 
 /**
  * Fetch all designs from the API (or mock data)
