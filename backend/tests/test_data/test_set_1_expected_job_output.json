@@ -1,8 +1,8 @@
 [
     {"COLUMN_NAMES": ["CUSTOMER_ID", "PRODUCT_ID", "DESIGN_ID", "GOLD_TRIM", "TOTAL_QUANTITY"],
-    "ROWS": [[1, 1, 1, 0, 3], [2, 2, 3, 1, 5], [2, 2, 3, 0, 2], [3, 1, 1, 1, 2], [4, 5, 3, 1, 1]]},
+    "ROWS": [[1, 1, 1, 0, 3], [2, 2, 3, 0, 2], [2, 2, 3, 1, 5], [3, 1, 1, 1, 2], [4, 4, 3, 1, 1]]},
     {"COLUMN_NAMES": ["ORDER_DATE", "PRODUCT_ID", "DESIGN_ID", "GOLD_TRIM", "TOTAL_QUANTITY"],
-    "ROWS": [["03/01/2026", 5, 3, 1, 1], ["02/10/2026", 1, 1, 1, 2], ["01/25/2026", 2, 3, 0, 2], ["01/25/2026", 2, 3, 1, 2], ["01/20/2026", 2, 3, 1, 3], ["01/15/2026", 1, 1, 0, 3]]},
+    "ROWS": [["03/01/2026", 4, 3, 1, 1], ["02/10/2026", 1, 1, 1, 2], ["01/25/2026", 2, 3, 0, 2], ["01/25/2026", 2, 3, 1, 2], ["01/20/2026", 2, 3, 1, 3], ["01/15/2026", 1, 1, 0, 3]]},
     {"COLUMN_NAMES": ["PRODUCT_ID", "SIZE", "STYLE", "MATERIAL", "COLOR", "GOLD_TRIM"],
-    "ROWS": [[2, "M", "Short Sleeve", "Polyester", "000000", 1], [1, "M", "Short Sleeve", "Polyester", "FFFFFF", 0], [2, "M", "Short Sleeve", "Polyester", "000000", 0], [1, "M", "Short Sleeve", "Polyester", "FFFFFF", 1], [5, "XL", "Hoodie", "Wool", "808080", 1]]}
+    "ROWS": [[1, "M", "Short Sleeve", "Polyester", "FFFFFF", 0], [1, "M", "Short Sleeve", "Polyester", "FFFFFF", 1], [2, "M", "Short Sleeve", "Polyester", "000000", 0], [2, "M", "Short Sleeve", "Polyester", "000000", 1], [4, "S", "Tank Top", "Blend", "0000FF", 1]]}
 ]
