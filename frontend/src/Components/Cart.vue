@@ -39,7 +39,6 @@ const getColorName = (color: string): string => {
 const cartTotal = computed(() =>
   cartItems.value.reduce((sum, item) => sum + item.Price * (item.quantity ?? 1), 0).toFixed(2)
 );
-
 // Single-item remove dialog
 const pendingRemoveId = ref<string | null>(null);
 const pendingRemoveQty = ref(1);
@@ -131,21 +130,20 @@ const cancelRemove = () => {
 
                 <!-- Cart total + Clear All row -->
                 <div class="cart-total-row">
-                    <button class="clear-all-btn" @click="promptClearAll">Clear All</button>
-                    <div class="cart-total">
-                        <span class="cart-total-label">Order Total</span>
-                        <span class="cart-total-value">${{ cartTotal }}</span>
+                    <div class="cart-actions-left">
+                        <BrowseButton />
+                        <button class="clear-all-btn" @click="promptClearAll">Clear All</button>
+                    </div>
+                    <div class="cart-total-section">
+                        <div class="cart-total">
+                            <span class="cart-total-label">Order Total</span>
+                            <span class="cart-total-value">${{ cartTotal }}</span>
+                        </div>
+                        <CheckOutButton class="cart-checkout-btn" />
                     </div>
                 </div>
             </div>
 
-        </div>
-
-        <div class="browse-footer">
-            <BrowseButton />
-        </div>
-        <div class="checkout-browse-footer" v-if="cartItems.length > 0">
-            <CheckOutButton />
         </div>
     </section>
 
@@ -377,20 +375,31 @@ const cancelRemove = () => {
   align-items: center;
   justify-content: space-between;
   margin-top: 24px;
+  gap: 1rem;
+}
+
+.cart-actions-left {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 280px;
+  gap: 0.75rem;
 }
 
 .clear-all-btn {
-  padding: 0.55rem 1.4rem;
+  padding: 0;
+  height: 100%;
+  min-height: 44px;
   font-size: 0.85rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   border: 2px solid #c0392b;
-  border-radius: 4px;
   background: transparent;
   color: #c0392b;
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
+  width: 100%;
 }
 
 .clear-all-btn:hover {
@@ -398,15 +407,26 @@ const cancelRemove = () => {
   color: #fff;
 }
 
+.cart-total-section {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 280px;
+  flex-shrink: 0;
+  gap: 0.75rem;
+}
+
+.cart-checkout-btn {
+  width: 100%;
+}
+
 .cart-total {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   gap: 1rem;
   padding: 16px 20px;
   border: 2px solid #333;
-  max-width: 400px;
-  margin-left: auto;
 }
 
 .cart-total-label {
@@ -423,12 +443,6 @@ const cancelRemove = () => {
   color: #333;
 }
 
-.checkout-browse-footer {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 999;
-}
 
 /* Confirmation dialog */
 .confirm-overlay {
