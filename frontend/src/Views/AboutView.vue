@@ -4,7 +4,10 @@ import { ref } from 'vue';
 //import logo from '../Assets/goldfin_logo.jpg';
 
 const showMembers = ref(false);
-const showDocumentation = ref(false);
+
+const openDocumentation = () => {
+  window.open('/docs/index.html', '_blank');
+};
 </script>
 
 <template>
@@ -58,17 +61,10 @@ const showDocumentation = ref(false);
     </p>
   </div>
 
-  <button class="documentation-toggle" @click="showDocumentation = !showDocumentation">
-    <span class="toggle-arrow" :class="{ open: showDocumentation }">▶</span>
-    Documentation
+  <button class="documentation-toggle" @click="openDocumentation">
+    <span class="doc-icon">📚</span>
+    View Documentation
   </button>
-
-  <div v-if="showDocumentation" class="docs-section">
-    <h1>Documentation</h1>
-    <p class = "p2">
-      Our documentation provides comprehensive information about our products, services, and company policies. It is designed to help our customers understand our offerings and make informed decisions. Whether you're looking for product specifications, return policies, or company history, our documentation has you covered.
-    </p>
-  </div>
   
   </section>
 </template>
@@ -176,7 +172,7 @@ h2 {
 }
 
 .documentation-toggle {
-  background: #333;
+  background: #2c5282;
   color: white;
   border: none;
   padding: 1rem 2rem;
@@ -193,14 +189,19 @@ h2 {
   transition: all 0.3s ease;
 }
 
+.doc-icon {
+  font-size: 1.4rem;
+}
+
 .members-toggle:hover {
   background: #555;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .documentation-toggle:hover {
-  background: #555;
+  background: #2b6cb0;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
 }
 
 .toggle-arrow {

@@ -6,11 +6,11 @@ import {
     DEFAULT_PRODUCT_DATA 
 } from '../Constants/productMappings'
 import { 
-    parseInventoryResponse,
     findProductById,
     findProductsByStyle,
     extractUniqueValues
 } from '../Utils/productHelpers'
+import { fetchInventory } from '../Services/inventoryApi'
 
 /**
  * Composable for managing product data and API interactions
@@ -271,16 +271,12 @@ export const useProductData = () => {
 
         try {
             console.log('Fetching product with ID:', productId)
-            const response = await fetch('/api/inventory')
             
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`)
-            }
+            // Use the fetchInventory function which handles mock data toggle
+            const responseData = await fetchInventory()
+            console.log('Inventory data received:', responseData.length, 'products')
             
-            const responseData = await response.json()
-            console.log('Full inventory response:', responseData)
-            
-            inventory.value = parseInventoryResponse(responseData)
+            inventory.value = responseData
             console.log('Parsed inventory length:', inventory.value.length)
             
             const currentProduct = findProductById(inventory.value, productId)

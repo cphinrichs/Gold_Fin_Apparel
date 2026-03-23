@@ -13,10 +13,12 @@
       
       <div class="carousel-wrapper">
         <div class="carousel-track" :style="{ transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)` }">
-          <div v-for="(product, index) in products" :key="index" class="product-item">
-            <a href="/inspect">
-              <img :src="product.image" :alt="product.alt">
-            </a>
+          <div v-for="(product, index) in products" :key="index" class="product-item" @click="navigateToProduct(product.id)">
+            <img :src="product.image" :alt="product.alt">
+            <div class="product-info">
+              <h3>{{ product.style }}</h3>
+              <p class="product-price">${{ product.price.toFixed(2) }}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -39,104 +41,111 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useInventory } from '../Composables/useInventory'
+import { getStyleFrontImage } from '../Constants/productMappings'
+import type { ProductApiResponse } from '../Types/product.types'
 
-interface Product {
-  image: string;
-  alt: string;
-  // Add more properties as needed when integrating with API
-  // id?: number;
-  // name?: string;
-  // price?: number;
+interface DisplayProduct {
+  id: number
+  image: string
+  alt: string
+  style: string
+  price: number
+  color: string
 }
 
-const currentIndex = ref(0);
-const itemsPerView = ref(3); // Number of items visible at once
-const autoPlayInterval = ref<number | null>(null);
-const autoPlayDelay = 3000; // 3 seconds
+const router = useRouter()
+const { products: inventoryData, loadProducts } = useInventory()
 
-const products = ref<Product[]>([
-  { image: new URL('../Assets/Kimono/Designer(5).png', import.meta.url).href, alt: 'Product Image' },
-  { image: new URL('../Assets/Kimono/Designer(5).png', import.meta.url).href, alt: 'Product Image' },
-  { image: new URL('../Assets/Kimono/Designer(5).png', import.meta.url).href, alt: 'Product Image' },
-  { image: new URL('../Assets/Kimono/Designer(5).png', import.meta.url).href, alt: 'Product Image' },
-  { image: new URL('../Assets/Kimono/Designer(5).png', import.meta.url).href, alt: 'Product Image' },
-  { image: new URL('../Assets/Kimono/Designer(5).png', import.meta.url).href, alt: 'Product Image' },
-]);
+const currentIndex = ref(0)
+const itemsPerView = ref(3) // Number of items visible at once
+const autoPlayInterval = ref<number | null>(null)
+const autoPlayDelay = 3000 // 3 seconds
+
+// Get unique products by style for display
+const products = computed<DisplayProduct[]>(() => {
+  const uniqueStyles = new Map<string, ProductApiResponse>()
+  
+  // Get one representative product per style
+  inventoryData.value.forEach(product => {
+    if (!uniqueStyles.has(product.Style)) {
+      uniqueStyles.set(product.Style, product)
+    }
+  })
+  
+  // Convert to display format
+  return Array.from(uniqueStyles.values()).map(product => ({
+    id: product.Product_Id,
+    image: getStyleFrontImage(product.Style),
+    alt: `${product.Style} - ${product.Material}`,
+    style: product.Style,
+    price: product.Price,
+    color: product.Color
+  }))
+})
 
 const nextSlide = () => {
   if (currentIndex.value >= products.value.length - itemsPerView.value) {
-    currentIndex.value = 0; // Loop back to start
+    currentIndex.value = 0 // Loop back to start
   } else {
-    currentIndex.value++;
+    currentIndex.value++
   }
-};
+}
 
 const prevSlide = () => {
   if (currentIndex.value <= 0) {
-    currentIndex.value = products.value.length - itemsPerView.value; // Loop to end
+    currentIndex.value = products.value.length - itemsPerView.value // Loop to end
   } else {
-    currentIndex.value--;
+    currentIndex.value--
   }
-};
+}
 
 const goToSlide = (index: number) => {
-  currentIndex.value = index;
-  stopAutoPlay();
-  startAutoPlay();
-};
+  currentIndex.value = index
+  stopAutoPlay()
+  startAutoPlay()
+}
 
 const startAutoPlay = () => {
   autoPlayInterval.value = window.setInterval(() => {
-    nextSlide();
-  }, autoPlayDelay);
-};
+    nextSlide()
+  }, autoPlayDelay)
+}
 
 const stopAutoPlay = () => {
   if (autoPlayInterval.value !== null) {
-    clearInterval(autoPlayInterval.value);
-    autoPlayInterval.value = null;
+    clearInterval(autoPlayInterval.value)
+    autoPlayInterval.value = null
   }
-};
+}
 
-// Function to fetch products from API (ready for integration)
-const fetchProducts = async () => {
-  try {
-    // Replace with your actual API endpoint
-    // const response = await fetch('YOUR_API_ENDPOINT');
-    // const data = await response.json();
-    // products.value = data.map((item: any) => ({
-    //   image: item.imageUrl,
-    //   alt: item.name,
-    //   id: item.id,
-    //   name: item.name,
-    //   price: item.price
-    // }));
-  } catch (error) {
-    console.error('Error fetching products:', error);
-  }
-};
+const navigateToProduct = (productId: number) => {
+  router.push({ name: 'Inspect', params: { id: productId } })
+}
 
-onMounted(() => {
-  // fetchProducts();
-  startAutoPlay();
-});
+onMounted(async () => {
+  await loadProducts()
+  startAutoPlay()
+})
 
 onUnmounted(() => {
-  stopAutoPlay();
-});
+  stopAutoPlay()
+})
 </script>
 
 <style scoped>
 .home {
   width: 100%;
   height: 100vh;
-  background-color: #D8CEC5;
   font-family: Arial, sans-serif;
-  background-image: url('../Assets/T-shirt/T-shirt(front).png');
-  background-size: contain;
-  background-position: center;
+  background-image: url('../Assets/landing.png');
+  background-size: cover;
+  background-position: center top;
   background-repeat: no-repeat;
+  margin-top: -80px;
+  padding-top: 80px;
 }
 
 .product-list {
@@ -171,6 +180,7 @@ onUnmounted(() => {
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease;
+  cursor: pointer;
 }
 
 .product-item:hover {
@@ -182,6 +192,24 @@ onUnmounted(() => {
   width: 100%;
   height: 300px;
   object-fit: contain;
+}
+
+.product-info {
+  padding: 1rem;
+  text-align: center;
+}
+
+.product-info h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.product-price {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #2c3e50;
 }
 
 .carousel-btn {
