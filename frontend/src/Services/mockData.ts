@@ -33,14 +33,6 @@ export const mockInventory: ProductApiResponse[] = [
     { Product_Id: 13, Style: 'Short Sleeve', Color: '000000', Material: 'Polyester', Size: 'M', Stock: 60, Price: 22.99 },
     { Product_Id: 14, Style: 'Short Sleeve', Color: '000000', Material: 'Polyester', Size: 'L', Stock: 55, Price: 22.99 },
     
-    // Long Sleeves - Navy/Black in Cotton
-    { Product_Id: 15, Style: 'Long Sleeve', Color: '1E3A5F', Material: 'Cotton', Size: 'S', Stock: 35, Price: 29.99 },
-    { Product_Id: 16, Style: 'Long Sleeve', Color: '1E3A5F', Material: 'Cotton', Size: 'M', Stock: 50, Price: 29.99 },
-    { Product_Id: 17, Style: 'Long Sleeve', Color: '1E3A5F', Material: 'Cotton', Size: 'L', Stock: 45, Price: 29.99 },
-    { Product_Id: 18, Style: 'Long Sleeve', Color: '1E3A5F', Material: 'Cotton', Size: 'XL', Stock: 30, Price: 29.99 },
-    { Product_Id: 19, Style: 'Long Sleeve', Color: '000000', Material: 'Cotton', Size: 'S', Stock: 40, Price: 29.99 },
-    { Product_Id: 20, Style: 'Long Sleeve', Color: '000000', Material: 'Cotton', Size: 'M', Stock: 55, Price: 29.99 },
-    
     // Kimonos - Various colors in Wool/Cotton
     { Product_Id: 21, Style: 'Kimono', Color: 'DC143C', Material: 'Wool', Size: 'S', Stock: 15, Price: 89.99 },
     { Product_Id: 22, Style: 'Kimono', Color: 'DC143C', Material: 'Wool', Size: 'M', Stock: 20, Price: 89.99 },
@@ -90,30 +82,6 @@ export const mockInventory: ProductApiResponse[] = [
     { Product_Id: 59, Style: 'Vest', Color: '696969', Material: 'Cotton', Size: 'XL', Stock: 32, Price: 39.99 },
     { Product_Id: 60, Style: 'Vest', Color: '696969', Material: 'Cotton', Size: 'XXL', Stock: 25, Price: 39.99 },
     
-    // Hoodies - Popular colors in Cotton/Wool
-    { Product_Id: 61, Style: 'Hoodie', Color: '808080', Material: 'Cotton', Size: 'S', Stock: 40, Price: 44.99 },
-    { Product_Id: 62, Style: 'Hoodie', Color: '808080', Material: 'Cotton', Size: 'M', Stock: 55, Price: 44.99 },
-    { Product_Id: 63, Style: 'Hoodie', Color: '808080', Material: 'Cotton', Size: 'L', Stock: 50, Price: 44.99 },
-    { Product_Id: 64, Style: 'Hoodie', Color: '808080', Material: 'Cotton', Size: 'XL', Stock: 38, Price: 44.99 },
-    { Product_Id: 65, Style: 'Hoodie', Color: '808080', Material: 'Cotton', Size: 'XXL', Stock: 30, Price: 44.99 },
-    
-    { Product_Id: 66, Style: 'Hoodie', Color: '000000', Material: 'Wool', Size: 'S', Stock: 45, Price: 49.99 },
-    { Product_Id: 67, Style: 'Hoodie', Color: '000000', Material: 'Wool', Size: 'M', Stock: 60, Price: 49.99 },
-    { Product_Id: 68, Style: 'Hoodie', Color: '000000', Material: 'Wool', Size: 'L', Stock: 55, Price: 49.99 },
-    { Product_Id: 69, Style: 'Hoodie', Color: '000000', Material: 'Wool', Size: 'XL', Stock: 42, Price: 49.99 },
-    { Product_Id: 70, Style: 'Hoodie', Color: '000000', Material: 'Wool', Size: 'XXL', Stock: 35, Price: 49.99 },
-    
-    { Product_Id: 71, Style: 'Hoodie', Color: '00008B', Material: 'Cotton', Size: 'S', Stock: 35, Price: 44.99 },
-    { Product_Id: 72, Style: 'Hoodie', Color: '00008B', Material: 'Cotton', Size: 'M', Stock: 48, Price: 44.99 },
-    { Product_Id: 73, Style: 'Hoodie', Color: '00008B', Material: 'Cotton', Size: 'L', Stock: 44, Price: 44.99 },
-    { Product_Id: 74, Style: 'Hoodie', Color: '00008B', Material: 'Cotton', Size: 'XL', Stock: 33, Price: 44.99 },
-    { Product_Id: 75, Style: 'Hoodie', Color: '00008B', Material: 'Cotton', Size: 'XXL', Stock: 28, Price: 44.99 },
-    
-    { Product_Id: 76, Style: 'Hoodie', Color: '8B0000', Material: 'Wool', Size: 'S', Stock: 25, Price: 49.99 },
-    { Product_Id: 77, Style: 'Hoodie', Color: '8B0000', Material: 'Wool', Size: 'M', Stock: 38, Price: 49.99 },
-    { Product_Id: 78, Style: 'Hoodie', Color: '8B0000', Material: 'Wool', Size: 'L', Stock: 35, Price: 49.99 },
-    { Product_Id: 79, Style: 'Hoodie', Color: '8B0000', Material: 'Wool', Size: 'XL', Stock: 28, Price: 49.99 },
-    { Product_Id: 80, Style: 'Hoodie', Color: '8B0000', Material: 'Wool', Size: 'XXL', Stock: 22, Price: 49.99 },
 ]
 
 /**

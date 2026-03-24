@@ -53,8 +53,8 @@
 <style scoped>
 h1 {
   font-size: 2.5rem;
-  color: #000000;
-  border-bottom: 3px solid #000000;
+  color: #d4af37;
+  border-bottom: 3px solid #d4af37;
   padding-bottom: 1rem;
   margin: 2rem 0;
   text-align: center;
@@ -63,9 +63,9 @@ h1 {
 
 h2 {
   font-size: 1.3rem;
-  color: #000000;
-  border-bottom: #000000 solid 2px;
-  border-top: #000000 solid 2px;
+  color: #e8e8e8;
+  border-bottom: #d4af37 solid 2px;
+  border-top: #d4af37 solid 2px;
   padding: 1.5rem 0;
   margin-bottom: 1rem;
   text-align: center   ;
@@ -73,14 +73,14 @@ h2 {
 
 h3 {
   font-size: 1.1rem;
-  color: #000000;
+  color: #d4af37;
   margin: 0 0 0.5rem 0;
 }
 
 .intro-section {
   font-size: 1.1rem;
   line-height: 1.2;
-  color: #000000;
+  color: #c0c0c0;
 }
 
 .p2 {
@@ -89,7 +89,7 @@ h3 {
   border-radius: 4px;
   margin: 2rem 0;
   font-size: 1.3rem;
-  color: #000000;
+  color: #c0c0c0;
 }
 
 .shipping-section {
@@ -118,14 +118,14 @@ h3 {
 
 .shipping-detail {
   font-weight: 600;
-  color: #000000;
+  color: #d4af37;
   margin: 0.5rem 0 0.5rem 0;
 }
 
 .shipping-box p {
   font-size: 1rem;
   line-height: 1.2;
-  color: #000000;
+  color: #c0c0c0;
   margin: 1rem 0;
 }
 

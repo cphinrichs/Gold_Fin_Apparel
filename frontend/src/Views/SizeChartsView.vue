@@ -358,8 +358,8 @@
 
 h1{
   font-size: 2.5rem;
-  color: #000000;
-  border-bottom: 3px solid #000000;
+  color: #d4af37;
+  border-bottom: 3px solid #d4af37;
   padding-bottom: 1rem;
   margin: 2rem 0;
   text-align: center;
@@ -371,7 +371,7 @@ h2{
   margin-left: 0.5rem;
   text-align: center;
   font-size: 1.5rem;
-  color: #000000;
+  color: #e8e8e8;
 }
 
 p{
@@ -380,7 +380,7 @@ p{
   line-height: 1.0;
   margin: 1rem 0;
   font-size: 1.2rem;
-  color: #000000;
+  color: #c0c0c0;
 }
 .size-chart {
   display: flex;
@@ -395,14 +395,14 @@ p{
   max-width: 900px;
   border-collapse: collapse;
   margin: 1.5rem 0;
-  background: #fff;
-  border: 2px solid #333;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: #1a1a1a;
+  border: 2px solid rgba(212, 175, 55, 0.3);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
 }
 
 .size-table thead {
-  background: #333;
-  color: white;
+  background: #0a0a0a;
+  color: #d4af37;
 }
 
 .size-table th {
@@ -411,13 +411,14 @@ p{
   font-weight: 600;
   font-size: 1rem;
   letter-spacing: 0.5px;
-  border-bottom: 2px solid #333;
+  border-bottom: 2px solid rgba(212, 175, 55, 0.5);
 }
 
 .size-table td {
   padding: 1.5rem;
   text-align: center;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  color: #e8e8e8;
 }
 
 .size-table tbody tr:last-child td {
@@ -425,16 +426,16 @@ p{
 }
 
 .size-table tbody tr:nth-child(odd) {
-  background: #f9f9f9;
+  background: #1a1a1a;
 }
 
 .size-table tbody tr:hover {
-  background: #f0f0f0;
+  background: rgba(212, 175, 55, 0.15);
   transition: background 0.2s ease;
 }
 
 .size-table tbody tr:nth-child(even):hover {
-  background: #e8e8e8;
+  background: rgba(212, 175, 55, 0.1);
 }
 
 section {

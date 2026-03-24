@@ -42,8 +42,8 @@
 h1 {
   
   font-size: 2.5rem;
-  color: #000000;
-  border-bottom: 3px solid #000000;
+  color: #d4af37;
+  border-bottom: 3px solid #d4af37;
   padding-bottom: 0.5rem;
   max-width: 800px;
 }
@@ -56,7 +56,7 @@ h1 {
   max-width: 800px;
   padding: 1.5rem 0;
   border-radius: 4px;
-  color: #555;
+  color: #c0c0c0;
 }
 
 .help-intro {
@@ -64,6 +64,7 @@ h1 {
   margin: 2rem 0;
   font-size: 1.1rem;
   line-height: 1.6;
+  color: #c0c0c0;
 }
 
 .help-links {
@@ -76,41 +77,34 @@ h1 {
 .help-link {
   text-decoration: none;
   padding: 2rem;
-  border: 2px solid #333;
+  border: 2px solid rgba(212, 175, 55, 0.3);
   border-radius: 8px;
   transition: all 0.3s ease;
-  color: #333;
+  color: #e8e8e8;
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  background: #1a1a1a;
 }
 
 .help-link:hover {
-  border-color: #333;
-  background-color: #f9f9f9;
+  border-color: #d4af37;
+  background-color: rgba(212, 175, 55, 0.1);
   transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
 }
 
 .help-link h3 {
   margin: 0;
   font-size: 1.3rem;
   font-weight: 600;
+  color: #d4af37;
 }
 
 .help-link p {
   margin: 0;
-  color: #666;
+  color: #c0c0c0;
   font-size: 0.95rem;
-}
-
-.p2{
-  max-width: 900px;
-  line-height: 1.3;
-  border-radius: 4px;
-  margin: 2rem 0;
-  font-size: 1.3rem;
-  color: #000000;
 }
 
 section {

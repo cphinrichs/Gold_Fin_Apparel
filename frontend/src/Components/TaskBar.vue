@@ -48,7 +48,7 @@ const { cartCount } = useCart()
 
 <style scoped>
 .taskbar {
-  background-color: #333;
+  background-color: #0a0a0a;
   padding: 1rem;
   display: flex;
   align-items: center;
@@ -57,6 +57,8 @@ const { cartCount } = useCart()
   top: 0;
   width: 100%;
   z-index: 1000;
+  border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
 .logo {
@@ -88,10 +90,10 @@ const { cartCount } = useCart()
 .taskbar a:hover {
   text-decoration: none;
   background: 
-    radial-gradient(circle at 20% 50%, #FFD700 0%, #FFD700 20%, transparent 50%),
-    radial-gradient(circle at 60% 30%, #FFD700 0%, #FFD700 20%, transparent 50%),
-    radial-gradient(circle at 80% 70%, #FFD700 0%, #FFD700 20%, transparent 50%),
-    radial-gradient(circle at 40% 80%, #FFD700 0%, #FFD700 20%, transparent 50%);
+    radial-gradient(circle at 20% 50%, #d4af37 0%, #d4af37 20%, transparent 50%),
+    radial-gradient(circle at 60% 30%, #d4af37 0%, #d4af37 20%, transparent 50%),
+    radial-gradient(circle at 80% 70%, #d4af37 0%, #d4af37 20%, transparent 50%),
+    radial-gradient(circle at 40% 80%, #d4af37 0%, #d4af37 20%, transparent 50%);
   background-size: 100% 100%;
   background-clip: text;
   -webkit-background-clip: text;
@@ -109,8 +111,8 @@ const { cartCount } = useCart()
   position: absolute;
   top: 100%;
   left: 0;
-  background-color: #222;
-  border: 1px solid #444;
+  background-color: #0a0a0a;
+  border: 1px solid rgba(212, 175, 55, 0.3);
   border-radius: 4px;
   padding: 0.5rem 0;
   min-width: 150px;
@@ -171,8 +173,8 @@ const { cartCount } = useCart()
   position: absolute;
   top: -8px;
   right: 4px;
-  background-color: #FFD700;
-  color: #222;
+  background-color: #d4af37;
+  color: #0a0a0a;
   font-size: 0.6rem;
   font-weight: 700;
   min-width: 16px;

@@ -13,10 +13,8 @@ The mock data system provides:
 ### **Inventory Data** (80 products)
 - **Tank Tops**: White, Black in Cotton (Sizes: S-XL)
 - **Short Sleeves**: White, Black, Navy in Cotton/Polyester (Sizes: S-XL)
-- **Long Sleeves**: Navy, Black in Cotton (Sizes: S-XL)
 - **Kimonos**: Red, Navy Blue, Gold in Wool/Cotton (Sizes: S-XL)
 - **Vests**: Brown, Black, Royal Blue, Gray in Leather/Blend/Cotton (Sizes: S-XXL)
-- **Hoodies**: Gray, Black, Dark Blue, Dark Red in Cotton/Wool (Sizes: S-XXL)
 
 **Available Materials** (match texture files in `Assets/Textures/`):
 - Blend
@@ -29,8 +27,6 @@ The mock data system provides:
 **Available Styles**:
 - Tank Top
 - Short Sleeve
-- Long Sleeve
-- Hoodie
 - Vest
 - Kimono
 

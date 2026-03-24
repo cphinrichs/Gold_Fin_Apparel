@@ -193,18 +193,18 @@ const emit = defineEmits<{ (e: 'filtersChanged', filters: Filters): void }>();
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #333;
-  color: #FFD700;
+  background: #0a0a0a;
+  color: #d4af37;
   padding: 10px 12px;
   border-radius: 8px 0 0 8px;
   cursor: pointer;
-  box-shadow: -3px 2px 10px rgba(0, 0, 0, 0.25);
+  box-shadow: -3px 2px 10px rgba(0, 0, 0, 0.5);
   transition: background 0.2s ease;
 }
 
 .filter-toggle-tab.open {
-  background: #FFD700;
-  color: #333;
+  background: #d4af37;
+  color: #0a0a0a;
 }
 
 .toggle-icon {
@@ -213,8 +213,8 @@ const emit = defineEmits<{ (e: 'filtersChanged', filters: Filters): void }>();
 }
 
 .filter-badge {
-  background: #FFD700;
-  color: #333;
+  background: #d4af37;
+  color: #0a0a0a;
   font-size: 0.7rem;
   font-weight: 700;
   border-radius: 50%;
@@ -235,13 +235,14 @@ const emit = defineEmits<{ (e: 'filtersChanged', filters: Filters): void }>();
   right: -340px;
   width: 300px;
   height: calc(100vh - 80px);
-  background: #fff;
+  background: #1a1a1a;
   z-index: 1050;
   overflow-y: scroll;
   padding: 0;
   box-shadow: none;
   transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s ease;
   display: block;
+  border-left: 2px solid rgba(212, 175, 55, 0.3);
 }
 
 .filter-panel.open {
@@ -263,26 +264,26 @@ const emit = defineEmits<{ (e: 'filtersChanged', filters: Filters): void }>();
 .panel-header h2 {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #333;
-  border-bottom: 3px solid #FFD700;
+  color: #d4af37;
+  border-bottom: 3px solid #d4af37;
   padding-bottom: 0.4rem;
 }
 
 .clear-btn {
   background: none;
-  border: 1px solid #ccc;
+  border: 1px solid rgba(212, 175, 55, 0.3);
   border-radius: 4px;
   padding: 0.3rem 0.6rem;
   font-size: 0.8rem;
-  color: #666;
+  color: #d4af37;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
 }
 
 .clear-btn:hover {
-  border-color: #FF4444;
-  color: #FF4444;
+  border-color: #ff6b6b;
+  color: #ff6b6b;
 }
 
 .filter-group {
@@ -295,10 +296,10 @@ const emit = defineEmits<{ (e: 'filtersChanged', filters: Filters): void }>();
 .filter-group h3 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #333;
+  color: #e8e8e8;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  border-left: 3px solid #FFD700;
+  border-left: 3px solid #d4af37;
   padding-left: 0.5rem;
   margin: 0;
 }
@@ -315,25 +316,25 @@ const emit = defineEmits<{ (e: 'filtersChanged', filters: Filters): void }>();
   align-items: center;
   gap: 6px;
   padding: 0.4rem 0.85rem;
-  border: 2px solid #e0e0e0;
+  border: 2px solid rgba(212, 175, 55, 0.3);
   border-radius: 20px;
   font-size: 0.875rem;
-  color: #555;
-  background: #fafafa;
+  color: #e8e8e8;
+  background: #0f0f0f;
   cursor: pointer;
   transition: all 0.2s ease;
   user-select: none;
 }
 
 .filter-chip:hover {
-  border-color: #FFD700;
-  background: #fffde7;
+  border-color: #d4af37;
+  background: rgba(212, 175, 55, 0.15);
 }
 
 .filter-chip.selected {
-  border-color: #FFD700;
-  background: #FFD700;
-  color: #333;
+  border-color: #d4af37;
+  background: #d4af37;
+  color: #0a0a0a;
   font-weight: 600;
 }
 
@@ -360,9 +361,9 @@ const emit = defineEmits<{ (e: 'filtersChanged', filters: Filters): void }>();
   margin-top: 0.5rem;
   width: 100%;
   padding: 0.85rem;
-  background: #333;
-  color: #FFD700;
-  border: none;
+  background: #0a0a0a;
+  color: #d4af37;
+  border: 2px solid rgba(212, 175, 55, 0.3);
   border-radius: 4px;
   font-size: 1rem;
   font-weight: 700;
@@ -373,16 +374,17 @@ const emit = defineEmits<{ (e: 'filtersChanged', filters: Filters): void }>();
 }
 
 .apply-btn:hover {
-  background: #FFD700;
-  color: #333;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: #d4af37;
+  color: #0a0a0a;
+  border-color: #d4af37;
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
 }
 
 /* Backdrop overlay */
 .filter-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.7);
   z-index: 1040;
 }
 </style>

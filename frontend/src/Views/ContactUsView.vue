@@ -33,8 +33,8 @@
 <style scoped>
 h1 {
   font-size: 2.5rem;
-  color: #000000;
-  border-bottom: 3px solid #000000;
+  color: #d4af37;
+  border-bottom: 3px solid #d4af37;
   padding-bottom: 1rem;
   margin: 2rem 0;
   text-align: center;
@@ -43,9 +43,9 @@ h1 {
 
 h2 {
   font-size: 1.3rem;
-  color: #000000;
-  border-bottom: #000000 solid 2px;
-  border-top: #000000 solid 2px;
+  color: #e8e8e8;
+  border-bottom: #d4af37 solid 2px;
+  border-top: #d4af37 solid 2px;
   padding: 1rem 0;
   margin-top: 0;
   margin-bottom: 0.5rem;
@@ -54,7 +54,7 @@ h2 {
 .intro-section {
   max-width: 800px;
   font-size: 1.3rem;
-  color: #000000;
+  color: #c0c0c0;
   margin-right: auto;
 }
 
@@ -68,25 +68,28 @@ h2 {
 .contact-box {
   padding: 1.5rem;
   transition: all 0.3s ease;
+  border: 2px solid rgba(212, 175, 55, 0.3);
+  border-radius: 8px;
+  background: #1a1a1a;
 }
 
 .contact-box:hover {
-  border-color: #000000;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  background: #f9f9f9;
+  border-color: #d4af37;
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+  background: rgba(212, 175, 55, 0.1);
 }
 
 .contact-detail {
   font-size: 1.2rem;
   font-weight: 600;
-  color: #000000;
+  color: #d4af37;
   margin: 0.5rem 0 1rem 0;
 }
 
 .contact-box p {
   font-size: 1.2rem;
   line-height: 1.2;
-  color: #000000;
+  color: #c0c0c0;
   margin: 0.5rem 0;
 }
 

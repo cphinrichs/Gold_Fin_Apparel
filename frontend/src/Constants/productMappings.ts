@@ -12,12 +12,19 @@ import productVestBack from '../Assets/Vest/vest(3).png'
 import productVestRight from '../Assets/Vest/vest(4).png'
 import productVestDetail from '../Assets/Vest/vest(5).png'
 
+// Tank Top product images
+import productTankFront from '../Assets/Tank/tank(1).png'
+import productTankLeft from '../Assets/Tank/tank(2).png'
+import productTankBack from '../Assets/Tank/tank(3).png'
+import productTankRight from '../Assets/Tank/tank(4).png'
+import productTankDetail from '../Assets/Tank/tank(5).png'
+
 // T-Shirt product images
-import prodcutShirtFront from '../Assets/T-shirt/shirt(1).png'
-import prodcutShirtLeft from '../Assets/T-shirt/shirt(2).png'
-import prodcutShirtBack from '../Assets/T-shirt/shirt(3).png'
-import prodcutShirtRight from '../Assets/T-shirt/shirt(4).png'
-import prodcutShirtDetail from '../Assets/T-shirt/shirt(5).png'
+import productShirtFront from '../Assets/T-shirt/shirt(1).png'
+import productShirtLeft from '../Assets/T-shirt/shirt(2).png'
+import productShirtBack from '../Assets/T-shirt/shirt(3).png'
+import productShirtRight from '../Assets/T-shirt/shirt(4).png'
+import productShirtDetail from '../Assets/T-shirt/shirt(5).png'
 
 // Material texture images
 import materialCotton from '../Assets/Textures/material-cotton.png'
@@ -34,9 +41,8 @@ import type { ProductData } from '../Types/product.types'
 export const STYLE_TO_IMAGES: Record<string, string[]> = {
     'Kimono': [productKimFront, productKimLeft, productKimBack, productKimRight, productKimDetail],
     'Vest': [productVestFront, productVestLeft, productVestBack, productVestRight, productVestDetail],
-    'Tank Top': [prodcutShirtFront, prodcutShirtLeft, prodcutShirtBack, prodcutShirtRight, prodcutShirtDetail],
-    'Short Sleeve': [prodcutShirtFront, prodcutShirtLeft, prodcutShirtBack, prodcutShirtRight, prodcutShirtDetail],
-    'Long Sleeve': [prodcutShirtFront, prodcutShirtLeft, prodcutShirtBack, prodcutShirtRight, prodcutShirtDetail],
+    'Tank Top': [productTankFront, productTankLeft, productTankBack, productTankRight, productTankDetail],
+    'Short Sleeve': [productShirtFront, productShirtLeft, productShirtBack, productShirtRight, productShirtDetail],
     'Hoodie': [productKimFront, productKimLeft, productKimBack, productKimRight, productKimDetail]
 }
 

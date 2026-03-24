@@ -48,8 +48,8 @@
 <style scoped>
 h1 {
   font-size: 2.5rem;
-  color: #000000;
-  border-bottom: 3px solid #000000;
+  color: #d4af37;
+  border-bottom: 3px solid #d4af37;
   padding-bottom: 1rem;
   margin: 2rem 0;
   text-align: center;
@@ -58,9 +58,9 @@ h1 {
 
 h2 {
   font-size: 1.3rem;
-  color: #000000;
-  border-bottom: #000000 solid 2px;
-  border-top: #000000 solid 2px;
+  color: #e8e8e8;
+  border-bottom: #d4af37 solid 2px;
+  border-top: #d4af37 solid 2px;
   padding: 1.5rem 0;
   margin-top: 0;
   margin-bottom: 1rem;
@@ -73,7 +73,7 @@ h2 {
   border-radius: 4px;
   margin: 2rem 0;
   font-size: 1.3rem;
-  color: #000000;
+  color: #c0c0c0;
 }
 
 .policy-section {
@@ -87,13 +87,13 @@ h2 {
 .policy-box p {
   font-size: 1.2rem;
   line-height: 1.2;
-  color: #000000;
+  color: #c0c0c0;
   margin: 1rem 0;
 }
 
 .policy-box ol {
   padding-left: 2rem;
-  color: #000000;
+  color: #c0c0c0;
   line-height: 1.2;
 }
 

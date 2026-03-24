@@ -9,7 +9,7 @@
                     :style="{ backgroundColor: currentColor}"
                     @click="currentImageIndex = index">
                     <div class="thumbnail-overlay" :style="{ backgroundImage: materialBackgroundImage }"></div>
-                    <div class="thumbnail-design" :style="{ backgroundImage: designBackgroundImage }"></div>
+                    <div class="thumbnail-design" :style="{ backgroundImage: designBackgroundImage, ...designPositionStyles }"></div>
                     <img :src="image" :alt="`Product thumbnail ${index + 1}`">
                 </button>
             </div>
@@ -18,7 +18,7 @@
                 <div class="frame-content">
                     <div class="color-background" :style="{ backgroundColor: currentColor }"></div>
                     <div class="material-layer" :style="{ backgroundImage: materialBackgroundImage }"></div>
-                    <div class="design-layer" :style="{ backgroundImage: designBackgroundImage}"></div>
+                    <div class="design-layer" :style="{ backgroundImage: designBackgroundImage, ...designPositionStyles }"></div>
                     <img :src="productImages[currentImageIndex]" :alt="`${productData.name} - Main view`">
                 </div>
             </div>
@@ -198,6 +198,162 @@ const designBackgroundImage = computed(() => {
     } catch (e) {
         console.error(`Failed to load design image for ID ${designId}:`, e)
         return ''
+    }
+})
+
+// Style-specific and design-specific positioning configuration
+interface DesignPosition {
+    top: string
+    left: string
+    width: string
+    height: string
+    backgroundSize: string
+}
+
+// Configuration for each Style + Design combination
+// Format: styleDesignPositions[Style][DesignId]
+const styleDesignPositions: Record<string, Record<string, DesignPosition>> = {
+    'Tank Top': {
+        '1': {
+            top: '10%',
+            left: '20%',
+            width: '60%',
+            height: '50%',
+            backgroundSize: 'contain'
+        },
+        '2': {
+            top: '5%',
+            left: '20%',
+            width: '60%',
+            height: '50%',
+            backgroundSize: 'contain'
+        },
+        '3': {
+            top: '15%',
+            left: '20%',
+            width: '60%',
+            height: '50%',
+            backgroundSize: 'contain'
+        },
+        '4': {
+            top: '15%',
+            left: '20%',
+            width: '60%',
+            height: '50%',
+            backgroundSize: 'contain'
+        }
+    },
+    'Short Sleeve': {
+        '1': {
+            top: '40%',
+            left: '15%',
+            width: '70%',
+            height: '50%',
+            backgroundSize: 'contain'
+        },
+        '2': {
+            top: '35%',  // Higher than design 1
+            left: '15%',
+            width: '70%',
+            height: '50%',
+            backgroundSize: 'contain'
+        },
+        '3': {
+            top: '50%',
+            left: '15%',
+            width: '70%',
+            height: '50%',
+            backgroundSize: 'contain'
+        },
+        '4': {
+            top: '25%',
+            left: '15%',
+            width: '100%',
+            height: '100%',
+            backgroundSize: 'contain'
+        }
+    },
+    'Vest': {
+        '1': {
+            top: '22%',
+            left: '18%',
+            width: '64%',
+            height: '45%',
+            backgroundSize: 'contain'
+        },
+        '2': {
+            top: '10%',
+            left: '18%',
+            width: '64%',
+            height: '45%',
+            backgroundSize: 'contain'
+        },
+        '3': {
+            top: '22%',
+            left: '18%',
+            width: '64%',
+            height: '45%',
+            backgroundSize: 'contain'
+        },
+        '4': {
+            top: '22%',
+            left: '18%',
+            width: '64%',
+            height: '45%',
+            backgroundSize: 'contain'
+        }
+    },
+    'Kimono': {
+        '1': {
+            top: '20%',
+            left: '12%',
+            width: '76%',
+            height: '52%',
+            backgroundSize: 'contain'
+        },
+        '2': {
+            top: '20%',
+            left: '12%',
+            width: '76%',
+            height: '52%',
+            backgroundSize: 'contain'
+        },
+        '3': {
+            top: '20%',
+            left: '12%',
+            width: '76%',
+            height: '52%',
+            backgroundSize: 'contain'
+        },
+        '4': {
+            top: '20%',
+            left: '12%',
+            width: '76%',
+            height: '52%',
+            backgroundSize: 'contain'
+        }
+    }
+}
+
+// Get design position based on current product style and design ID
+const designPositionStyles = computed(() => {
+    const style = productData.value.style
+    const designId = route.query.designId as string || '1'
+    
+    // Get style-specific positions, or fallback to Short Sleeve
+    const stylePositions = styleDesignPositions[style] || styleDesignPositions['Short Sleeve']
+    
+    // Get design-specific position, or fallback to design 1
+    const position = stylePositions[designId] || stylePositions['1']
+    
+    return {
+        top: position.top,
+        left: position.left,
+        width: position.width,
+        height: position.height,
+        backgroundSize: position.backgroundSize,
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
     }
 })
 

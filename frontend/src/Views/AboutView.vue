@@ -73,8 +73,8 @@ const openDocumentation = () => {
 h1 {
   margin-left: 10px;
   font-size: 2.5rem;
-  color: #000000;
-  border-bottom: 3px solid #000000;
+  color: #d4af37;
+  border-bottom: 3px solid #d4af37;
   padding-bottom: 1rem;
   margin-top: 0rem;
 }
@@ -82,7 +82,7 @@ h1 {
 h2 {
   margin-left: 10px;
   font-size: 1.5rem;
-  color: #000000;
+  color: #e8e8e8;
   margin-bottom: 0.25rem;
 }
 
@@ -114,8 +114,8 @@ h2 {
   margin-right: 0;
   margin-left: 10px;
   padding: 5px;
-  color: #000000;
-  border-bottom: 3px solid #0000;
+  color: #c0c0c0;
+  border-bottom: 3px solid transparent;
 }
 
 .p2 {
@@ -123,7 +123,7 @@ h2 {
   margin-right: 0;
   margin-left: 10px;
   border-radius: 4px;
-  color: #555;
+  color: #c0c0c0;
 }
 
 .info {
@@ -132,7 +132,7 @@ h2 {
   padding: 1.5rem;
   margin-left: 10px;
   margin-top: -0.95rem;
-  color: #555;
+  color: #c0c0c0;
   transition: all 0.3s ease;
 }
 

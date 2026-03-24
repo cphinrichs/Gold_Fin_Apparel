@@ -29,22 +29,33 @@ import TaskBar from "./Components/TaskBar.vue";
 
 .footer {
   font-family: Arial, sans-serif;
-  padding: 1rem 2rem;
-  text-align: left;
+  padding: 2rem;
+  text-align: center;
+  background: linear-gradient(to top, #000000 0%, #0a0a0a 100%);
+  color: #d4af37;
+  border-top: 2px solid rgba(212, 175, 55, 0.3);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.footer p {
+  margin: 0;
+  font-size: 0.95rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 body {
-  background-color: #f5f5f5;
+  background-color: #0a0a0a;
   background-image: 
-    radial-gradient(circle at 15% 30%, rgba(140, 140, 140, 0.18) 0%, transparent 15%),
-    radial-gradient(circle at 85% 70%, rgba(140, 140, 140, 0.18) 0%, transparent 15%),
-    radial-gradient(circle at 50% 50%, rgba(160, 160, 160, 0.12) 0%, transparent 25%),
-    repeating-linear-gradient(0deg, transparent 0px, transparent 40px, rgba(180, 180, 180, 0.07) 40px, rgba(180, 180, 180, 0.07) 80px),
-    repeating-linear-gradient(90deg, transparent 0px, transparent 40px, rgba(180, 180, 180, 0.07) 40px, rgba(180, 180, 180, 0.07) 80px),
-    repeating-linear-gradient(45deg, transparent 0px, transparent 60px, rgba(170, 170, 170, 0.05) 60px, rgba(170, 170, 170, 0.05) 120px),
-    repeating-linear-gradient(-45deg, transparent 0px, transparent 60px, rgba(170, 170, 170, 0.05) 60px, rgba(170, 170, 170, 0.05) 120px),
-    radial-gradient(circle at 25% 75%, rgba(150, 150, 150, 0.10) 0%, transparent 20%),
-    radial-gradient(circle at 75% 25%, rgba(150, 150, 150, 0.10) 0%, transparent 20%);
+    radial-gradient(circle at 15% 30%, rgba(212, 175, 55, 0.08) 0%, transparent 15%),
+    radial-gradient(circle at 85% 70%, rgba(212, 175, 55, 0.08) 0%, transparent 15%),
+    radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.05) 0%, transparent 25%),
+    repeating-linear-gradient(0deg, transparent 0px, transparent 40px, rgba(212, 175, 55, 0.03) 40px, rgba(212, 175, 55, 0.03) 80px),
+    repeating-linear-gradient(90deg, transparent 0px, transparent 40px, rgba(212, 175, 55, 0.03) 40px, rgba(212, 175, 55, 0.03) 80px),
+    repeating-linear-gradient(45deg, transparent 0px, transparent 60px, rgba(212, 175, 55, 0.02) 60px, rgba(212, 175, 55, 0.02) 120px),
+    repeating-linear-gradient(-45deg, transparent 0px, transparent 60px, rgba(212, 175, 55, 0.02) 60px, rgba(212, 175, 55, 0.02) 120px),
+    radial-gradient(circle at 25% 75%, rgba(212, 175, 55, 0.06) 0%, transparent 20%),
+    radial-gradient(circle at 75% 25%, rgba(212, 175, 55, 0.06) 0%, transparent 20%);
   background-size: 
     100% 100%,
     100% 100%,
